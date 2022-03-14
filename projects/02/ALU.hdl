@@ -39,8 +39,28 @@ CHIP ALU {
     OUT 
         out[16], // 16-bit output
         zr, // 1 if (out == 0), 0 otherwise
-        ng; // 1 if (out < 0),  0 otherwise
-
+        ng; // 1 if (out < 0),  0 otherwise        
     PARTS:
-   // Put you code here:
+        And16(a=x, b=false, out=zerox); 
+        Mux16(a=x, b=zerox, sel=zx, out=afterzx);
+        Not16(in=afterzx, out=negatex);
+        Mux16(a=afterzx, b=negatex, sel=nx, out=afternx);
+        
+        And16(a=y, b=false, out=zeroy); 
+        Mux16(a=y, b=zeroy, sel=zy, out=afterzy);
+        Not16(in=afterzy, out=negatey);
+        Mux16(a=afterzy, b=negatey, sel=ny, out=afterny);
+
+        And16(a=afternx, b=afterny, out=andxy);
+        Add16(a=afternx, b=afterny, out=addxy);
+        Mux16(a=andxy, b=addxy, sel=f, out=afterf);
+        
+        Not16(in=afterf, out=negateout);
+        Mux16(a=afterf, b=negateout, sel=no, out=out, out[0..7]=outfirst, out[8..15]=outsecond, out[15]=msb);
+
+        Or8Way(in=outfirst, out=orfirst);
+        Or8Way(in=outsecond, out=orsecond);
+        Or(a=orfirst, b=orsecond, out=negatezr); 
+        Not(in=negatezr, out=zr);
+        And(a=msb, b=msb, out=ng);        
 }
