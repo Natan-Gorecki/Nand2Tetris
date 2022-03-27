@@ -12,7 +12,7 @@
 CHIP Bit {
     IN in, load;
     OUT out;
-
     PARTS:
-    // Put your code here:
+    Mux(a=outdff, b=in, sel=load, out=outmutex);
+    DFF(in=outmutex, out=outdff, out=out);
 }
