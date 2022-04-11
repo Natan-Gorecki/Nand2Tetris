@@ -27,20 +27,13 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-    Not(in=address[14], out=not14Bit);
-    And(a=load, b=not14Bit, out=loadRam16K);
-    
-    Not(in=address[13], out=not13Bit);
-    And(a=address[14], b=not13Bit, out=isScreen);
-    And(a=load, b=isScreen, out=loadScreen);
-    
-    //invalid addresses are ignored
-    And(a=address[13], b=address[14], out=isKeyboard);
+    //invalid addresses are treated as Keyboard output
+    DMux4Way(in=load, sel=address[13..14], a=loadRamA, b=loadRamB, c=loadScreen, d=loadKeyboard);
+    Or(a=loadRamA, b=loadRamB, out=loadRam16K);
 
     RAM16K(in=in, load=loadRam16K, address=address[0..13], out=outRam16K);
     Screen(in=in, load=loadScreen, address=address[0..12], out=outScreen);
     Keyboard(out=outKeyboard);
 
-    Mux16(a=outRam16K, b=outScreen, sel=isScreen, out=outRamScreen);
-    Mux16(a=outRamScreen, b=outKeyboard, sel=isKeyboard, out=out);
+    Mux4Way16(a=outRam16K, b=outRam16K, c=outScreen, d=outKeyboard, sel=address[13..14], out=out);
 }
