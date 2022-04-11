@@ -27,5 +27,13 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    //invalid addresses are treated as Keyboard output
+    DMux4Way(in=load, sel=address[13..14], a=loadRamA, b=loadRamB, c=loadScreen, d=loadKeyboard);
+    Or(a=loadRamA, b=loadRamB, out=loadRam16K);
+
+    RAM16K(in=in, load=loadRam16K, address=address[0..13], out=outRam16K);
+    Screen(in=in, load=loadScreen, address=address[0..12], out=outScreen);
+    Keyboard(out=outKeyboard);
+
+    Mux4Way16(a=outRam16K, b=outRam16K, c=outScreen, d=outKeyboard, sel=address[13..14], out=out);
 }
