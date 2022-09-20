@@ -2,26 +2,15 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\main.cpp" />
-    <ClCompile Include="SymbolTable.cpp">
+    <ClCompile Include="..\CodeModule.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="Parser.cpp">
+    <ClCompile Include="..\Parser.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="CodeModule.cpp">
+    <ClCompile Include="..\SymbolTable.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Parser.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="SymbolTable.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="CodeModule.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">
@@ -30,5 +19,19 @@
     <Filter Include="Sources">
       <UniqueIdentifier>{337f33c0-48cc-4bdf-98d8-762066996132}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\CodeModule.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\InstructionType.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Parser.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SymbolTable.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

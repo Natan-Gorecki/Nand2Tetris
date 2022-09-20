@@ -19,15 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\CodeModule.cpp" />
     <ClCompile Include="..\main.cpp" />
-    <ClCompile Include="CodeModule.cpp" />
-    <ClCompile Include="Parser.cpp" />
-    <ClCompile Include="SymbolTable.cpp" />
+    <ClCompile Include="..\Parser.cpp" />
+    <ClCompile Include="..\SymbolTable.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CodeModule.h" />
-    <ClInclude Include="Parser.h" />
-    <ClInclude Include="SymbolTable.h" />
+    <ClInclude Include="..\CodeModule.h" />
+    <ClInclude Include="..\InstructionType.h" />
+    <ClInclude Include="..\Parser.h" />
+    <ClInclude Include="..\SymbolTable.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
