@@ -1,6 +1,10 @@
 #pragma once
+#include <map>
 #include <string>
 
+/// <summary>
+/// Resolves symbolic references into actual addresses
+/// </summary>
 class SymbolTable
 {
 public:
@@ -22,5 +26,8 @@ public:
 	/// Creates a new empty symbol table.
 	/// </summary>
 	SymbolTable();
+
+private:
+	std::map<std::string, int> symbol_table;
 };
 
