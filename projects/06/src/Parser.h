@@ -1,7 +1,12 @@
 #pragma once
+#include <fstream>
 #include <string>
 #include "InstructionType.h"
 
+/// <summary>
+/// The Parser encapsulates access to the input assembly code. In particular, it provides a convenient means for advancing through the source code,
+/// skipping comments and white space, and breaking each symbolic instruction into its underlying components.
+/// </summary>
 class Parser
 {
 public:
@@ -46,6 +51,23 @@ public:
 	/// <summary>
 	/// Opens the input file/stream and gets ready to parse it.
 	/// </summary>
-	Parser(std::ifstream inputStream);
+	Parser(std::ifstream* inputStream);
+
+	/// <summary>
+	/// Closes the input file/stream
+	/// </summary>
+	~Parser();
+
+private:
+	std::ifstream* input_stream = NULL;
+	std::string current_line = "";
+	std::string next_line = "";
+
+	InstructionType instruction_type = InstructionType::UNDEFINED;
+
+	std::string f_symbol = "";
+	std::string f_dest= "";
+	std::string f_comp = "";
+	std::string f_jump = "";
 };
 
