@@ -51,7 +51,7 @@ public:
 	/// <summary>
 	/// Opens the input file/stream and gets ready to parse it.
 	/// </summary>
-	Parser(std::ifstream* inputStream);
+	Parser(std::string filename);
 
 	/// <summary>
 	/// Closes the input file/stream
@@ -61,7 +61,6 @@ public:
 private:
 	std::ifstream* input_stream = NULL;
 	std::string current_line = "";
-	std::string next_line = "";
 
 	InstructionType instruction_type = InstructionType::UNDEFINED;
 

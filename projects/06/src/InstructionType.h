@@ -17,5 +17,9 @@ enum class InstructionType
 	/// <summary>
 	/// L_INSTRUCTION for (xxx), where xxx is a symbol.
 	/// </summary>
-	L_INSTRUCTION = 3
+	L_INSTRUCTION = 3,
+	/// <summary>
+	/// Comment or empty line
+	/// </summary>
+	COMMENT = 4
 };

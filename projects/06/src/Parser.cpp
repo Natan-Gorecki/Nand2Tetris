@@ -30,26 +30,7 @@ inline std::string& trim(std::string& s, const char* t = whitespace_chars)
 /// </summary>
 bool Parser::hasMoreLines()
 {
-	if (next_line != "")
-		return true;
-	
-	while (std::getline(*input_stream, next_line))
-	{
-		// remove comments
-		int comment_pos = next_line.find("//");
-		if (comment_pos != std::string::npos)
-		{
-			next_line = comment_pos == 0 ? "" : next_line.substr(0, comment_pos);
-		}
-
-		// trim
-		next_line = trim(next_line);
-
-		if (next_line != "")
-			break;
-	}
-
-	return next_line != "";
+	return input_stream->peek() != EOF;
 }
 
 /// <summary>
@@ -60,21 +41,30 @@ bool Parser::hasMoreLines()
 /// </summary>
 void Parser::advance()
 {
-	if (next_line == "" && !hasMoreLines())
-		return;
-
-	// hasMoreLines() should store first non comment line
-	if (next_line == "")
-		return;
-
 	// initialize fields
-	current_line = next_line;
-	next_line = "";
+	current_line = "";
 	instruction_type = InstructionType::UNDEFINED;
 	f_symbol = "";
 	f_dest = "";
 	f_comp = "";
 	f_jump = "";
+
+	if (!std::getline(*input_stream, current_line))
+		return;
+
+	// remove comments
+	int comment_pos = current_line.find("//");
+	if (comment_pos != std::string::npos)
+	{
+		current_line = comment_pos == 0 ? "" : current_line.substr(0, comment_pos);
+	}
+	current_line = trim(current_line);
+
+	if (current_line == "")
+	{
+		instruction_type = InstructionType::COMMENT;
+		return;
+	}
 
 	std::regex a_regex("@\\w+"); // A_INSTRUCTION for @xxx
 	std::regex c_regex("([ADM]={1,3})?([A-Z0-1-!+&|]{1,3})(;[A-Z]{1,3})?"); // C_INSTRUCTION for dest=comp;jump
@@ -154,10 +144,9 @@ std::string Parser::jump()
 /// <summary>
 /// Opens the input file/stream and gets ready to parse it.
 /// </summary>
-Parser::Parser(std::ifstream* inputStream)
+Parser::Parser(std::string filename)
 {
-	input_stream = inputStream;
-	//input_stream->open();
+	input_stream = new std::ifstream(filename);
 }
 
 /// <summary>
@@ -166,4 +155,6 @@ Parser::Parser(std::ifstream* inputStream)
 Parser::~Parser()
 {
 	input_stream->close();
+	delete input_stream;
+	input_stream = NULL;
 }
