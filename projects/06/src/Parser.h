@@ -22,6 +22,10 @@ public:
 	/// </summary>
 	void advance();
 	/// <summary>
+	/// Returns the current line address, where only A_INSTRUCTION and C_INSTRUCTION are counted
+	/// </summary>
+	int lineNumber();
+	/// <summary>
 	/// Returns the type of the current instruction.
 	/// </summary>
 	InstructionType instructionType();
@@ -61,6 +65,7 @@ public:
 private:
 	std::ifstream* input_stream = NULL;
 	std::string current_line = "";
+	int line_number = -1;
 
 	InstructionType instruction_type = InstructionType::UNDEFINED;
 

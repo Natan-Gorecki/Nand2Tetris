@@ -74,11 +74,14 @@ void Parser::advance()
 	if (std::regex_match(current_line.c_str(), match, a_regex))
 	{
 		instruction_type = InstructionType::A_INSTRUCTION;
+		line_number++;
+
 		f_symbol = current_line.substr(1, current_line.length() - 1);
 	}
 	else if (std::regex_match(current_line.c_str(), match, c_regex))
 	{
 		instruction_type = InstructionType::C_INSTRUCTION;
+		line_number++;
 		
 		int equal_sign_pos = current_line.find("=");
 		f_dest = equal_sign_pos != std::string::npos ? current_line.substr(0, equal_sign_pos) : "";
@@ -95,6 +98,14 @@ void Parser::advance()
 		instruction_type = InstructionType::L_INSTRUCTION;
 		f_symbol = current_line.substr(1, current_line.length() - 2);
 	}
+}
+
+/// <summary>
+/// Returns the current line address, where only A_INSTRUCTION and C_INSTRUCTION are counted
+/// </summary>
+int Parser::lineNumber()
+{
+	return line_number;
 }
 
 /// <summary>
