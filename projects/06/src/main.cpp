@@ -1,5 +1,8 @@
 #include <bitset>
 #include <iostream>
+#include <string>
+#include <windows.h>
+
 #include "CodeModule.h"
 #include "Parser.h"
 #include "SymbolTable.h"
@@ -17,7 +20,12 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    Parser* parser = new Parser(std::string(argv[1]));
+    CHAR buffer[MAX_PATH] = { 0 };
+    GetModuleFileNameA(NULL, buffer, MAX_PATH);
+    std::string::size_type directorySize = std::string(buffer).find_last_of("\\");
+    std::string directoryPath = std::string(buffer).substr(0, directorySize + 1);
+
+    Parser* parser = new Parser(directoryPath + std::string(argv[1]));
     SymbolTable* symbolTable = new SymbolTable();
 
     // map symbols
@@ -58,8 +66,8 @@ int main(int argc, char* argv[])
 
     // convert assembler instruction to machine code
     delete parser;
-    parser = new Parser(std::string(argv[1]));
-    std::ofstream* outputFile = new std::ofstream("Prog.hack");
+    parser = new Parser(directoryPath + std::string(argv[1]));
+    std::ofstream* outputFile = new std::ofstream(directoryPath + "Prog.hack");
     while (parser->hasMoreLines())
     {
         parser->advance();
@@ -93,20 +101,17 @@ int main(int argc, char* argv[])
                 return EXIT_FAILURE;
             }
 
-            std::string binary = std::bitset<8>(128).to_string();
+            std::string binary = std::bitset<16>(symbolAddress).to_string();
             *outputFile << binary << "\n";
             continue;
         }
         else if (parser->instructionType() == InstructionType::C_INSTRUCTION)
         {
-            std::string dest_part = CodeModule::dest(parser->dest());
-            std::string comp_part = CodeModule::dest(parser->comp());
-            std::string jump_part = CodeModule::dest(parser->jump());
-            
             *outputFile
-                << dest_part << (dest_part != "" ? "=" : "")
-                << comp_part
-                << (jump_part != "" ? ";" : "") << jump_part
+                << "111"
+                << CodeModule::comp(parser->comp())
+                << CodeModule::dest(parser->dest())
+                << CodeModule::jump(parser->jump())
                 << "\n";
         }
     }
