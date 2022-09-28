@@ -20,12 +20,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\CodeModule.cpp" />
+    <ClCompile Include="..\HackAssembler.cpp" />
     <ClCompile Include="..\main.cpp" />
     <ClCompile Include="..\Parser.cpp" />
     <ClCompile Include="..\SymbolTable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\CodeModule.h" />
+    <ClInclude Include="..\HackAssembler.h" />
     <ClInclude Include="..\InstructionType.h" />
     <ClInclude Include="..\Parser.h" />
     <ClInclude Include="..\SymbolTable.h" />

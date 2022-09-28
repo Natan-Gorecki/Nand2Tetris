@@ -1,6 +1,6 @@
-#include "Parser.h"
 #include <regex>
-
+#include <shlwapi.h>
+#include "Parser.h"
 
 const char* whitespace_chars = " \t\n\r\f\v";
 
@@ -155,9 +155,23 @@ std::string Parser::jump()
 /// <summary>
 /// Opens the input file/stream and gets ready to parse it.
 /// </summary>
-Parser::Parser(std::string filename)
+Parser::Parser(std::string filename, std::string directoryPath)
 {
-	input_stream = new std::ifstream(filename);
+	BOOL isRelative = PathIsRelativeA(filename.c_str());
+
+	if (isRelative)
+	{
+		input_stream = new std::ifstream(directoryPath + filename);
+	}
+	else
+	{
+		input_stream = new std::ifstream(filename);
+	}
+
+	if (!input_stream->is_open())
+	{
+		throw std::runtime_error("Cannot open " + filename + " file");
+	}
 }
 
 /// <summary>
@@ -165,7 +179,10 @@ Parser::Parser(std::string filename)
 /// </summary>
 Parser::~Parser()
 {
-	input_stream->close();
-	delete input_stream;
-	input_stream = NULL;
+	if (input_stream)
+	{
+		input_stream->close();
+		delete input_stream;
+		input_stream = NULL;
+	}
 }

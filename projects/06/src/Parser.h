@@ -55,7 +55,7 @@ public:
 	/// <summary>
 	/// Opens the input file/stream and gets ready to parse it.
 	/// </summary>
-	Parser(std::string filename);
+	Parser(std::string filename, std::string directoryPath);
 
 	/// <summary>
 	/// Closes the input file/stream

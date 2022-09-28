@@ -11,6 +11,9 @@
     <ClCompile Include="..\SymbolTable.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="..\HackAssembler.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">
@@ -31,6 +34,9 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\SymbolTable.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\HackAssembler.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
