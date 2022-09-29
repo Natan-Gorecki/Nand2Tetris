@@ -20,16 +20,10 @@ void HackAssembler::searchSymbols()
     SAFE_DELETE(parser);
     parser = new Parser(input_file, directory_path);
 
-    int variableAddress = 16;
+    
     while (parser->hasMoreLines())
     {
         parser->advance();
-
-        if (parser->instructionType() == InstructionType::COMMENT
-            || parser->instructionType() == InstructionType::C_INSTRUCTION)
-        {
-            continue;
-        }
 
         if (parser->instructionType() == InstructionType::L_INSTRUCTION)
         {
@@ -39,18 +33,6 @@ void HackAssembler::searchSymbols()
             }
 
             symbol_table->addEntry(parser->symbol(), parser->lineNumber() + 1);
-        }
-        else if (parser->instructionType() == InstructionType::A_INSTRUCTION)
-        {
-            if (isNumber(parser->symbol()))
-            {
-                continue;
-            }
-
-            if (!symbol_table->contains(parser->symbol()))
-            {
-                symbol_table->addEntry(parser->symbol(), variableAddress++);
-            }
         }
     }
 }
@@ -80,6 +62,7 @@ void HackAssembler::assemblerToMachineCode()
         throw std::runtime_error("Cannot find or open " + output_file + " file");
     }
     
+    int variableAddress = 16;
     while (parser->hasMoreLines())
     {
         parser->advance();
@@ -99,6 +82,11 @@ void HackAssembler::assemblerToMachineCode()
             }
             else
             {
+                if (!symbol_table->contains(parser->symbol()))
+                {
+                    symbol_table->addEntry(parser->symbol(), variableAddress++);
+                }
+
                 symbolAddress = symbol_table->getAddress(parser->symbol());
                 if (symbolAddress == -1)
                 {
