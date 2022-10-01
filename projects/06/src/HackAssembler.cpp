@@ -27,6 +27,11 @@ void HackAssembler::searchSymbols()
 
         if (parser->instructionType() == InstructionType::L_INSTRUCTION)
         {
+            if (std::isdigit(parser->symbol()[0]))
+            {
+                throw std::runtime_error("Error: label symbol " + parser->symbol() + " starts with digit");
+            }
+
             if (symbol_table->contains(parser->symbol()))
             {
                 throw std::runtime_error("Error: label symbol " + parser->symbol() + " is duplicated");
@@ -76,9 +81,16 @@ void HackAssembler::assemblerToMachineCode()
         if (parser->instructionType() == InstructionType::A_INSTRUCTION)
         {
             int symbolAddress = -1;
-            if (isNumber(parser->symbol()))
+            if (std::isdigit(parser->symbol()[0]))
             {
-                symbolAddress = std::stoi(parser->symbol());
+                if (isNumber(parser->symbol()))
+                {
+                    symbolAddress = std::stoi(parser->symbol());
+                }
+                else
+                {
+                    throw std::runtime_error("Error: number " + parser->symbol() + " has invalid format");
+                }
             }
             else
             {

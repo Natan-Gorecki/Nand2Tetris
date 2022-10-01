@@ -66,9 +66,9 @@ void Parser::advance()
 		return;
 	}
 
-	std::regex a_regex("@\\w+"); // A_INSTRUCTION for @xxx
+	std::regex a_regex("@[\\w.$:]+"); // A_INSTRUCTION for @xxx
 	std::regex c_regex("([ADM]{1,3}=)?([A-Z0-1-!+&|]{1,3})(;[A-Z]{1,3})?"); // C_INSTRUCTION for dest=comp;jump
-	std::regex l_regex("\\(\\w+\\)"); // L_INSTRUCTION for (xxx)
+	std::regex l_regex("\\([\\w.$:]+\\)"); // L_INSTRUCTION for (xxx)
 	std::cmatch match;
 
 	if (std::regex_match(current_line.c_str(), match, a_regex))
