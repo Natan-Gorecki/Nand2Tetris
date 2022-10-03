@@ -155,19 +155,9 @@ std::string Parser::jump()
 /// <summary>
 /// Opens the input file/stream and gets ready to parse it.
 /// </summary>
-Parser::Parser(std::string filename, std::string directoryPath)
+Parser::Parser(std::string filename)
 {
-	BOOL isRelative = PathIsRelativeA(filename.c_str());
-
-	if (isRelative)
-	{
-		input_stream = new std::ifstream(directoryPath + filename);
-	}
-	else
-	{
-		input_stream = new std::ifstream(filename);
-	}
-
+	input_stream = new std::ifstream(filename);
 	if (!input_stream->is_open())
 	{
 		throw std::runtime_error("Cannot open " + filename + " file");
