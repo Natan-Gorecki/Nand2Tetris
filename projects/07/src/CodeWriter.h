@@ -1,4 +1,5 @@
 #pragma once
+#include <fstream>
 #include <string>
 #include "ECommandType.h"
 
@@ -7,6 +8,17 @@
 /// </summary>
 class CodeWriter
 {
+public:
+	/// <summary>
+	/// Opens the output file and gets ready to write into it
+	/// </summary>
+	/// <param name="filename">Name of the output file</param>
+	CodeWriter(std::string filename, bool generateComment);
+	/// <summary>
+	/// Closes the output file
+	///</summary>
+	~CodeWriter();
+
 public:
 	/// <summary>
 	/// Writes to the output file the assembly code that implements the given arithmetic-logical command.
@@ -21,14 +33,15 @@ public:
 	/// <param name="index">Numeric address</param>
 	void writePushPop(ECommandType commandType, std::string segment, int index);
 
-public:
-	/// <summary>
-	/// Opens the output file and gets ready to write into it
-	/// </summary>
-	/// <param name="filename">Name of the output file</param>
-	CodeWriter(std::string filename);
-	/// <summary>
-	/// Closes the output file
-	///</summary>
-	~CodeWriter();
+private:
+	void initialCode();
+	void writePush(std::string segment, int index);
+	void writePop(std::string segment, int index);
+	int getUniqNumber();
+
+private:
+	std::ofstream* output_file = NULL;
+	bool generate_comment = false;
+
+	int uniq_number = 1;
 };
