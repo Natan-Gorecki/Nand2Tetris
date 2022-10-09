@@ -1,4 +1,5 @@
 #pragma once
+#include <fstream>
 #include <string>
 #include "ECommandType.h"
 
@@ -8,6 +9,17 @@
 /// and providing convenient access to these components.
 /// </summary>
 class Parser {
+public:
+	/// <summary>
+	/// Opens the input file and gets ready to parse it.
+	/// </summary>
+	/// <param name="filename">Name of the input file</param>
+	Parser(std::string filename);
+	/// <summary>
+	/// Closes the input file and cleans up.
+	/// </summary>
+	~Parser();
+
 public:
 	/// <summary>
 	/// Are there more lines in the input?
@@ -36,14 +48,11 @@ public:
 	/// </summary>
 	int arg2();
 
-public:
-	/// <summary>
-	/// Opens the input file and gets ready to parse it.
-	/// </summary>
-	/// <param name="filename">Name of the input file</param>
-	Parser(std::string filename);
-	/// <summary>
-	/// Closes the input file and cleans up.
-	/// </summary>
-	~Parser();
+private:
+	std::ifstream* input_stream = NULL;
+	std::string current_line = "";
+
+	ECommandType f_command_type = ECommandType::UNDEFINED;
+	std::string f_arg1 = "";
+	int f_arg2 = -1;
 };

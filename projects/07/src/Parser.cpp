@@ -1,11 +1,87 @@
+#include <iterator>
+#include <sstream>
+#include <string>
+#include <vector>
+
 #include "Parser.h"
+
+#pragma region Auxiliary functions
+const char* whitespace_chars = " \t\n\r\f\v";
+
+// trim from end of string (right)
+inline std::string& rtrim(std::string& s, const char* t = whitespace_chars)
+{
+	s.erase(s.find_last_not_of(t) + 1);
+	return s;
+}
+
+// trim from beginning of string (left)
+inline std::string& ltrim(std::string& s, const char* t = whitespace_chars)
+{
+	s.erase(0, s.find_first_not_of(t));
+	return s;
+}
+
+// trim from both ends of string (right then left)
+inline std::string& trim(std::string& s, const char* t = whitespace_chars)
+{
+	return ltrim(rtrim(s, t), t);
+}
+
+template <typename Out>
+void split(const std::string& s, char delim, Out result)
+{
+	std::istringstream iss(s);
+	std::string item;
+	while (std::getline(iss, item, delim))
+	{
+		if (!item.empty())
+		{
+			*result++ = item;
+		}
+	}
+}
+
+std::vector<std::string> split(const std::string& s, char delim)
+{
+	std::vector<std::string> elems;
+	split(s, delim, std::back_inserter(elems));
+	return elems;
+}
+#pragma endregion
+
+/// <summary>
+/// Opens the input file and gets ready to parse it.
+/// </summary>
+/// <param name="filename">Name of the input file</param>
+Parser::Parser(std::string filename)
+{
+	input_stream = new std::ifstream(filename);
+	if (!input_stream->is_open())
+	{
+		throw std::runtime_error("Cannot open " + filename + " file");
+	}
+}
+
+/// <summary>
+/// Closes the input file and cleans up.
+/// </summary>
+Parser::~Parser()
+{
+	if (input_stream)
+	{
+		input_stream->close();
+		delete input_stream;
+		input_stream = NULL;
+	}
+}
 
 /// <summary>
 /// Are there more lines in the input?
 /// </summary>
 bool Parser::hasMoreLines() 
 {
-	return false;
+	return this->input_stream->peek() != EOF;
 }
 
 /// <summary>
@@ -15,7 +91,54 @@ bool Parser::hasMoreLines()
 /// </summary>
 void Parser::advance()
 {
+	//initialize fields
+	current_line = "";
+	f_command_type = ECommandType::UNDEFINED;
+	f_arg1 = "";
+	f_arg2 = -1;
 
+	if (!std::getline(*input_stream, current_line))
+		return;
+
+	// remove comments
+	int comment_pos = current_line.find("//");
+	if (comment_pos != std::string::npos)
+	{
+		current_line = comment_pos == 0 ? "" : current_line.substr(0, comment_pos);
+	}
+	current_line = trim(current_line);
+
+	if (current_line == "")
+	{
+		f_command_type = ECommandType::COMMENT;
+		return;
+	}
+
+	std::vector<std::string> commandArgs = split(current_line, ' ');
+	std::string command = commandArgs[0];
+
+	if (command == "add" || command == "sub" || command == "neg"
+		|| command == "eq" || command == "gt" || command == "lt"
+		|| command == "and" || command == "or" || command == "not")
+	{
+		f_arg1 == command;
+		f_command_type = ECommandType::C_ARITHMETIC;
+	}
+	else if (command == "push" || command == "pop")
+	{
+		if (commandArgs.size() != 3)
+		{
+			throw std::runtime_error("Invalid push/pop command: " + current_line + ".");
+		}
+		
+		f_command_type = command == "push" ? ECommandType::C_PUSH : ECommandType::C_POP;
+		f_arg1 = commandArgs[1];
+		f_arg2 = std::stoi(commandArgs[2]);
+	}
+	else
+	{
+		throw std::runtime_error("Unknown " + command + " command.");
+	}
 }
 
 /// <summary>
@@ -24,7 +147,7 @@ void Parser::advance()
 /// </summary>
 ECommandType Parser::commandType()
 {
-	return ECommandType::UNDEFINED;
+	return f_command_type;
 }
 
 /// <summary>
@@ -34,7 +157,7 @@ ECommandType Parser::commandType()
 /// </summary>
 std::string Parser::arg1()
 {
-	return std::string();
+	return f_arg1;
 }
 
 /// <summary>
@@ -43,22 +166,5 @@ std::string Parser::arg1()
 /// </summary>
 int Parser::arg2()
 {
-	return -1;
-}
-
-/// <summary>
-/// Opens the input file and gets ready to parse it.
-/// </summary>
-/// <param name="filename">Name of the input file</param>
-Parser::Parser(std::string filename)
-{
-
-}
-
-/// <summary>
-/// Closes the input file and cleans up.
-/// </summary>
-Parser::~Parser()
-{
-
+	return f_arg2;
 }
