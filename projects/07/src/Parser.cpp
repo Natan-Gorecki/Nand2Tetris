@@ -121,7 +121,7 @@ void Parser::advance()
 		|| command == "eq" || command == "gt" || command == "lt"
 		|| command == "and" || command == "or" || command == "not")
 	{
-		f_arg1 == command;
+		f_arg1 = command;
 		f_command_type = ECommandType::C_ARITHMETIC;
 	}
 	else if (command == "push" || command == "pop")

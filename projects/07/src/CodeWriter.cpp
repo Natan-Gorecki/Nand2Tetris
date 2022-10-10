@@ -27,6 +27,7 @@ CodeWriter::~CodeWriter()
 {
     if (output_file)
     {
+        this->finalCode();
         output_file->close();
         delete output_file;
         output_file = NULL;
@@ -39,7 +40,10 @@ CodeWriter::~CodeWriter()
 /// <param name="command">Arithmetic-logical command</param>
 void CodeWriter::writeArithmetic(std::string command)
 {
-    *output_file << generate_comment ? "// " + command + "\n" : "";
+    if (generate_comment)
+    {
+        *output_file << "\n// " << command << "\n";
+    }
 
     if (command == "add")
     {
@@ -92,7 +96,7 @@ D;JEQ
 
 (AFTER_CONDITION.1))";
         std::string eqString(eqCommand);
-        eqString = std::regex_replace(eqString, std::regex("AFTER_CONDITION.1"), "AFTER_CONDITION." + getUniqNumber());
+        eqString = std::regex_replace(eqString, std::regex("AFTER_CONDITION\\.1"), std::string("AFTER_CONDITION.") + std::to_string(getUniqNumber()));
         *output_file << eqString << "\n";
     }
     else if (command == "gt")
@@ -118,7 +122,7 @@ D;JGT
 
 (AFTER_CONDITION.1))";
         std::string gtString(gtCommand);
-        gtString = std::regex_replace(gtString, std::regex("AFTER_CONDITION.1"), "AFTER_CONDITION." + getUniqNumber());
+        gtString = std::regex_replace(gtString, std::regex("AFTER_CONDITION\\.1"), std::string("AFTER_CONDITION.") + std::to_string(getUniqNumber()));
         *output_file << gtString << "\n";
     }
     else if (command == "lt")
@@ -144,7 +148,7 @@ D;JLT
 
 (AFTER_CONDITION.1))";
         std::string ltString(ltCommand);
-        ltString = std::regex_replace(ltString, std::regex("AFTER_CONDITION.1"), "AFTER_CONDITION." + getUniqNumber());
+        ltString = std::regex_replace(ltString, std::regex("AFTER_CONDITION\\.1"), std::string("AFTER_CONDITION.") + std::to_string(getUniqNumber()));
         *output_file << ltString << "\n";
     }
     else if (command == "and")
@@ -189,6 +193,13 @@ M=!M)";
 /// <param name="index">Numeric address</param>
 void CodeWriter::writePushPop(ECommandType commandType, std::string segment, int index)
 {
+    std::string pushPop = commandType == ECommandType::C_PUSH ? "push" : "pop";
+    if (generate_comment)
+    {
+        *output_file << "\n// " << pushPop << " " << segment << " " << index << "\n";
+    }
+    
+
     if (commandType == ECommandType::C_PUSH)
     {
         this->writePush(segment, index);
@@ -205,9 +216,13 @@ void CodeWriter::writePushPop(ECommandType commandType, std::string segment, int
 
 void CodeWriter::initialCode()
 {
-    const char* eqCommand =
-R"((TRUE_CONDITION)
-@-1
+    const char* initCode =
+R"(@START
+0;JMP
+
+(TRUE_CONDITION)
+@1
+A=-A
 D=A
 @SP
 A=M
@@ -215,7 +230,9 @@ M=D
 @SP
 M=M+1
 @R13
+A=M
 0;JMP
+
 (FALSE_CONDITION)
 @0
 D=A
@@ -225,8 +242,26 @@ M=D
 @SP
 M=M+1
 @R13
+A=M
+0;JMP
+
+(START)
+@256
+D=A
+@SP
+M=D)";
+    *output_file << initCode << "\n";
+}
+
+void CodeWriter::finalCode()
+{
+    const char* finalCommand =
+R"(
+(END)
+@END
 0;JMP)";
-    *output_file << eqCommand << "\n";
+
+    *output_file << finalCommand << "\n";
 }
 
 void CodeWriter::writePush(std::string segment, int index)
@@ -237,7 +272,7 @@ void CodeWriter::writePush(std::string segment, int index)
 R"(@INDEX
 D=A
 @LCL
-A=A+D
+A=M+D
 D=M
 
 @SP
@@ -256,7 +291,7 @@ M=M+1)";
 R"(@INDEX
 D=A
 @ARG
-A=A+D
+A=M+D
 D=M
 
 @SP
@@ -275,7 +310,7 @@ M=M+1)";
 R"(@INDEX
 D=A
 @THIS
-A=A+D
+A=M+D
 D=M
 
 @SP
@@ -294,7 +329,7 @@ M=M+1)";
 R"(@INDEX
 D=A
 @THAT
-A=A+D
+A=M+D
 D=M
 
 @SP
@@ -415,7 +450,7 @@ void CodeWriter::writePop(std::string segment, int index)
 R"(@INDEX
 D=A
 @LCL
-D=A+D
+D=M+D
 
 @R14
 M=D
@@ -437,7 +472,7 @@ M=D)";
 R"(@INDEX
 D=A
 @ARG
-D=A+D
+D=M+D
 
 @R14
 M=D
@@ -459,7 +494,7 @@ M=D)";
 R"(@INDEX
 D=A
 @THIS
-D=A+D
+D=M+D
 
 @R14
 M=D
@@ -481,7 +516,7 @@ M=D)";
 R"(@INDEX
 D=A
 @THAT
-D=A+D
+D=M+D
 
 @R14
 M=D
@@ -557,7 +592,7 @@ AM=M-1
 D=M
 
 @Foo.INDEX
-D=M)";
+M=D)";
         std::string popString(popCommand);
         popString = std::regex_replace(popString, std::regex("INDEX"), std::to_string(index));
         *output_file << popString << "\n";

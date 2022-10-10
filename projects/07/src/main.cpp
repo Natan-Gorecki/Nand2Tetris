@@ -28,8 +28,8 @@ int main(int argc, char* argv[])
         std::string inputFile, outputFile;
         if (filePath.is_relative())
         {
-            inputFile = std::filesystem::current_path().string() + filePath.string();
-            outputFile = std::filesystem::current_path().string() + filePath.replace_extension(".asm").string();
+            inputFile = std::filesystem::current_path().string() + "\\" + filePath.string();
+            outputFile = std::filesystem::current_path().string() + "\\" + filePath.replace_extension(".asm").string();
         }
         else
         {
@@ -37,9 +37,33 @@ int main(int argc, char* argv[])
             outputFile = filePath.replace_extension(".asm").string();
         }
 
-        CodeWriter* codeWriter = new CodeWriter(outputFile, true);
-        Parser* parser = new Parser(inputFile);
+        CodeWriter codeWriter = CodeWriter(outputFile, true);
+        Parser parser = Parser(inputFile);
 
+        auto startTime = std::chrono::high_resolution_clock::now();
+        while (parser.hasMoreLines())
+        {
+            parser.advance();
+            if (parser.commandType() == ECommandType::UNDEFINED)
+            {
+                throw std::runtime_error("Unknown command.");
+            }
+            else if (parser.commandType() == ECommandType::COMMENT)
+            {
+                continue;
+            }
+            else if (parser.commandType() == ECommandType::C_ARITHMETIC)
+            {
+                codeWriter.writeArithmetic(parser.arg1());
+            }
+            else if (parser.commandType() == ECommandType::C_PUSH || parser.commandType() == ECommandType::C_POP)
+            {
+                codeWriter.writePushPop(parser.commandType(), parser.arg1(), parser.arg2());
+            }
+        }
+        auto endTime = std::chrono::high_resolution_clock::now();
+
+        std::cout << "Created assembly code " << outputFile << " file in " << (endTime - startTime) / std::chrono::milliseconds(1) << " ms.\n";
         return EXIT_SUCCESS;
     }
     catch (const std::runtime_error& error)

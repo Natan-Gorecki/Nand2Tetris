@@ -35,6 +35,7 @@ public:
 
 private:
 	void initialCode();
+	void finalCode();
 	void writePush(std::string segment, int index);
 	void writePop(std::string segment, int index);
 	int getUniqNumber();
