@@ -25,7 +25,7 @@ public:
 	/// <summary>
 	/// Creates parser, symbol table and handles file paths
 	/// </summary>
-	HackAssembler(std::string inputFile, std::string outputFile);
+	HackAssembler(std::string inputFile);
 	/// <summary>
 	/// Releases allocated memory
 	/// </summary>
@@ -37,6 +37,5 @@ private:
 
 	std::string input_file;
 	std::string output_file;
-	std::string directory_path;
 };
 

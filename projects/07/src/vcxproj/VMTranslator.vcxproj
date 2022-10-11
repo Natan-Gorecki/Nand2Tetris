@@ -18,25 +18,11 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\CodeModule.cpp" />
-    <ClCompile Include="..\HackAssembler.cpp" />
-    <ClCompile Include="..\main.cpp" />
-    <ClCompile Include="..\Parser.cpp" />
-    <ClCompile Include="..\SymbolTable.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\CodeModule.h" />
-    <ClInclude Include="..\HackAssembler.h" />
-    <ClInclude Include="..\InstructionType.h" />
-    <ClInclude Include="..\Parser.h" />
-    <ClInclude Include="..\SymbolTable.h" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{03ec01ab-6b73-49ba-a2a2-19d80c6f440d}</ProjectGuid>
-    <RootNamespace>HackAssembler</RootNamespace>
+    <ProjectGuid>{8e0606bc-ce12-4bc7-8155-c4d65af7c833}</ProjectGuid>
+    <RootNamespace>VMTranslator</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -84,18 +70,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -156,6 +130,16 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\CodeWriter.cpp" />
+    <ClCompile Include="..\main.cpp" />
+    <ClCompile Include="..\Parser.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\CodeWriter.h" />
+    <ClInclude Include="..\ECommandType.h" />
+    <ClInclude Include="..\Parser.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

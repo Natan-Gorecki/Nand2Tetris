@@ -4,15 +4,15 @@
 
 int main(int argc, char* argv[])
 {
-    if (argc != 3)
+    if (argc != 2)
     {
-        std::cout << "Usage: HackAssembler InputFile.asm OutputFile.hack\n";
+        std::cout << "Usage: HackAssembler InputFile.asm\n";
         return EXIT_FAILURE;
     }
 
     try
     {
-        HackAssembler hackAssembler = HackAssembler(argv[1], argv[2]);
+        HackAssembler hackAssembler = HackAssembler(argv[1]);
         
         auto startTime = std::chrono::high_resolution_clock::now();
         hackAssembler.searchSymbols();

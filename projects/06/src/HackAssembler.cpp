@@ -1,9 +1,6 @@
 #include <bitset>
-#include <shlwapi.h>
-#include <windows.h>
+#include <filesystem> //C++17
 #include "HackAssembler.h"
-
-#pragma comment(lib, "Shlwapi.lib")
 
 #define SAFE_DELETE(x) if(x) { delete x; x = NULL; }
 
@@ -18,8 +15,7 @@ bool isNumber(std::string text)
 void HackAssembler::searchSymbols()
 {
     SAFE_DELETE(parser);
-    parser = new Parser(input_file, directory_path);
-
+    parser = new Parser(input_file);
     
     while (parser->hasMoreLines())
     {
@@ -48,20 +44,9 @@ void HackAssembler::searchSymbols()
 void HackAssembler::assemblerToMachineCode()
 {
     SAFE_DELETE(parser);
-    parser = new Parser(input_file, directory_path);
+    parser = new Parser(input_file);
 
-    BOOL isRelative = PathIsRelativeA(output_file.c_str());
-    std::ofstream* outputStream = NULL;
-
-    if (isRelative)
-    {
-        outputStream = new std::ofstream(directory_path + output_file);
-    }
-    else
-    {
-        outputStream = new std::ofstream(output_file);
-    }
-
+    std::ofstream* outputStream = new std::ofstream(output_file);
     if (!outputStream->is_open())
     {
         throw std::runtime_error("Cannot find or open " + output_file + " file");
@@ -130,17 +115,26 @@ void HackAssembler::assemblerToMachineCode()
 /// <summary>
 /// Creates parser, symbol table and handles file paths
 /// </summary>
-HackAssembler::HackAssembler(std::string inputFile, std::string outputFile)
+HackAssembler::HackAssembler(std::string inputFile)
 {
     this->symbol_table = new SymbolTable();
 
-    CHAR buffer[MAX_PATH] = { 0 };
-    GetModuleFileNameA(NULL, buffer, MAX_PATH);
-    std::string::size_type directorySize = std::string(buffer).find_last_of("\\");
-    this->directory_path = std::string(buffer).substr(0, directorySize + 1);
+    std::filesystem::path filePath = inputFile;
+    if (filePath.extension() != ".asm")
+    {
+        throw std::runtime_error("Error: File " + inputFile + " doesn't have .asm extension");
+    }
 
-    this->input_file = inputFile;
-    this->output_file = outputFile;
+    if (filePath.is_relative()) 
+    {
+        this->input_file = std::filesystem::current_path().string() + "\\" + filePath.string();
+        this->output_file = std::filesystem::current_path().string() + "\\" + filePath.replace_extension(".hack").string();
+    }
+    else
+    {
+        this->input_file = filePath.string();
+        this->output_file = filePath.replace_extension(".hack").string();
+    }
 }
 
 /// <summary>
