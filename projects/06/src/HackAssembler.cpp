@@ -1,10 +1,6 @@
 #include <bitset>
-#include <shlwapi.h>
 #include <filesystem> //C++17
-#include <windows.h>
 #include "HackAssembler.h"
-
-#pragma comment(lib, "Shlwapi.lib")
 
 #define SAFE_DELETE(x) if(x) { delete x; x = NULL; }
 
@@ -129,15 +125,10 @@ HackAssembler::HackAssembler(std::string inputFile)
         throw std::runtime_error("Error: File " + inputFile + " doesn't have .asm extension");
     }
 
-    CHAR buffer[MAX_PATH] = { 0 };
-    GetModuleFileNameA(NULL, buffer, MAX_PATH);
-    std::string::size_type directorySize = std::string(buffer).find_last_of("\\");
-    std::string directoryPath = std::string(buffer).substr(0, directorySize + 1);
-
     if (filePath.is_relative()) 
     {
-        this->input_file = directoryPath + filePath.string();
-        this->output_file = directoryPath + filePath.replace_extension(".hack").string();
+        this->input_file = std::filesystem::current_path().string() + "\\" + filePath.string();
+        this->output_file = std::filesystem::current_path().string() + "\\" + filePath.replace_extension(".hack").string();
     }
     else
     {
