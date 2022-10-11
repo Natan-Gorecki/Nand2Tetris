@@ -54,4 +54,5 @@ private:
 	bool generate_comment = false;
 
 	int uniq_number = 1;
+	bool is_comparison_used = false;
 };

@@ -185,9 +185,29 @@ void CodeWriter::writePushPop(ECommandType commandType, std::string segment, int
 void CodeWriter::initialCode()
 {
     const char* initCode =
-R"(@START
-0;JMP
+R"((START)
+@256
+D=A
+@SP
+M=D
+)";
+    *output_file << initCode;
+}
 
+void CodeWriter::finalCode()
+{
+    const char* finalCommand =
+R"(
+(END)
+@END
+0;JMP
+)";
+    *output_file << finalCommand;
+
+    if (is_comparison_used)
+    {
+        const char* comparisonCommand =
+R"(
 (TRUE_CONDITION)
 @1
 A=-A
@@ -204,30 +224,17 @@ DREGISTER_2_STACK
 @R13
 A=M
 0;JMP
-
-(START)
-@256
-D=A
-@SP
-M=D)";
-    std::string initString = std::string(initCode);
-    initString = std::regex_replace(initString, std::regex("DREGISTER_2_STACK\n"), DRegister2Stack());
-    *output_file << initString << "\n";
-}
-
-void CodeWriter::finalCode()
-{
-    const char* finalCommand =
-R"(
-(END)
-@END
-0;JMP
 )";
-    *output_file << finalCommand;
+        std::string comparisonString = std::string(comparisonCommand);
+        comparisonString = std::regex_replace(comparisonString, std::regex("DREGISTER_2_STACK\n"), DRegister2Stack());
+        *output_file << comparisonString;
+    }
 }
 
 void CodeWriter::writeComparisonCommand(std::string comparisonCheck)
 {
+    is_comparison_used = true;
+
     const char* comparisonCommand =
 R"(@AFTER_CONDITION.1
 D=A
