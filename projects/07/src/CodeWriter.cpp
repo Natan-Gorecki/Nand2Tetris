@@ -240,20 +240,16 @@ R"(@AFTER_CONDITION.1
 D=A
 @R13
 M=D
-
 @SP
 AM=M-1
 D=M
-
 @SP
 AM=M-1
 D=M-D
-
 @TRUE_CONDITION
 COMPARISON_CHECK
 @FALSE_CONDITION
 0;JMP
-
 (AFTER_CONDITION.1)
 )";
     std::string comparisonString(comparisonCommand);
