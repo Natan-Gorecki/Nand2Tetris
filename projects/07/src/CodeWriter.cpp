@@ -52,8 +52,9 @@ R"(@SP
 AM=M-1
 D=M
 A=A-1
-M=M+D)";
-        *output_file << addCommand << "\n";
+M=M+D
+)";
+        *output_file << addCommand;
     }
     else if (command == "sub") 
     {
@@ -62,122 +63,61 @@ R"(@SP
 AM=M-1
 D=M
 A=A-1
-M=M-D)";
-        *output_file << subCommand << "\n";
+M=M-D
+)";
+        *output_file << subCommand;
     }
     else if (command == "neg")
     {
         const char* negCommand =
 R"(@SP
 A=M-1
-M=-M)";
-        *output_file << negCommand << "\n";
+M=-M
+)";
+        *output_file << negCommand;
     }
     else if (command == "eq")
     {
-        const char* eqCommand =
-R"(@AFTER_CONDITION.1
-D=A
-@R13
-M=D
-
-@SP
-AM=M-1
-D=M
-
-@SP
-AM=M-1
-D=D-M
-
-@TRUE_CONDITION
-D;JEQ
-@FALSE_CONDITION
-0;JMP
-
-(AFTER_CONDITION.1))";
-        std::string eqString(eqCommand);
-        eqString = std::regex_replace(eqString, std::regex("AFTER_CONDITION\\.1"), std::string("AFTER_CONDITION.") + std::to_string(getUniqNumber()));
-        *output_file << eqString << "\n";
+        writeComparisonCommand("D;JEQ");
     }
     else if (command == "gt")
     {
-        const char* gtCommand =
-R"(@AFTER_CONDITION.1
-D=A
-@R13
-M=D
-
-@SP
-AM=M-1
-D=M
-
-@SP
-AM=M-1
-D=M-D
-
-@TRUE_CONDITION
-D;JGT
-@FALSE_CONDITION
-0;JMP
-
-(AFTER_CONDITION.1))";
-        std::string gtString(gtCommand);
-        gtString = std::regex_replace(gtString, std::regex("AFTER_CONDITION\\.1"), std::string("AFTER_CONDITION.") + std::to_string(getUniqNumber()));
-        *output_file << gtString << "\n";
+        writeComparisonCommand("D;JGT");
     }
     else if (command == "lt")
     {
-        const char* ltCommand =
-R"(@AFTER_CONDITION.1
-D=A
-@R13
-M=D
-
-@SP
-AM=M-1
-D=M
-
-@SP
-AM=M-1
-D=M-D
-
-@TRUE_CONDITION
-D;JLT
-@FALSE_CONDITION
-0;JMP
-
-(AFTER_CONDITION.1))";
-        std::string ltString(ltCommand);
-        ltString = std::regex_replace(ltString, std::regex("AFTER_CONDITION\\.1"), std::string("AFTER_CONDITION.") + std::to_string(getUniqNumber()));
-        *output_file << ltString << "\n";
+        writeComparisonCommand("D;JLT");
     }
     else if (command == "and")
     {
-    const char* andCommand =
+        const char* andCommand =
 R"(@SP
 AM=M-1
 D=M
 A=A-1
-M=M&D)";
-    *output_file << andCommand << "\n";
+M=M&D
+)";
+        *output_file << andCommand;
     }
     else if (command == "or")
     {
-    const char* orCommand =
+        const char* orCommand =
 R"(@SP
 AM=M-1
 D=M
 A=A-1
-M=M|D)";
-    *output_file << orCommand << "\n";
+M=M|D
+)";
+        *output_file << orCommand;
     }
     else if (command == "not")
     {
-    const char* notCommand =
+        const char* notCommand =
 R"(@SP
 A=M-1
-M=!M)";
-    *output_file << notCommand << "\n";
+M=!M
+)";
+        *output_file << notCommand;
     }
     else
     {
@@ -199,18 +139,46 @@ void CodeWriter::writePushPop(ECommandType commandType, std::string segment, int
         *output_file << "\n// " << pushPop << " " << segment << " " << index << "\n";
     }
     
-
-    if (commandType == ECommandType::C_PUSH)
+    if (commandType != ECommandType::C_PUSH && commandType != ECommandType::C_POP)
     {
-        this->writePush(segment, index);
+        throw std::runtime_error("Method only allowed with C_PUSH or C_POP command.");
     }
-    else if (commandType == ECommandType::C_POP)
+
+    if (segment == "local")
     {
-        this->writePop(segment, index);
+        writeLocalArgThisThat(commandType, "LCL", index);
+    }
+    else if (segment == "argument")
+    {
+        writeLocalArgThisThat(commandType, "ARG", index);
+    }
+    else if (segment == "this")
+    {
+        writeLocalArgThisThat(commandType, "THIS", index);
+    }
+    else if (segment == "that")
+    {
+        writeLocalArgThisThat(commandType, "THAT", index);
+    }
+    else if (segment == "pointer")
+    {
+        writePointer(commandType, index);
+    }
+    else if (segment == "temp")
+    {
+        writeTemp(commandType, index);
+    }
+    else if (segment == "constant")
+    {
+        writeConstant(commandType, index);
+    }
+    else if (segment == "static")
+    {
+        writeStatic(commandType, index);
     }
     else
     {
-        throw std::runtime_error("Method only allowed with C_PUSH or C_POP command.");
+        throw std::runtime_error("Unknown " + segment + " segment.");
     }
 }
 
@@ -224,11 +192,7 @@ R"(@START
 @1
 A=-A
 D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
+DREGISTER_2_STACK
 @R13
 A=M
 0;JMP
@@ -236,11 +200,7 @@ A=M
 (FALSE_CONDITION)
 @0
 D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
+DREGISTER_2_STACK
 @R13
 A=M
 0;JMP
@@ -250,7 +210,9 @@ A=M
 D=A
 @SP
 M=D)";
-    *output_file << initCode << "\n";
+    std::string initString = std::string(initCode);
+    initString = std::regex_replace(initString, std::regex("DREGISTER_2_STACK\n"), DRegister2Stack());
+    *output_file << initString << "\n";
 }
 
 void CodeWriter::finalCode()
@@ -259,348 +221,188 @@ void CodeWriter::finalCode()
 R"(
 (END)
 @END
-0;JMP)";
-
-    *output_file << finalCommand << "\n";
+0;JMP
+)";
+    *output_file << finalCommand;
 }
 
-void CodeWriter::writePush(std::string segment, int index)
+void CodeWriter::writeComparisonCommand(std::string comparisonCheck)
 {
-    if (segment == "local")
+    const char* comparisonCommand =
+R"(@AFTER_CONDITION.1
+D=A
+@R13
+M=D
+
+@SP
+AM=M-1
+D=M
+
+@SP
+AM=M-1
+D=M-D
+
+@TRUE_CONDITION
+COMPARISON_CHECK
+@FALSE_CONDITION
+0;JMP
+
+(AFTER_CONDITION.1)
+)";
+    std::string comparisonString(comparisonCommand);
+    comparisonString = std::regex_replace(comparisonString, std::regex("AFTER_CONDITION\\.1"), std::string("AFTER_CONDITION.") + std::to_string(getUniqNumber()));
+    comparisonString = std::regex_replace(comparisonString, std::regex("COMPARISON_CHECK"), comparisonCheck);
+    *output_file << comparisonString;
+}
+
+void CodeWriter::writeLocalArgThisThat(ECommandType commandType, std::string segmentName, int index)
+{
+    if (commandType == ECommandType::C_PUSH)
     {
         const char* pushCommand =
 R"(@INDEX
 D=A
-@LCL
+@SEGMENT_NAME
 A=M+D
 D=M
-
-@SP
-A=M
-M=D
-
-@SP
-M=M+1)";
-        std::string pushString(pushCommand);
+)";
+        std::string pushString = std::string(pushCommand);
         pushString = std::regex_replace(pushString, std::regex("INDEX"), std::to_string(index));
-        *output_file << pushString << "\n";
+        pushString = std::regex_replace(pushString, std::regex("SEGMENT_NAME"), segmentName);
+        *output_file 
+            << pushString 
+            << DRegister2Stack();
     }
-    else if (segment == "argument")
+    else if (commandType == ECommandType::C_POP)
     {
-        const char* pushCommand =
+        const char* address2temp =
 R"(@INDEX
 D=A
-@ARG
-A=M+D
-D=M
-
-@SP
+@SEGMENT_NAME
+D=M+D
+@R14
+M=D
+)";
+        const char* value2Address =
+R"(@R14
 A=M
 M=D
-
-@SP
-M=M+1)";
-        std::string pushString(pushCommand);
-        pushString = std::regex_replace(pushString, std::regex("INDEX"), std::to_string(index));
-        *output_file << pushString << "\n";
+)";
+        std::string popString(address2temp);
+        popString = std::regex_replace(popString, std::regex("INDEX"), std::to_string(index));
+        popString = std::regex_replace(popString, std::regex("SEGMENT_NAME"), segmentName);
+        *output_file 
+            << popString 
+            << stack2DRegister() 
+            << value2Address;
     }
-    else if (segment == "this")
+}
+
+void CodeWriter::writePointer(ECommandType commandType, int index)
+{
+    if (index != 0 && index != 1)
     {
-        const char* pushCommand =
-R"(@INDEX
-D=A
-@THIS
-A=M+D
-D=M
-
-@SP
-A=M
-M=D
-
-@SP
-M=M+1)";
-        std::string pushString(pushCommand);
-        pushString = std::regex_replace(pushString, std::regex("INDEX"), std::to_string(index));
-        *output_file << pushString << "\n";
+        throw std::runtime_error("Unsupported index " + std::to_string(index) + " with pointer segment.");
     }
-    else if (segment == "that")
+
+    const char* segmentName = index == 0 ? "THIS" : "THAT";
+
+    if (commandType == ECommandType::C_PUSH)
     {
-        const char* pushCommand =
-R"(@INDEX
-D=A
-@THAT
-A=M+D
-D=M
-
-@SP
-A=M
-M=D
-
-@SP
-M=M+1)";
-        std::string pushString(pushCommand);
-        pushString = std::regex_replace(pushString, std::regex("INDEX"), std::to_string(index));
-        *output_file << pushString << "\n";
+        *output_file
+            << "@" << segmentName << "\n"
+            << "D=M\n"
+            << DRegister2Stack();
     }
-    else if (segment == "pointer")
+    else if (commandType == ECommandType::C_POP)
     {
-        if (index == 0)
-        {
-            const char* pushCommand =
-R"(@THIS
-D=M
-
-@SP
-A=M
-M=D
-
-@SP
-M=M+1)";
-            *output_file << pushCommand << "\n";
-        }
-        else if (index == 1)
-        {
-            const char* pushCommand =
-R"(@THAT
-D=M
-
-@SP
-A=M
-M=D
-
-@SP
-M=M+1)";
-            *output_file << pushCommand << "\n";
-        }
-        else
-        {
-            throw std::runtime_error("Unsupported index " + std::to_string(index) + " with 'push pointer' command.");
-        }
+        *output_file
+            << stack2DRegister()
+            << "@" << segmentName << "\n"
+            << "M=D\n";
     }
-    else if (segment == "temp")
+}
+
+void CodeWriter::writeTemp(ECommandType commandType, int index)
+{
+    int tempIndex = 5 + index;
+    if (index < 0 || index > 7)
     {
-        int tempIndex = 5 + index;
-        if (index < 0 || index > 7)
-        {
-            throw std::runtime_error("Unsupported index " + std::to_string(index) + " with 'push temp' command.");
-        }
-
-        const char* pushCommand =
-R"(@INDEX
-D=M
-
-@SP
-A=M
-M=D
-
-@SP
-M=M+1)";
-        std::string pushString(pushCommand);
-        pushString = std::regex_replace(pushString, std::regex("INDEX"), "R" + std::to_string(tempIndex));
-        *output_file << pushString << "\n";
+        throw std::runtime_error("Unsupported index " + std::to_string(index) + " with temp segment.");
     }
-    else if (segment == "constant")
+
+    if (commandType == ECommandType::C_PUSH)
+    {
+        *output_file
+            << "@R" << tempIndex << "\n"
+            << "D=M\n"
+            << DRegister2Stack();
+    }
+    else if (commandType == ECommandType::C_POP)
+    {
+        *output_file
+            << stack2DRegister()
+            << "@R" << tempIndex << "\n"
+            << "M=D\n";
+    }
+}
+
+void CodeWriter::writeConstant(ECommandType commandType, int index)
+{
+    if (commandType == ECommandType::C_PUSH)
     {
         if (index < 0 || index > SHRT_MAX)
         {
             throw std::runtime_error("Unsupported index " + std::to_string(index) + " with 'push constant' command.");
         }
 
-        const char* pushCommand =
-R"(@INDEX
-D=A
-
-@SP
-A=M
-M=D
-
-@SP
-M=M+1)";
-        std::string pushString(pushCommand);
-        pushString = std::regex_replace(pushString, std::regex("INDEX"), std::to_string(index));
-        *output_file << pushString << "\n";
+        *output_file
+            << "@" << index << "\n"
+            << "D=A\n"
+            << DRegister2Stack();
     }
-    else if (segment == "static")
-    {
-        const char* pushCommand =
-R"(@Foo.INDEX
-D=M
-
-@SP
-A=M
-M=D
-
-@SP
-M=M+1)";
-        std::string pushString(pushCommand);
-        pushString = std::regex_replace(pushString, std::regex("INDEX"), std::to_string(index));
-        *output_file << pushString << "\n";
-    }
-    else
-    {
-        throw std::runtime_error("Unknown " + segment + " segment.");
-    }
-}
-
-void CodeWriter::writePop(std::string segment, int index)
-{
-    if (segment == "local")
-    {
-        const char* popCommand =
-R"(@INDEX
-D=A
-@LCL
-D=M+D
-
-@R14
-M=D
-
-@SP
-AM=M-1
-D=M
-
-@R14
-A=M
-M=D)";
-        std::string popString(popCommand);
-        popString = std::regex_replace(popString, std::regex("INDEX"), std::to_string(index));
-        *output_file << popString << "\n";
-    }
-    else if (segment == "argument")
-    {
-        const char* popCommand =
-R"(@INDEX
-D=A
-@ARG
-D=M+D
-
-@R14
-M=D
-
-@SP
-AM=M-1
-D=M
-
-@R14
-A=M
-M=D)";
-        std::string popString(popCommand);
-        popString = std::regex_replace(popString, std::regex("INDEX"), std::to_string(index));
-        *output_file << popString << "\n";
-    }
-    else if (segment == "this")
-    {
-        const char* popCommand =
-R"(@INDEX
-D=A
-@THIS
-D=M+D
-
-@R14
-M=D
-
-@SP
-AM=M-1
-D=M
-
-@R14
-A=M
-M=D)";
-        std::string popString(popCommand);
-        popString = std::regex_replace(popString, std::regex("INDEX"), std::to_string(index));
-        *output_file << popString << "\n";
-    }
-    else if (segment == "that")
-    {
-        const char* popCommand =
-R"(@INDEX
-D=A
-@THAT
-D=M+D
-
-@R14
-M=D
-
-@SP
-AM=M-1
-D=M
-
-@R14
-A=M
-M=D)";
-        std::string popString(popCommand);
-        popString = std::regex_replace(popString, std::regex("INDEX"), std::to_string(index));
-        *output_file << popString << "\n";
-    }
-    else if (segment == "pointer")
-    {
-        if (index == 0)
-        {
-            const char* popCommand =
-R"(@SP
-AM=M-1
-D=M
-
-@THIS
-M=D)";
-            *output_file << popCommand << "\n";
-        }
-        else if (index == 1)
-        {
-            const char* popCommand =
-R"(@SP
-AM=M-1
-D=M
-
-@THAT
-M=D)";
-            *output_file << popCommand << "\n";
-        }
-        else
-        {
-            throw std::runtime_error("Unsupported index " + std::to_string(index) + " with 'pop pointer' command.");
-        }
-    }
-    else if (segment == "temp")
-    {
-        int tempIndex = 5 + index;
-        if (index < 0 || index > 7)
-        {
-            throw std::runtime_error("Unsupported index " + std::to_string(index) + " with 'pop temp' command.");
-        }
-
-        const char* popCommand =
-R"(@SP
-AM=M-1
-D=M
-
-@INDEX
-M=D)";
-        std::string popString(popCommand);
-        popString = std::regex_replace(popString, std::regex("INDEX"), "R" + std::to_string(tempIndex));
-        *output_file << popString << "\n";
-    }
-    else if (segment == "constant")
+    else if (commandType == ECommandType::C_POP)
     {
         throw std::runtime_error("Unsupported command 'pop constant " + std::to_string(index) + "'.");
     }
-    else if (segment == "static")
+}
+
+void CodeWriter::writeStatic(ECommandType commandType, int index)
+{
+    if (commandType == ECommandType::C_PUSH)
     {
-        const char* popCommand =
+        *output_file
+            << "@Foo." << index << "\n"
+            << "D=M\n"
+            << DRegister2Stack();
+    }
+    else if (commandType == ECommandType::C_POP)
+    {
+        *output_file
+            << stack2DRegister()
+            << "@Foo." << index << "\n"
+            << "M=D\n";
+    }
+}
+
+std::string CodeWriter::stack2DRegister()
+{
+    return std::string(
 R"(@SP
 AM=M-1
 D=M
+)");
+}
 
-@Foo.INDEX
-M=D)";
-        std::string popString(popCommand);
-        popString = std::regex_replace(popString, std::regex("INDEX"), std::to_string(index));
-        *output_file << popString << "\n";
-    }
-    else
-    {
-        throw std::runtime_error("Unknown " + segment + " segment.");
-    }
+std::string CodeWriter::DRegister2Stack()
+{
+    return std::string(
+R"(@SP
+A=M
+M=D
+@SP
+M=M+1
+)");
 }
 
 int CodeWriter::getUniqNumber()

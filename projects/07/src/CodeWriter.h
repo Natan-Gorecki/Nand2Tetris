@@ -36,8 +36,17 @@ public:
 private:
 	void initialCode();
 	void finalCode();
-	void writePush(std::string segment, int index);
-	void writePop(std::string segment, int index);
+
+	void writeComparisonCommand(std::string comparisonCheck);
+
+	void writeLocalArgThisThat(ECommandType commandType, std::string segmentName, int index);
+	void writePointer(ECommandType commandType, int index);
+	void writeTemp(ECommandType commandType, int index);
+	void writeConstant(ECommandType commandType, int index);
+	void writeStatic(ECommandType commandType, int index);
+
+	std::string stack2DRegister();
+	std::string DRegister2Stack();
 	int getUniqNumber();
 
 private:
