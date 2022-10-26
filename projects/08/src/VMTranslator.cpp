@@ -2,24 +2,26 @@
 
 #include <iostream>
 #include <filesystem>
-#include "CodeWriter.h"
 #include "Parser.h"
 
+#define SAFE_DELETE(x) if(x) { delete x; x = NULL; }
+
+namespace fs = std::filesystem;
 
 VMTranslator::VMTranslator(std::string path)
 {
-    std::filesystem::path filePath = path;
+    fs::path filePath = path;
 
     if (isupper(path[0]) == false)
     {
         throw std::runtime_error("Input file/directory " + std::string(path) + " doesn't start with uppercase.");
     }
 
-    std::filesystem::path inputPath, outputPath;
+    fs::path inputPath, outputPath;
     if (filePath.is_relative())
     {
-        inputPath = std::filesystem::current_path().string() + "\\" + filePath.string();
-        outputPath = std::filesystem::current_path().string() + "\\" + filePath.replace_extension(".asm").string();
+        inputPath = fs::current_path().string() + "\\" + filePath.string();
+        outputPath = fs::current_path().string() + "\\" + filePath.replace_extension(".asm").string();
     }
     else
     {
@@ -35,10 +37,13 @@ VMTranslator::VMTranslator(std::string path)
     {
         throw std::runtime_error("Input file " + std::string(path) + " doesn't have .vm extension");
     }
+
+    code_writer = new CodeWriter(output_file, true);
 }
 
 VMTranslator::~VMTranslator()
 {
+    SAFE_DELETE(code_writer);
 }
 
 bool VMTranslator::isDirectoryPath()
@@ -48,16 +53,46 @@ bool VMTranslator::isDirectoryPath()
 
 void VMTranslator::parseDirectory()
 {
-    throw std::runtime_error("Not implemented exception");
+    fs::path filePath = fs::path(input_file);
+    if (fs::exists(filePath) == false)
+    {
+        throw std::runtime_error("Directory " + input_file + " doesn't exist");
+    }
+
+    std::vector<std::string> vmFiles = std::vector<std::string>();
+    for (const fs::directory_entry& entry : fs::directory_iterator(input_file))
+    {
+        if (entry.is_regular_file() && entry.path().extension() == ".vm")
+        {
+            vmFiles.push_back(entry.path().string());
+        }
+    }
+    
+    if (vmFiles.size() == 0)
+    {
+        throw std::runtime_error("Directory " + input_file + " doesn't contain any .vm extension");
+    }
+
+    for (std::string vmFile : vmFiles)
+    {
+        parseSingleFile(vmFile);
+    }
 }
 
 void VMTranslator::parseSingleFile()
 {
-    std::string outputFile, inputFile;
-    throw std::runtime_error("Not implemented exception");
+    fs::path filePath = fs::path(input_file);
+    if (fs::exists(filePath) == false)
+    {
+        throw std::runtime_error("File " + input_file + " doesn't exist");
+    }
+    
+    parseSingleFile(input_file);
+}
 
-    CodeWriter codeWriter = CodeWriter(outputFile, true);
-    Parser parser = Parser(inputFile);
+void VMTranslator::parseSingleFile(std::string path)
+{
+    Parser parser = Parser(path);
 
     while (parser.hasMoreLines())
     {
@@ -72,11 +107,11 @@ void VMTranslator::parseSingleFile()
         }
         else if (parser.commandType() == ECommandType::C_ARITHMETIC)
         {
-            codeWriter.writeArithmetic(parser.arg1());
+            code_writer->writeArithmetic(parser.arg1());
         }
         else if (parser.commandType() == ECommandType::C_PUSH || parser.commandType() == ECommandType::C_POP)
         {
-            codeWriter.writePushPop(parser.commandType(), parser.arg1(), parser.arg2());
+            code_writer->writePushPop(parser.commandType(), parser.arg1(), parser.arg2());
         }
     }
 }

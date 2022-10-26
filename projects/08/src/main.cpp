@@ -15,7 +15,6 @@ int main(int argc, char* argv[])
     try
     {
         VMTranslator vmTranslator = VMTranslator(argv[1]);
-        return EXIT_SUCCESS;
 
         auto startTime = std::chrono::high_resolution_clock::now();
 
