@@ -35,6 +35,15 @@ CodeWriter::~CodeWriter()
 }
 
 /// <summary>
+/// Informs that the translation of a new VM file has started (called by VMTranslator).
+/// </summary>
+/// <param name="fileName"></param>
+void CodeWriter::setFileName(std::string fileName)
+{
+
+}
+
+/// <summary>
 /// Writes to the output file the assembly code that implements the given arithmetic-logical command.
 /// </summary>
 /// <param name="command">Arithmetic-logical command</param>
@@ -180,6 +189,61 @@ void CodeWriter::writePushPop(ECommandType commandType, std::string segment, int
     {
         throw std::runtime_error("Unknown " + segment + " segment.");
     }
+}
+
+/// <summary>
+/// Writes assembly code that effects the label command
+/// </summary>
+/// <param name="label">Label name</param>
+void CodeWriter::writeLabel(std::string label)
+{
+
+}
+
+/// <summary>
+/// Writes assembly code that effects the goto command.
+/// </summary>
+/// <param name="label">Label name</param>
+void CodeWriter::writeGoto(std::string label)
+{
+
+}
+
+/// <summary>
+/// Writes assembly code that effects the if-goto command.
+/// </summary>
+/// <param name="label">Label name</param>
+void CodeWriter::wirteIf(std::string label)
+{
+
+}
+
+/// <summary>
+/// Writes assembly code that effects the function command.
+/// </summary>
+/// <param name="functionName">Function name</param>
+/// <param name="nVars">Count of the function local variables</param>
+void CodeWriter::writeFunction(std::string functionName, int nVars)
+{
+
+}
+
+/// <summary>
+/// Writes assembly code that effects the call command.
+/// </summary>
+/// <param name="functionName">Function name</param>
+/// <param name="nArgs">Count of the arguments that have been pushed onto the stack before the call</param>
+void CodeWriter::writeCall(std::string functionName, int nArgs)
+{
+
+}
+
+/// <summary>
+/// Writes assembly code that effects the return command.
+/// </summary>
+void CodeWriter::writeReturn()
+{
+
 }
 
 void CodeWriter::initialCode()

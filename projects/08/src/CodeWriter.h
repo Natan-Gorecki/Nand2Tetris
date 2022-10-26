@@ -21,6 +21,11 @@ public:
 
 public:
 	/// <summary>
+	/// Informs that the translation of a new VM file has started (called by VMTranslator).
+	/// </summary>
+	/// <param name="fileName"></param>
+	void setFileName(std::string fileName);
+	/// <summary>
 	/// Writes to the output file the assembly code that implements the given arithmetic-logical command.
 	/// </summary>
 	/// <param name="command">Arithmetic-logical command</param>
@@ -32,6 +37,37 @@ public:
 	/// <param name="segment">Name of the segment</param>
 	/// <param name="index">Numeric address</param>
 	void writePushPop(ECommandType commandType, std::string segment, int index);
+	/// <summary>
+	/// Writes assembly code that effects the label command
+	/// </summary>
+	/// <param name="label">Label name</param>
+	void writeLabel(std::string label);
+	/// <summary>
+	/// Writes assembly code that effects the goto command.
+	/// </summary>
+	/// <param name="label">Label name</param>
+	void writeGoto(std::string label);
+	/// <summary>
+	/// Writes assembly code that effects the if-goto command.
+	/// </summary>
+	/// <param name="label">Label name</param>
+	void wirteIf(std::string label);
+	/// <summary>
+	/// Writes assembly code that effects the function command.
+	/// </summary>
+	/// <param name="functionName">Function name</param>
+	/// <param name="nVars">Count of the function local variables</param>
+	void writeFunction(std::string functionName, int nVars);
+	/// <summary>
+	/// Writes assembly code that effects the call command.
+	/// </summary>
+	/// <param name="functionName">Function name</param>
+	/// <param name="nArgs">Count of the arguments that have been pushed onto the stack before the call</param>
+	void writeCall(std::string functionName, int nArgs);
+	/// <summary>
+	/// Writes assembly code that effects the return command.
+	/// </summary>
+	void writeReturn();
 
 private:
 	void initialCode();
