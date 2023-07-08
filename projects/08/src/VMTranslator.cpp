@@ -90,6 +90,11 @@ void VMTranslator::parseSingleFile()
     parseSingleFile(input_file);
 }
 
+std::string VMTranslator::getOutputFile()
+{
+    return this->output_file;
+}
+
 void VMTranslator::parseSingleFile(std::string path)
 {
     Parser parser = Parser(path);

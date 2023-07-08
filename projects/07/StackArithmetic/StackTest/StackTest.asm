@@ -408,8 +408,7 @@ M=!M
 
 (TRUE_CONDITION)
 @1
-A=-A
-D=A
+D=-A
 @SP
 A=M
 M=D

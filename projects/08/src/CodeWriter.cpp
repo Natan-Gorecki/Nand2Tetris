@@ -213,7 +213,7 @@ void CodeWriter::writeGoto(std::string label)
 /// Writes assembly code that effects the if-goto command.
 /// </summary>
 /// <param name="label">Label name</param>
-void CodeWriter::wirteIf(std::string label)
+void CodeWriter::writeIf(std::string label)
 {
 
 }
@@ -274,8 +274,7 @@ R"(
 R"(
 (TRUE_CONDITION)
 @1
-A=-A
-D=A
+D=-A
 DREGISTER_2_STACK
 @R13
 A=M
@@ -439,7 +438,7 @@ void CodeWriter::writeStatic(ECommandType commandType, int index)
     if (commandType == ECommandType::C_PUSH)
     {
         *output_file
-            << "@Foo." << index << "\n"
+            << "@Static." << index << "\n"
             << "D=M\n"
             << DRegister2Stack();
     }
@@ -447,7 +446,7 @@ void CodeWriter::writeStatic(ECommandType commandType, int index)
     {
         *output_file
             << stack2DRegister()
-            << "@Foo." << index << "\n"
+            << "@Static." << index << "\n"
             << "M=D\n";
     }
 }

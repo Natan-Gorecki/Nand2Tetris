@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 
         auto endTime = std::chrono::high_resolution_clock::now();
         
-        std::cout << "Created assembly code " << argv[1] << ".asm file in " << (endTime - startTime) / std::chrono::milliseconds(1) << " ms.\n";
+        std::cout << "Created assembly code " << vmTranslator.getOutputFile() << " file in " << (endTime - startTime) / std::chrono::milliseconds(1) << " ms.\n";
         return EXIT_SUCCESS;
     }
     catch (const std::runtime_error& error)

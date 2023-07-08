@@ -4,8 +4,8 @@
 #include "CodeWriter.h"
 
 /// <summary>
-/// VMTranslator contains main implementation to parse single file/ all files from the specified directory. It converts code from .vm files 
-///		and creates single .asm file.
+/// VMTranslator contains main implementation to parse single file or all files from the specified directory. 
+///		It converts code from .vm files and creates single .asm file.
 /// </summary>
 class VMTranslator
 {
@@ -34,6 +34,11 @@ public:
 	/// Parses specified .vm file.
 	/// </summary>
 	void parseSingleFile();
+	/// <summary>
+	/// Gets output file name.
+	/// </summary>
+	/// <returns></returns>
+	std::string getOutputFile();
 
 private:
 	void parseSingleFile(std::string path);
