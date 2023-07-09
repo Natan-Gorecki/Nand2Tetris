@@ -135,6 +135,21 @@ void Parser::advance()
 		f_arg1 = commandArgs[1];
 		f_arg2 = std::stoi(commandArgs[2]);
 	}
+	else if (command == "label")
+	{
+		f_command_type = ECommandType::C_LABEL;
+		f_arg1 = commandArgs[1];
+	}
+	else if (command == "goto")
+	{
+		f_command_type = ECommandType::C_GOTO;
+		f_arg1 = commandArgs[1];
+	}
+	else if (command == "if-goto")
+	{
+		f_command_type = ECommandType::C_IF;
+		f_arg1 = commandArgs[1];
+	}
 	else
 	{
 		throw std::runtime_error("Unknown " + command + " command.");

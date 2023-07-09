@@ -40,7 +40,7 @@ CodeWriter::~CodeWriter()
 /// <param name="fileName"></param>
 void CodeWriter::setFileName(std::string fileName)
 {
-
+    this->file_name = fileName;
 }
 
 /// <summary>
@@ -197,7 +197,24 @@ void CodeWriter::writePushPop(ECommandType commandType, std::string segment, int
 /// <param name="label">Label name</param>
 void CodeWriter::writeLabel(std::string label)
 {
+    std::regex labelRegex("[A-z.:][\w.:]*");
+    std::cmatch match;
+    if (std::regex_match(label.c_str(), match, labelRegex))
+    {
+        throw new std::runtime_error("Invalid label format: " + label);
+    }
 
+    std::string fullName = this->getFullLabelName(label);
+
+    if (defined_labels.count(fullName))
+    {
+        throw new std::runtime_error("Duplicated labels " + fullName);
+    }
+
+    *output_file
+        << "(" << fullName << ")\n";
+
+    defined_labels.insert(fullName);
 }
 
 /// <summary>
@@ -206,7 +223,13 @@ void CodeWriter::writeLabel(std::string label)
 /// <param name="label">Label name</param>
 void CodeWriter::writeGoto(std::string label)
 {
+    std::string fullName = this->getFullLabelName(label);
+    
+    *output_file
+        << "@" << fullName << "\n"
+        << "0;JMP\n";    
 
+    defined_goto.insert(fullName);
 }
 
 /// <summary>
@@ -215,7 +238,14 @@ void CodeWriter::writeGoto(std::string label)
 /// <param name="label">Label name</param>
 void CodeWriter::writeIf(std::string label)
 {
+    std::string fullName = this->getFullLabelName(label);
 
+    *output_file
+        << stack2DRegister()
+        << "@" << fullName << "\n"
+        << "D;JNE\n";
+    
+    defined_goto.insert(fullName);
 }
 
 /// <summary>
@@ -244,6 +274,18 @@ void CodeWriter::writeCall(std::string functionName, int nArgs)
 void CodeWriter::writeReturn()
 {
 
+/// <summary>
+/// Validates if every label used in goto and if-goto is defined.
+/// </summary>
+void CodeWriter::validateGotoStatements()
+{
+    for (std::string labelName : defined_goto)
+    {
+        if (!defined_labels.count(labelName))
+        {
+            throw new std::runtime_error("Label " + labelName + " is not defined.");
+        }
+    }
 }
 
 void CodeWriter::initialCode()
@@ -438,7 +480,7 @@ void CodeWriter::writeStatic(ECommandType commandType, int index)
     if (commandType == ECommandType::C_PUSH)
     {
         *output_file
-            << "@Static." << index << "\n"
+            << "@"<< file_name << "." << index << "\n"
             << "D=M\n"
             << DRegister2Stack();
     }
@@ -446,9 +488,24 @@ void CodeWriter::writeStatic(ECommandType commandType, int index)
     {
         *output_file
             << stack2DRegister()
-            << "@Static." << index << "\n"
+            << "@" << file_name << "." << index << "\n"
             << "M=D\n";
     }
+}
+
+std::string CodeWriter::getFullLabelName(std::string label)
+{
+    if (file_name.empty())
+    {
+        throw new std::runtime_error("File name is empty.");
+    }
+
+    if (function_name.empty())
+    {
+        throw new std::runtime_error("Function name is empty.");
+    }
+
+    return file_name + "." + function_name + "$" + label;
 }
 
 std::string CodeWriter::stack2DRegister()

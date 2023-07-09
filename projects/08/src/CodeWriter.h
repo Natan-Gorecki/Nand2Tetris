@@ -1,5 +1,6 @@
 #pragma once
 #include <fstream>
+#include <set>
 #include <string>
 #include "ECommandType.h"
 
@@ -23,8 +24,13 @@ public:
 	/// <summary>
 	/// Informs that the translation of a new VM file has started (called by VMTranslator).
 	/// </summary>
-	/// <param name="fileName"></param>
+	/// <param name="fileName">File name</param>
 	void setFileName(std::string fileName);
+	/// <summary>
+	/// Informs that the translation of a new function has started (called by VMTranslator).
+	/// </summary>
+	/// <param name="functionName">Function name</param>
+	void setFunctionName(std::string functionName);
 	/// <summary>
 	/// Writes to the output file the assembly code that implements the given arithmetic-logical command.
 	/// </summary>
@@ -51,7 +57,7 @@ public:
 	/// Writes assembly code that effects the if-goto command.
 	/// </summary>
 	/// <param name="label">Label name</param>
-	void wirteIf(std::string label);
+	void writeIf(std::string label);
 	/// <summary>
 	/// Writes assembly code that effects the function command.
 	/// </summary>
@@ -68,6 +74,10 @@ public:
 	/// Writes assembly code that effects the return command.
 	/// </summary>
 	void writeReturn();
+	/// <summary>
+	/// Validates if every label used in goto and if-goto is defined.
+	/// </summary>
+	void validateGotoStatements();
 
 private:
 	void initialCode();
@@ -81,6 +91,8 @@ private:
 	void writeConstant(ECommandType commandType, int index);
 	void writeStatic(ECommandType commandType, int index);
 
+	std::string getFullLabelName(std::string label);
+
 	std::string stack2DRegister();
 	std::string DRegister2Stack();
 	int getUniqNumber();
@@ -91,4 +103,9 @@ private:
 
 	int uniq_number = 1;
 	bool is_comparison_used = false;
+
+	std::set<std::string> defined_labels = std::set<std::string>();
+	std::set<std::string> defined_goto = std::set<std::string>();
+	std::string file_name = "";
+	std::string function_name = "";
 };

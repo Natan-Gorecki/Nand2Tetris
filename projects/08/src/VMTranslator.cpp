@@ -77,6 +77,8 @@ void VMTranslator::parseDirectory()
     {
         parseSingleFile(vmFile);
     }
+
+    code_writer->validateGotoStatements();
 }
 
 void VMTranslator::parseSingleFile()
@@ -88,6 +90,8 @@ void VMTranslator::parseSingleFile()
     }
     
     parseSingleFile(input_file);
+
+    code_writer->validateGotoStatements();
 }
 
 std::string VMTranslator::getOutputFile()
@@ -98,6 +102,9 @@ std::string VMTranslator::getOutputFile()
 void VMTranslator::parseSingleFile(std::string path)
 {
     Parser parser = Parser(path);
+
+    std::string fileName = fs::path(path).replace_extension("").filename().string();
+    code_writer->setFileName(fileName);
 
     while (parser.hasMoreLines())
     {
@@ -117,6 +124,18 @@ void VMTranslator::parseSingleFile(std::string path)
         else if (parser.commandType() == ECommandType::C_PUSH || parser.commandType() == ECommandType::C_POP)
         {
             code_writer->writePushPop(parser.commandType(), parser.arg1(), parser.arg2());
+        }
+        else if (parser.commandType() == ECommandType::C_LABEL)
+        {
+            code_writer->writeLabel(parser.arg1());
+        }
+        else if (parser.commandType() == ECommandType::C_GOTO)
+        {
+            code_writer->writeGoto(parser.arg1());
+        }
+        else if (parser.commandType() == ECommandType::C_IF)
+        {
+            code_writer->writeIf(parser.arg1());
         }
     }
 }
