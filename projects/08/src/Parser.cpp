@@ -101,7 +101,7 @@ void Parser::advance()
 		return;
 
 	// remove comments
-	int comment_pos = current_line.find("//");
+	size_t comment_pos = current_line.find("//");
 	if (comment_pos != std::string::npos)
 	{
 		current_line = comment_pos == 0 ? "" : current_line.substr(0, comment_pos);

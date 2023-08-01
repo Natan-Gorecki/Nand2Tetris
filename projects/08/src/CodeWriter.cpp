@@ -44,6 +44,34 @@ void CodeWriter::setFileName(std::string fileName)
 }
 
 /// <summary>
+/// Informs that the translation of a new function has started (called by VMTranslator).
+/// </summary>
+/// <param name="functionName">Function name</param>
+void CodeWriter::setFunctionName(std::string functionName)
+{
+    if (functionName.empty())
+    {
+        this->function_name = functionName;
+        return;
+    }
+
+    std::regex functionRegex("[A-z][\\w]*");
+    std::cmatch match;
+    if (!std::regex_match(functionName.c_str(), match, functionRegex))
+    {
+        throw std::runtime_error("Invalid function name format: " + functionName);
+    }
+
+    if (!this->function_name.empty())
+    {
+        throw std::runtime_error("Function " + this->function_name + " already started. Cannot start " + functionName + " inside another function.");
+    }
+
+    this->function_name = functionName;
+    this->no_function_defined = false;
+}
+
+/// <summary>
 /// Writes to the output file the assembly code that implements the given arithmetic-logical command.
 /// </summary>
 /// <param name="command">Arithmetic-logical command</param>
@@ -197,18 +225,23 @@ void CodeWriter::writePushPop(ECommandType commandType, std::string segment, int
 /// <param name="label">Label name</param>
 void CodeWriter::writeLabel(std::string label)
 {
-    std::regex labelRegex("[A-z.:][\w.:]*");
-    std::cmatch match;
-    if (std::regex_match(label.c_str(), match, labelRegex))
+    if (generate_comment)
     {
-        throw new std::runtime_error("Invalid label format: " + label);
+        *output_file << "\n// label " << label<< "\n";
+    }
+
+    std::regex labelRegex("[A-z.:][\\w.:]*");
+    std::cmatch match;
+    if (!std::regex_match(label.c_str(), match, labelRegex))
+    {
+        throw std::runtime_error("Invalid label format: " + label);
     }
 
     std::string fullName = this->getFullLabelName(label);
 
     if (defined_labels.count(fullName))
     {
-        throw new std::runtime_error("Duplicated labels " + fullName);
+        throw std::runtime_error("Duplicated labels " + fullName);
     }
 
     *output_file
@@ -223,6 +256,11 @@ void CodeWriter::writeLabel(std::string label)
 /// <param name="label">Label name</param>
 void CodeWriter::writeGoto(std::string label)
 {
+    if (generate_comment)
+    {
+        *output_file << "\n// goto " << label << "\n";
+    }
+
     std::string fullName = this->getFullLabelName(label);
     
     *output_file
@@ -238,6 +276,11 @@ void CodeWriter::writeGoto(std::string label)
 /// <param name="label">Label name</param>
 void CodeWriter::writeIf(std::string label)
 {
+    if (generate_comment)
+    {
+        *output_file << "\n// if-goto " << label << "\n";
+    }
+
     std::string fullName = this->getFullLabelName(label);
 
     *output_file
@@ -255,7 +298,29 @@ void CodeWriter::writeIf(std::string label)
 /// <param name="nVars">Count of the function local variables</param>
 void CodeWriter::writeFunction(std::string functionName, int nVars)
 {
+    if (generate_comment)
+    {
+        *output_file << "\n// function " << functionName << " " << nVars << "\n";
+    }
 
+    std::string fullName = this->getFullFunctionName(functionName);
+    if (defined_labels.count(fullName))
+    {
+        throw std::runtime_error("Duplicated labels " + fullName);
+    }
+
+    *output_file
+        << "(" << fullName << ")\n";
+
+    for (int i = 0; i < nVars; i++)
+    {
+        *output_file
+            << "@0\n"
+            << "D=A\n"
+            << DRegister2Stack();
+    }
+
+    defined_labels.insert(fullName);
 }
 
 /// <summary>
@@ -265,7 +330,61 @@ void CodeWriter::writeFunction(std::string functionName, int nVars)
 /// <param name="nArgs">Count of the arguments that have been pushed onto the stack before the call</param>
 void CodeWriter::writeCall(std::string functionName, int nArgs)
 {
+    if (generate_comment)
+    {
+        *output_file << "\n// call " << functionName << " " << nArgs << "\n";
+    }
 
+    std::string fullName = this->getFullFunctionName(functionName);
+    std::string returnLabel = fullName + "$ret." + std::to_string(getUniqNumber());
+
+    if (defined_labels.count(returnLabel))
+    {
+        throw std::runtime_error("Duplicated labels " + returnLabel);
+    }
+
+    const char* callCommand =
+R"(@ReturnLabel
+D=A
+DRegister2Stack
+@LCL
+D=M
+DRegister2Stack
+@ARG
+D=M
+DRegister2Stack
+@THIS
+D=M
+DRegister2Stack
+@THAT
+D=M
+DRegister2Stack
+@nArgs
+D=A
+@5
+D=A+D
+@SP
+D=M-D
+@ARG
+M=D
+@SP
+D=M
+@LCL
+M=D
+@FunctionName
+0;JMP
+(ReturnLabel)
+)";
+
+    std::string callString(callCommand);
+    callString = std::regex_replace(callString, std::regex("ReturnLabel"), returnLabel);
+    callString = std::regex_replace(callString, std::regex("DRegister2Stack"), DRegister2Stack());
+    callString = std::regex_replace(callString, std::regex("nArgs"), std::to_string(nArgs));
+    callString = std::regex_replace(callString, std::regex("FunctionName"), fullName);
+    
+    *output_file << callString;
+
+    defined_goto.insert(fullName);
 }
 
 /// <summary>
@@ -273,6 +392,63 @@ void CodeWriter::writeCall(std::string functionName, int nArgs)
 /// </summary>
 void CodeWriter::writeReturn()
 {
+    if (generate_comment)
+    {
+        *output_file << "\n// return\n";
+    }
+
+    const char* returnCommand =
+R"(@LCL
+D=M
+@R13
+M=D
+
+@5
+D=A
+@R13
+D=M-5
+@R14
+M=D
+
+stack2DRegister
+@ARG
+M=D
+
+@ARG
+D=A
+@SP
+M=D+1
+
+@R13
+AM=M-1
+D=M
+@THAT
+M=D
+@R13
+AM=M-1
+D=M
+@THIS
+M=D
+@R13
+AM=M-1
+D=M
+@ARG
+M=D
+@R13
+AM=M-1
+D=M
+@LCL
+M=D
+
+@R14
+A=M
+0;JMP
+)";
+
+    std::string returnString(returnCommand);
+    returnString = std::regex_replace(returnString, std::regex("stack2DRegister"), stack2DRegister());
+    *output_file << returnString;
+}
 
 /// <summary>
 /// Validates if every label used in goto and if-goto is defined.
@@ -283,7 +459,7 @@ void CodeWriter::validateGotoStatements()
     {
         if (!defined_labels.count(labelName))
         {
-            throw new std::runtime_error("Label " + labelName + " is not defined.");
+            throw std::runtime_error("Label " + labelName + " is not defined.");
         }
     }
 }
@@ -388,11 +564,11 @@ R"(@INDEX
 D=A
 @SEGMENT_NAME
 D=M+D
-@R14
+@R13
 M=D
 )";
         const char* value2Address =
-R"(@R14
+R"(@R13
 A=M
 M=D
 )";
@@ -495,17 +671,32 @@ void CodeWriter::writeStatic(ECommandType commandType, int index)
 
 std::string CodeWriter::getFullLabelName(std::string label)
 {
+    if (this->no_function_defined)
+    {
+        return default_function_name + "$" + label;
+    }
+
     if (file_name.empty())
     {
-        throw new std::runtime_error("File name is empty.");
+        throw std::runtime_error("File name is empty.");
     }
 
     if (function_name.empty())
     {
-        throw new std::runtime_error("Function name is empty.");
+        throw std::runtime_error("Function name is empty.");
     }
 
     return file_name + "." + function_name + "$" + label;
+}
+
+std::string CodeWriter::getFullFunctionName(std::string functionName)
+{
+    if (functionName.empty())
+    {
+        throw std::runtime_error("Function name is empty.");
+    }
+
+    return file_name + "." + functionName;
 }
 
 std::string CodeWriter::stack2DRegister()

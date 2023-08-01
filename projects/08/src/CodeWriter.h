@@ -92,6 +92,7 @@ private:
 	void writeStatic(ECommandType commandType, int index);
 
 	std::string getFullLabelName(std::string label);
+	std::string getFullFunctionName(std::string functionName);
 
 	std::string stack2DRegister();
 	std::string DRegister2Stack();
@@ -106,6 +107,9 @@ private:
 
 	std::set<std::string> defined_labels = std::set<std::string>();
 	std::set<std::string> defined_goto = std::set<std::string>();
+	
 	std::string file_name = "";
 	std::string function_name = "";
+	std::string default_function_name = "Main";
+	bool no_function_defined = true;
 };

@@ -137,5 +137,19 @@ void VMTranslator::parseSingleFile(std::string path)
         {
             code_writer->writeIf(parser.arg1());
         }
+        else if (parser.commandType() == ECommandType::C_FUNCTION)
+        {
+            code_writer->setFunctionName(parser.arg1());
+            code_writer->writeFunction(parser.arg1(), parser.arg2());
+        }
+        else if (parser.commandType() == ECommandType::C_RETURN)
+        {
+            code_writer->setFunctionName("");
+            code_writer->writeReturn();
+        }
+        else if (parser.commandType() == ECommandType::C_CALL)
+        {
+            code_writer->writeCall(parser.arg1(), parser.arg2());
+        }
     }
 }
