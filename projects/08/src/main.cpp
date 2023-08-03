@@ -1,20 +1,32 @@
 #include <chrono>
+#include <filesystem>
 #include <iostream>
 #include "VMTranslator.h"
 
 int main(int argc, char* argv[])
 {
-    if (argc != 2)
+    if (argc > 2)
     {
         std::cout << "Usage: \n"
             << "\tVMTranslator InputDirectory\n"
             << "\tVMTranslator InputFile.vm\n";
         return EXIT_FAILURE;
     }
+
+    std::string path;
+    if (argc == 1)
+    {
+        std::cout << "No file or directory specifed. Searching for files in current directory.\n";
+        path = std::filesystem::current_path().string();
+    }
+    else
+    {
+        path = argv[1];
+    }
     
     try
     {
-        VMTranslator vmTranslator = VMTranslator(argv[1]);
+        VMTranslator vmTranslator = VMTranslator(path);
 
         auto startTime = std::chrono::high_resolution_clock::now();
 
