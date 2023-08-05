@@ -150,6 +150,22 @@ void Parser::advance()
 		f_command_type = ECommandType::C_IF;
 		f_arg1 = commandArgs[1];
 	}
+	else if (command == "function")
+	{
+		f_command_type = ECommandType::C_FUNCTION;
+		f_arg1 = commandArgs[1];
+		f_arg2 = std::stoi(commandArgs[2]);
+	}
+	else if (command == "call")
+	{
+		f_command_type = ECommandType::C_CALL;
+		f_arg1 = commandArgs[1];
+		f_arg2 = std::stoi(commandArgs[2]);
+	}
+	else if (command == "return")
+	{
+		f_command_type = ECommandType::C_RETURN;
+	}
 	else
 	{
 		throw std::runtime_error("Unknown " + command + " command.");

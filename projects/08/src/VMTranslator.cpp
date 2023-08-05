@@ -17,21 +17,26 @@ VMTranslator::VMTranslator(std::string path)
         throw std::runtime_error("Input file/directory " + std::string(path) + " doesn't start with uppercase.");
     }
 
-    fs::path inputPath, outputPath;
+    fs::path inputPath = filePath.is_relative()
+        ? fs::current_path().string() + "\\" + filePath.string() 
+        : filePath.string();
+    
+    this->input_file = inputPath.string();
+    this->is_directory_path = inputPath.extension() == "";
+
+    fs::path outputPath;
     if (filePath.is_relative())
     {
-        inputPath = fs::current_path().string() + "\\" + filePath.string();
         outputPath = fs::current_path().string() + "\\" + filePath.replace_extension(".asm").string();
     }
     else
     {
-        inputPath = filePath.string();
-        outputPath = filePath.replace_extension(".asm").string();
+        outputPath = this->is_directory_path 
+            ? filePath.string() + "\\" + filePath.filename().string() + ".asm"
+            : filePath.replace_extension(".asm").string();
     }
-
-    this->input_file = inputPath.string();
     this->output_file = outputPath.string();
-    this->is_directory_path = inputPath.extension() == "";
+
 
     if (!is_directory_path && inputPath.extension() != ".vm")
     {

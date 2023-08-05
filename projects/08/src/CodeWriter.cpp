@@ -55,7 +55,7 @@ void CodeWriter::setFunctionName(std::string functionName)
         return;
     }
 
-    std::regex functionRegex("[A-z][\\w]*");
+    std::regex functionRegex("[A-z][\\w.]*");
     std::cmatch match;
     if (!std::regex_match(functionName.c_str(), match, functionRegex))
     {
@@ -303,14 +303,13 @@ void CodeWriter::writeFunction(std::string functionName, int nVars)
         *output_file << "\n// function " << functionName << " " << nVars << "\n";
     }
 
-    std::string fullName = this->getFullFunctionName(functionName);
-    if (defined_labels.count(fullName))
+    if (defined_labels.count(functionName))
     {
-        throw std::runtime_error("Duplicated labels " + fullName);
+        throw std::runtime_error("Duplicated labels " + functionName);
     }
 
     *output_file
-        << "(" << fullName << ")\n";
+        << "(" << functionName << ")\n";
 
     for (int i = 0; i < nVars; i++)
     {
@@ -320,7 +319,7 @@ void CodeWriter::writeFunction(std::string functionName, int nVars)
             << DRegister2Stack();
     }
 
-    defined_labels.insert(fullName);
+    defined_labels.insert(functionName);
 }
 
 /// <summary>
@@ -335,8 +334,7 @@ void CodeWriter::writeCall(std::string functionName, int nArgs)
         *output_file << "\n// call " << functionName << " " << nArgs << "\n";
     }
 
-    std::string fullName = this->getFullFunctionName(functionName);
-    std::string returnLabel = fullName + "$ret." + std::to_string(getUniqNumber());
+    std::string returnLabel = functionName + "$ret." + std::to_string(getNumber(functionName));
 
     if (defined_labels.count(returnLabel))
     {
@@ -380,11 +378,11 @@ M=D
     callString = std::regex_replace(callString, std::regex("ReturnLabel"), returnLabel);
     callString = std::regex_replace(callString, std::regex("DRegister2Stack"), DRegister2Stack());
     callString = std::regex_replace(callString, std::regex("nArgs"), std::to_string(nArgs));
-    callString = std::regex_replace(callString, std::regex("FunctionName"), fullName);
+    callString = std::regex_replace(callString, std::regex("FunctionName"), functionName);
     
     *output_file << callString;
 
-    defined_goto.insert(fullName);
+    defined_goto.insert(functionName);
 }
 
 /// <summary>
@@ -406,16 +404,18 @@ M=D
 @5
 D=A
 @R13
-D=M-5
+A=M-D
+D=M
 @R14
 M=D
 
 stack2DRegister
 @ARG
+A=M
 M=D
 
 @ARG
-D=A
+D=M
 @SP
 M=D+1
 
@@ -472,12 +472,31 @@ R"((START)
 D=A
 @SP
 M=D
+@CHECK_SYSINIT
+0;JMP
+(NO_SYSINIT)
 )";
     *output_file << initCode;
 }
 
 void CodeWriter::finalCode()
 {
+    if (defined_labels.count("Sys.init"))
+    {
+        *output_file << "\n(CHECK_SYSINIT)\n";
+        writeCall("Sys.init", 0);
+    }
+    else
+    {
+        const char* sysinitCheck =
+R"(
+(CHECK_SYSINIT)
+@NO_SYSINIT
+0;JMP
+)";
+        *output_file << sysinitCheck;
+    }
+    
     const char* finalCommand =
 R"(
 (END)
@@ -517,7 +536,7 @@ void CodeWriter::writeComparisonCommand(std::string comparisonCheck)
     is_comparison_used = true;
 
     const char* comparisonCommand =
-R"(@AFTER_CONDITION.1
+R"(@AFTER_CONDITION
 D=A
 @R13
 M=D
@@ -531,10 +550,10 @@ D=M-D
 COMPARISON_CHECK
 @FALSE_CONDITION
 0;JMP
-(AFTER_CONDITION.1)
+(AFTER_CONDITION)
 )";
     std::string comparisonString(comparisonCommand);
-    comparisonString = std::regex_replace(comparisonString, std::regex("AFTER_CONDITION\\.1"), std::string("AFTER_CONDITION.") + std::to_string(getUniqNumber()));
+    comparisonString = std::regex_replace(comparisonString, std::regex("AFTER_CONDITION"), std::string("AFTER_CONDITION.") + std::to_string(getNumber("AFTER_CONDITION")));
     comparisonString = std::regex_replace(comparisonString, std::regex("COMPARISON_CHECK"), comparisonCheck);
     *output_file << comparisonString;
 }
@@ -676,27 +695,12 @@ std::string CodeWriter::getFullLabelName(std::string label)
         return default_function_name + "$" + label;
     }
 
-    if (file_name.empty())
-    {
-        throw std::runtime_error("File name is empty.");
-    }
-
     if (function_name.empty())
     {
         throw std::runtime_error("Function name is empty.");
     }
 
-    return file_name + "." + function_name + "$" + label;
-}
-
-std::string CodeWriter::getFullFunctionName(std::string functionName)
-{
-    if (functionName.empty())
-    {
-        throw std::runtime_error("Function name is empty.");
-    }
-
-    return file_name + "." + functionName;
+    return function_name + "$" + label;
 }
 
 std::string CodeWriter::stack2DRegister()
@@ -719,7 +723,16 @@ M=M+1
 )");
 }
 
-int CodeWriter::getUniqNumber()
+int CodeWriter::getNumber(std::string label)
 {
-    return uniq_number++;
+    std::unordered_map<std::string, int>::iterator it = counters_map.find(label);
+    
+    int newValue = 1;
+    if (it != counters_map.end())
+    {
+        int newValue = it->second++;    
+    }
+    
+    counters_map.insert_or_assign(label, newValue);
+    return newValue;
 }

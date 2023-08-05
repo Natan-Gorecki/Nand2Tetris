@@ -1,5 +1,6 @@
 #pragma once
 #include <fstream>
+#include <unordered_map>
 #include <set>
 #include <string>
 #include "ECommandType.h"
@@ -92,17 +93,16 @@ private:
 	void writeStatic(ECommandType commandType, int index);
 
 	std::string getFullLabelName(std::string label);
-	std::string getFullFunctionName(std::string functionName);
 
 	std::string stack2DRegister();
 	std::string DRegister2Stack();
-	int getUniqNumber();
+	int getNumber(std::string label);
 
 private:
 	std::ofstream* output_file = NULL;
 	bool generate_comment = false;
 
-	int uniq_number = 1;
+	std::unordered_map<std::string, int> counters_map = std::unordered_map<std::string, int>();
 	bool is_comparison_used = false;
 
 	std::set<std::string> defined_labels = std::set<std::string>();
