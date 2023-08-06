@@ -28,11 +28,6 @@ public:
 	/// <param name="fileName">File name</param>
 	void setFileName(std::string fileName);
 	/// <summary>
-	/// Informs that the translation of a new function has started (called by VMTranslator).
-	/// </summary>
-	/// <param name="functionName">Function name</param>
-	void setFunctionName(std::string functionName);
-	/// <summary>
 	/// Writes to the output file the assembly code that implements the given arithmetic-logical command.
 	/// </summary>
 	/// <param name="command">Arithmetic-logical command</param>
@@ -92,6 +87,7 @@ private:
 	void writeConstant(ECommandType commandType, int index);
 	void writeStatic(ECommandType commandType, int index);
 
+	void setFunctionName(std::string functionName);
 	std::string getFullLabelName(std::string label);
 
 	std::string stack2DRegister();

@@ -44,34 +44,6 @@ void CodeWriter::setFileName(std::string fileName)
 }
 
 /// <summary>
-/// Informs that the translation of a new function has started (called by VMTranslator).
-/// </summary>
-/// <param name="functionName">Function name</param>
-void CodeWriter::setFunctionName(std::string functionName)
-{
-    if (functionName.empty())
-    {
-        this->function_name = functionName;
-        return;
-    }
-
-    std::regex functionRegex("[A-z][\\w.]*");
-    std::cmatch match;
-    if (!std::regex_match(functionName.c_str(), match, functionRegex))
-    {
-        throw std::runtime_error("Invalid function name format: " + functionName);
-    }
-
-    if (!this->function_name.empty())
-    {
-        throw std::runtime_error("Function " + this->function_name + " already started. Cannot start " + functionName + " inside another function.");
-    }
-
-    this->function_name = functionName;
-    this->no_function_defined = false;
-}
-
-/// <summary>
 /// Writes to the output file the assembly code that implements the given arithmetic-logical command.
 /// </summary>
 /// <param name="command">Arithmetic-logical command</param>
@@ -302,6 +274,8 @@ void CodeWriter::writeFunction(std::string functionName, int nVars)
     {
         *output_file << "\n// function " << functionName << " " << nVars << "\n";
     }
+
+    this->setFunctionName(functionName);
 
     if (defined_labels.count(functionName))
     {
@@ -688,6 +662,19 @@ void CodeWriter::writeStatic(ECommandType commandType, int index)
     }
 }
 
+void CodeWriter::setFunctionName(std::string functionName)
+{
+    std::regex functionRegex("[A-z][\\w.]*");
+    std::cmatch match;
+    if (!std::regex_match(functionName.c_str(), match, functionRegex))
+    {
+        throw std::runtime_error("Invalid function name format: " + functionName);
+    }
+
+    this->function_name = functionName;
+    this->no_function_defined = false;
+}
+
 std::string CodeWriter::getFullLabelName(std::string label)
 {
     if (this->no_function_defined)
@@ -730,7 +717,7 @@ int CodeWriter::getNumber(std::string label)
     int newValue = 1;
     if (it != counters_map.end())
     {
-        int newValue = it->second++;    
+        newValue = ++it->second;    
     }
     
     counters_map.insert_or_assign(label, newValue);
