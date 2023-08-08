@@ -3,6 +3,9 @@
 D=A
 @SP
 M=D
+@CHECK_SYSINIT
+0;JMP
+(NO_SYSINIT)
 
 // push argument 1
 @1
@@ -268,4 +271,8 @@ M=D
 
 (END)
 @END
+0;JMP
+
+(CHECK_SYSINIT)
+@NO_SYSINIT
 0;JMP

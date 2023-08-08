@@ -455,6 +455,14 @@ M=D
 
 void CodeWriter::finalCode()
 {
+    const char* finalCommand =
+R"(
+(END)
+@END
+0;JMP
+)";
+    *output_file << finalCommand;
+
     if (defined_labels.count("Sys.init"))
     {
         *output_file << "\n(CHECK_SYSINIT)\n";
@@ -470,14 +478,6 @@ R"(
 )";
         *output_file << sysinitCheck;
     }
-    
-    const char* finalCommand =
-R"(
-(END)
-@END
-0;JMP
-)";
-    *output_file << finalCommand;
 
     if (is_comparison_used)
     {

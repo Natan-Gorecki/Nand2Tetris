@@ -11,12 +11,6 @@ namespace fs = std::filesystem;
 VMTranslator::VMTranslator(std::string path)
 {
     fs::path filePath = path;
-
-    if (isupper(path[0]) == false)
-    {
-        throw std::runtime_error("Input file/directory " + std::string(path) + " doesn't start with uppercase.");
-    }
-
     fs::path inputPath = filePath.is_relative()
         ? fs::current_path().string() + "\\" + filePath.string() 
         : filePath.string();
@@ -24,19 +18,22 @@ VMTranslator::VMTranslator(std::string path)
     this->input_file = inputPath.string();
     this->is_directory_path = inputPath.extension() == "";
 
-    fs::path outputPath;
-    if (filePath.is_relative())
-    {
-        outputPath = fs::current_path().string() + "\\" + filePath.replace_extension(".asm").string();
-    }
-    else
-    {
-        outputPath = this->is_directory_path 
-            ? filePath.string() + "\\" + filePath.filename().string() + ".asm"
-            : filePath.replace_extension(".asm").string();
-    }
-    this->output_file = outputPath.string();
+    std::string outputPrefix = filePath.is_relative()
+        ? fs::current_path().string() + "\\"
+        : "";
+    std::string outputPath = this->is_directory_path
+        ? filePath.string()
+        : filePath.parent_path().string();
+    std::string outputFileName = this->is_directory_path
+        ? filePath.filename().string()
+        : filePath.filename().stem().string();
 
+    this->output_file= outputPrefix + outputPath + "\\" + outputFileName + ".asm";
+
+    if (!is_directory_path && !isupper(inputPath.filename().string()[0]))
+    {
+        throw std::runtime_error("Input file/directory " + std::string(path) + " doesn't start with uppercase.");
+    }
 
     if (!is_directory_path && inputPath.extension() != ".vm")
     {
@@ -59,7 +56,7 @@ bool VMTranslator::isDirectoryPath()
 void VMTranslator::parseDirectory()
 {
     fs::path filePath = fs::path(input_file);
-    if (fs::exists(filePath) == false)
+    if (!fs::exists(filePath))
     {
         throw std::runtime_error("Directory " + input_file + " doesn't exist");
     }
@@ -67,7 +64,7 @@ void VMTranslator::parseDirectory()
     std::vector<std::string> vmFiles = std::vector<std::string>();
     for (const fs::directory_entry& entry : fs::directory_iterator(input_file))
     {
-        if (entry.is_regular_file() && entry.path().extension() == ".vm")
+        if (entry.is_regular_file() && isupper(entry.path().filename().string()[0]) && entry.path().extension() == ".vm")
         {
             vmFiles.push_back(entry.path().string());
         }
@@ -89,7 +86,7 @@ void VMTranslator::parseDirectory()
 void VMTranslator::parseSingleFile()
 {
     fs::path filePath = fs::path(input_file);
-    if (fs::exists(filePath) == false)
+    if (!fs::exists(filePath))
     {
         throw std::runtime_error("File " + input_file + " doesn't exist");
     }

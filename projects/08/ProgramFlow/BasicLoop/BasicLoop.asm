@@ -3,6 +3,9 @@
 D=A
 @SP
 M=D
+@CHECK_SYSINIT
+0;JMP
+(NO_SYSINIT)
 
 // push constant 0
 @0
@@ -150,4 +153,8 @@ M=M+1
 
 (END)
 @END
+0;JMP
+
+(CHECK_SYSINIT)
+@NO_SYSINIT
 0;JMP

@@ -434,6 +434,10 @@ M=D
 @Sys.init$WHILE
 0;JMP
 
+(END)
+@END
+0;JMP
+
 (CHECK_SYSINIT)
 
 // call Sys.init 0
@@ -492,10 +496,6 @@ M=D
 @Sys.init
 0;JMP
 (Sys.init$ret.1)
-
-(END)
-@END
-0;JMP
 
 (TRUE_CONDITION)
 @1
