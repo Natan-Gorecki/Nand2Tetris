@@ -1,0 +1,47 @@
+/** Class SnakeGame */
+class SnakeGame {
+    field Snake _snake;
+    field int _direction;
+
+    constructor SnakeGame new() {
+        let _snake = Snake.new();
+        let _direction = Direction.Right();
+        return this;
+    }
+
+    method void dispose() {
+        do _snake.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void run() {
+        var char key;
+        var boolean exit;
+        let exit = false;
+
+        while(~exit) {
+            let key = Keyboard.keyPressed();
+
+            if (key = KeyboardButton.Q()) {
+                let exit = true;
+            }
+            if (key = KeyboardButton.LeftArrow()) {
+                let _direction = Direction.Left();
+            }
+            if (key = KeyboardButton.UpArrow()) {
+                let _direction = Direction.Up();
+            }
+            if (key = KeyboardButton.RightArrow()) {
+                let _direction = Direction.Right();
+            }
+            if (key = KeyboardButton.DownArrow()) {
+                let _direction = Direction.Down();
+            }
+
+            do _snake.move(_direction);
+        }
+
+        return;
+    }
+}

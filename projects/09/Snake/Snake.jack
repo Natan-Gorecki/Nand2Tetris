@@ -1,0 +1,16 @@
+/** Class Snake */
+class Snake {
+    field int _temp;
+
+    constructor Snake new() {
+        return this;
+    }
+
+    method void dispose() {
+        return;
+    }
+
+    method boolean move(int direction) {
+        return false;
+    }
+}
