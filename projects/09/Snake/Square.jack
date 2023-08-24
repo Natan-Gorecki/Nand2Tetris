@@ -1,0 +1,56 @@
+/** Class Square */
+class Square {
+    static int _size;
+    field int _x; // 0 <= x <= 32
+    field int _y; // 0 <= y <= 16
+
+    constructor Square new(int x, int y) {
+        let _x = x;
+        let _y = y;
+        return this;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void draw() {
+        do Screen.setColor(true);
+        do Screen.drawRectangle(_x * _size, _y * _size, (_x + 1) * _size - 1, (_y + 1) * _size - 1);
+        return;
+    }
+
+    method void erase() {
+        do Screen.setColor(false);
+        do Screen.drawRectangle(_x * _size, _y * _size, (_x + 1) * _size - 1, (_y + 1) * _size - 1);
+        return;
+    }
+
+    method int getX() {
+        return _x;
+    }
+
+    method void setX(int x) {
+        let _x = x;
+        return;
+    }
+
+    method int getY() {
+        return _y;
+    }
+
+    method void setY(int y) {
+        let _y = y;
+        return;
+    }
+
+    function int getSize() {
+        return _size;
+    }
+
+    function void setSize(int size) {
+        let _size = size;
+        return;
+    }
+}

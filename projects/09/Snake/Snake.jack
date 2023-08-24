@@ -1,16 +1,39 @@
 /** Class Snake */
 class Snake {
-    field int _temp;
+    field SnakeSegment _head;
 
     constructor Snake new() {
+        var SnakeSegment body1, body2;
+
+        let _head = SnakeSegment.new(SegmentType.Head(), 3, 0);
+        let body1 = SnakeSegment.new(SegmentType.Body(), 2, 0);
+        let body2 = SnakeSegment.new(SegmentType.Body(), 1, 0);
+        do pushBack(body1);
+        do pushBack(body2);
+
+        do _head.draw();
+        do body1.draw();
+        do body2.draw();
+
         return this;
     }
 
     method void dispose() {
+        do _head.dispose();
         return;
     }
 
     method boolean move(int direction) {
-        return false;
+        return true;
+    }
+
+    method void pushBack(SnakeSegment snakeSegment) {
+        var SnakeSegment current;
+        let current = _head;
+        while (~(current.getNextSegment() = null)) {
+            let current = current.getNextSegment();
+        }
+        do current.setNextSegment(snakeSegment);
+        return;
     }
 }

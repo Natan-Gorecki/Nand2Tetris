@@ -4,8 +4,11 @@ class SnakeGame {
     field int _direction;
 
     constructor SnakeGame new() {
+        do Square.setSize(16);
+
         let _snake = Snake.new();
         let _direction = Direction.Right();
+
         return this;
     }
 
@@ -18,14 +21,12 @@ class SnakeGame {
     method void run() {
         var char key;
         var boolean exit;
+        var boolean moveResult;
         let exit = false;
 
-        while(~exit) {
+        while (~exit) {
             let key = Keyboard.keyPressed();
 
-            if (key = KeyboardButton.Q()) {
-                let exit = true;
-            }
             if (key = KeyboardButton.LeftArrow()) {
                 let _direction = Direction.Left();
             }
@@ -39,7 +40,13 @@ class SnakeGame {
                 let _direction = Direction.Down();
             }
 
-            do _snake.move(_direction);
+            let moveResult = _snake.move(_direction);
+            if (~moveResult) {
+                let exit = true;
+            }
+            else {
+                do Sys.wait(1000);
+            }
         }
 
         return;
