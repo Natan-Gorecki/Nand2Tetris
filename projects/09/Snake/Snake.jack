@@ -4,12 +4,16 @@ class Snake {
 
     constructor Snake new() {
         var SnakeSegment body1, body2;
+        var SnakeSegment lastSegment;
 
         let _head = SnakeSegment.new(SegmentType.Head(), 3, 0);
         let body1 = SnakeSegment.new(SegmentType.Body(), 2, 0);
         let body2 = SnakeSegment.new(SegmentType.Body(), 1, 0);
-        do pushBack(body1);
-        do pushBack(body2);
+        
+        let lastSegment = getLastSegment();
+        do lastSegment.setNextSegment(body1);
+        let lastSegment = getLastSegment();
+        do lastSegment.setNextSegment(body2);
 
         do _head.draw();
         do body1.draw();
@@ -24,16 +28,54 @@ class Snake {
     }
 
     method boolean move(int direction) {
+        var int prevX, prevY, prevDir;
+        var int curX, curY, curDir;
+        var SnakeSegment current;
+        
+        let prevX = _head.getX(); 
+        let prevY = _head.getY();
+        let prevDir = direction;
+
+        if (direction = Direction.Left()) { let prevX = prevX - 1; }
+        if (direction = Direction.Up()) { let prevY = prevY - 1; }
+        if (direction = Direction.Right()) { let prevX = prevX + 1; }
+        if (direction = Direction.Down()) { let prevY = prevY + 1; }
+
+        // erase last segment
+        let current = getLastSegment();
+        do current.erase();
+        let current = _head;
+
+        // update all coordinates
+        while (~(current = null)) {
+            let curX = current.getX();
+            let curY = current.getY();
+            let curDir = current.getDirection();
+
+            do current.setX(prevX);
+            do current.setY(prevY);
+            do current.setDirection(prevDir);
+
+            let prevX = curX;
+            let prevY = curY;
+            let prevDir = curDir;
+            let current = current.getNextSegment();
+        }
+
+        // update first two segments
+        do _head.draw();
+        let current = _head.getNextSegment();
+        do current.draw();
+
         return true;
     }
 
-    method void pushBack(SnakeSegment snakeSegment) {
+    method SnakeSegment getLastSegment() {
         var SnakeSegment current;
         let current = _head;
         while (~(current.getNextSegment() = null)) {
             let current = current.getNextSegment();
         }
-        do current.setNextSegment(snakeSegment);
-        return;
+        return current;
     }
 }

@@ -21,7 +21,9 @@ class SnakeGame {
     method void run() {
         var char key;
         var boolean exit;
+        var int iteration;
         var boolean moveResult;
+        let iteration = 0;
         let exit = false;
 
         while (~exit) {
@@ -40,13 +42,19 @@ class SnakeGame {
                 let _direction = Direction.Down();
             }
 
-            let moveResult = _snake.move(_direction);
-            if (~moveResult) {
-                let exit = true;
+            if (iteration = 10) {
+                let iteration = 0;
+                
+                let moveResult = _snake.move(_direction);
+                if (~moveResult) {
+                    let exit = true;
+                }
             }
             else {
-                do Sys.wait(1000);
+                let iteration = iteration + 1;
             }
+
+            do Sys.wait(25);
         }
 
         return;

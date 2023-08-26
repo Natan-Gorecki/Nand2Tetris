@@ -23,6 +23,18 @@ class SnakeSegment {
         return;
     }
 
+    // getters
+    method int getX() { return _square.getX(); }
+    method int getY() { return _square.getY(); }
+    method int getDirection() { return _direction; }
+    method SnakeSegment getNextSegment() { return _nextSegment; }
+
+    // setters
+    method void setX(int x) { do _square.setX(x); return; }
+    method void setY(int y) { do _square.setY(y); return; }
+    method void setDirection(int direction) { let _direction = direction; return; }
+    method void setNextSegment(SnakeSegment nextSegment) { let _nextSegment = nextSegment; return; }
+
     method void draw() {
         if (_segmentType = SegmentType.Body()) {
             do _square.draw();
@@ -38,18 +50,9 @@ class SnakeSegment {
         return;
     }
 
-    method SnakeSegment getNextSegment() {
-        return _nextSegment;
-    }
-
-    method void setNextSegment(SnakeSegment nextSegment) {
-        let _nextSegment = nextSegment;
-        return;
-    }
-
     function void drawHead(int x, int y, int direction) {
         var int memAddress;
-        let memAddress = 16384 + x + (32 * y);
+        let memAddress = 16384 + x + (512 * y);
         do Screen.setColor(true);
 
         if (direction = Direction.Left()) {
