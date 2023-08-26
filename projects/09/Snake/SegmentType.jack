@@ -1,10 +1,5 @@
 /** Enum SegmentType */
 class SegmentType {
-    function int Body() {
-        return 0;
-    }
-
-    function int Head() {
-        return 1;
-    }
+    function int Body() { return 0; }
+    function int Head() { return 1; }
 }

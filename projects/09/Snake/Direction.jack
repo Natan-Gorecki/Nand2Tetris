@@ -1,18 +1,7 @@
 /** Enum Direction */
 class Direction {
-    function int Left() {
-        return 1;
-    }
-
-    function int Up() {
-        return 2;
-    }
-
-    function int Right() {
-        return 3;
-    }
-
-    function int Down() {
-        return 4;
-    }
+    function int Left() { return 1; }
+    function int Up() { return 2; }
+    function int Right() { return 3; }
+    function int Down() { return 4; }
 }

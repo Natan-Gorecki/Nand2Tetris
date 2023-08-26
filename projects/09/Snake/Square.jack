@@ -15,6 +15,16 @@ class Square {
         return;
     }
 
+    // getters
+    method int getX() { return _x; }
+    method int getY() { return _y; }
+    function int getSize() { return _size; }
+
+    // setters
+    method void setX(int x) { let _x = x; return; }
+    method void setY(int y) { let _y = y; return; }
+    function void setSize(int size) { let _size = size; return; }
+
     method void draw() {
         do Screen.setColor(true);
         do Screen.drawRectangle(_x * _size, _y * _size, (_x + 1) * _size - 1, (_y + 1) * _size - 1);
@@ -24,33 +34,6 @@ class Square {
     method void erase() {
         do Screen.setColor(false);
         do Screen.drawRectangle(_x * _size, _y * _size, (_x + 1) * _size - 1, (_y + 1) * _size - 1);
-        return;
-    }
-
-    method int getX() {
-        return _x;
-    }
-
-    method void setX(int x) {
-        let _x = x;
-        return;
-    }
-
-    method int getY() {
-        return _y;
-    }
-
-    method void setY(int y) {
-        let _y = y;
-        return;
-    }
-
-    function int getSize() {
-        return _size;
-    }
-
-    function void setSize(int size) {
-        let _size = size;
         return;
     }
 }
