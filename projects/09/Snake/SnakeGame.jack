@@ -4,8 +4,7 @@ class SnakeGame {
     field int _direction;
 
     constructor SnakeGame new() {
-        do Square.setSize(16);
-
+        do Matrix.new();
         let _snake = Snake.new();
         let _direction = Direction.Right();
 
@@ -14,6 +13,7 @@ class SnakeGame {
 
     method void dispose() {
         do _snake.dispose();
+        do Matrix.dispose();
         do Memory.deAlloc(this);
         return;
     }

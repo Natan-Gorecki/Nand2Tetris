@@ -1,0 +1,87 @@
+/** Class Matrix */
+class Matrix {
+    static Array _rows;
+    static int _width;
+    static int _height;
+
+    function void new() {
+        var int x, y;
+        var Array columns;
+        
+        let _width = 32;
+        let _height = 16;
+        
+        let x = 0;
+        let _rows = Array.new(_width);
+
+        do Square.setSize(16);
+
+        while (x < _width) {
+            let columns = Array.new(_height);
+            let y = 0;
+
+            while (y < _height) {
+                let columns[y] = Square.new(x, y);
+                let y = y + 1;
+            }
+
+            let _rows[x] = columns;
+            let x = x + 1;
+        }
+
+        return;
+    }
+
+    function void dispose() {
+        var int x, y;
+        var Array columns;
+        var Square cell;
+        let x = 0;
+
+        while (x < _width) {
+            let columns = _rows[x];
+            let y = 0;
+
+            while (y < _height) {
+                let cell = columns[y];
+                do cell.dispose();
+                let y = y + 1;
+            }
+
+            do columns.dispose();
+            let x = x + 1;
+        }
+
+        do _rows.dispose();
+        return;
+    }
+
+    // getters
+    function int getWidth() { return _width; }
+    function int getHeight() { return _height; }
+
+    function Square getCell(int dx, int dy) {
+        var int x, y;
+        var Array columns;
+        var Square cell;
+        let cell = null;
+        let x = 0;
+
+        while (x < _width) {
+            if (x = dx) {
+                let columns = _rows[x];
+                let y = 0;
+
+                while (y < _height) {
+                    if (y = dy) {
+                        let cell = columns[y];
+                    }
+                    let y = y + 1;
+                }
+            }
+            let x = x + 1;
+        }
+
+        return cell;
+    }
+}

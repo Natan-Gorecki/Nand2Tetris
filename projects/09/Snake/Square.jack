@@ -3,10 +3,14 @@ class Square {
     static int _size;
     field int _x; // 0 <= x <= 32
     field int _y; // 0 <= y <= 16
+    field int _squareType;
+    field int _direction;
 
     constructor Square new(int x, int y) {
         let _x = x;
         let _y = y;
+        let _squareType = SquareType.Empty();
+        let _direction = Direction.Undefined();
         return this;
     }
 
@@ -18,16 +22,34 @@ class Square {
     // getters
     method int getX() { return _x; }
     method int getY() { return _y; }
+    method int getSquareType() { return _squareType; }
+    method int getDirection() { return _direction; }
     function int getSize() { return _size; }
 
     // setters
     method void setX(int x) { let _x = x; return; }
     method void setY(int y) { let _y = y; return; }
+    method void setSquareType(int squareType) { let _squareType = squareType; return; }
+    method void setDirection(int direction) { let _direction = direction; return; }
     function void setSize(int size) { let _size = size; return; }
 
     method void draw() {
-        do Screen.setColor(true);
-        do Screen.drawRectangle(_x * _size, _y * _size, (_x + 1) * _size - 1, (_y + 1) * _size - 1);
+        if (_squareType = SquareType.Empty()) {
+            do erase();
+        }
+
+        if (_squareType = SquareType.SnakeBody()) {
+            do BitmapDrawer.drawSquare(_x, _y);
+        }
+
+        if (_squareType = SquareType.SnakeHead()) {
+            do BitmapDrawer.drawSnakeHead(_x, _y, _direction);
+        }
+
+        if (_squareType = SquareType.Food()) {
+            do BitmapDrawer.drawFood(_x, _y);
+        }
+
         return;
     }
 

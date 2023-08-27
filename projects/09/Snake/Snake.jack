@@ -6,9 +6,9 @@ class Snake {
         var SnakeSegment body1, body2;
         var SnakeSegment lastSegment;
 
-        let _head = SnakeSegment.new(SegmentType.Head(), 3, 0);
-        let body1 = SnakeSegment.new(SegmentType.Body(), 2, 0);
-        let body2 = SnakeSegment.new(SegmentType.Body(), 1, 0);
+        let _head = SnakeSegment.new(3, 0, SquareType.SnakeHead(), Direction.Right());
+        let body1 = SnakeSegment.new(2, 0, SquareType.SnakeBody(), Direction.Right());
+        let body2 = SnakeSegment.new(1, 0, SquareType.SnakeBody(), Direction.Right());
         
         let lastSegment = getLastSegment();
         do lastSegment.setNextSegment(body1);
@@ -24,6 +24,7 @@ class Snake {
 
     method void dispose() {
         do _head.dispose();
+        do Memory.deAlloc(this);
         return;
     }
 
@@ -31,7 +32,7 @@ class Snake {
         var int prevX, prevY, prevDir;
         var int curX, curY, curDir;
         var SnakeSegment current;
-        
+
         let prevX = _head.getX(); 
         let prevY = _head.getY();
         let prevDir = direction;
@@ -40,6 +41,12 @@ class Snake {
         if (direction = Direction.Up()) { let prevY = prevY - 1; }
         if (direction = Direction.Right()) { let prevX = prevX + 1; }
         if (direction = Direction.Down()) { let prevY = prevY + 1; }
+
+        // allow to go through wall
+        if (prevX < 0) { let prevX = prevX + Matrix.getWidth(); }
+        if (prevY < 0) { let prevY = prevY + Matrix.getHeight(); }
+        if ((prevX = Matrix.getWidth()) | (prevX > Matrix.getWidth())) { let prevX = 0; }
+        if ((prevY = Matrix.getHeight()) | (prevY > Matrix.getHeight())) { let prevY = 0; }
 
         // erase last segment
         let current = getLastSegment();
