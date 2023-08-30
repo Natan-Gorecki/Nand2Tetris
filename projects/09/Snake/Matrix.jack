@@ -59,6 +59,7 @@ class Matrix {
     // getters
     function int getWidth() { return _width; }
     function int getHeight() { return _height; }
+    function int getRows() { return _rows; }
 
     function Square getCell(int dx, int dy) {
         var int x, y;

@@ -1,11 +1,14 @@
 /** Class SnakeGame */
 class SnakeGame {
     field Snake _snake;
+    field FoodGenerator _foodGenerator;
     field int _direction;
 
     constructor SnakeGame new() {
         do Matrix.new();
+        do Random.setSeed(4567);
         let _snake = Snake.new();
+        let _foodGenerator = FoodGenerator.new(3);
         let _direction = Direction.Right();
 
         return this;
@@ -45,6 +48,7 @@ class SnakeGame {
             if (iteration = 10) {
                 let iteration = 0;
                 
+                do _foodGenerator.generateFood();
                 let moveResult = _snake.move(_direction);
                 if (~moveResult) {
                     let exit = true;

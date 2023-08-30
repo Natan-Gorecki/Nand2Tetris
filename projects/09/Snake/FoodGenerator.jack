@@ -1,0 +1,67 @@
+/** Class FoodGenerator */
+class FoodGenerator {
+    field int _freeCellsCount;
+
+    constructor FoodGenerator new(int snakeCount) {
+        var int width, height;
+        let width = Matrix.getWidth();
+        let height = Matrix.getHeight();
+
+        let _freeCellsCount = width * height - snakeCount;
+        return this;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method Square generateFood() {
+        var inr currInt, nextInt;
+        var int x, y;
+        var int width, height;
+        var Array rows, columns;
+        var Square cell;
+        var int squareType;
+
+        if (_freeCellsCount = 0 ) {
+            return null;
+        }
+
+        let currInt = 0;
+        let nextInt = Random.nextInt(_freeCellsCount);
+        let _freeCellsCount = _freeCellsCount - 1;
+
+        let width = Matrix.getWidth();
+        let height = Matrix.getHeight();
+        let rows = Matrix.getRows();
+        let x = 0;
+
+        while (x < width) {
+            let columns = rows[x];
+            let y = 0;
+            
+            while (y < height) {
+                let cell = columns[y];
+                let squareType = cell.getSquareType();
+
+                if (squareType = SquareType.Empty()) {
+                    let currInt = currInt + 1;
+                }
+
+                if (currInt = nextInt) {
+                    do cell.setSquareType(SquareType.Food());
+                    do cell.draw();
+                    return cell;
+                }
+                let y = y + 1;
+            }
+
+            let x = x + 1;
+        }
+
+        // we shouldn't be here, the code has bugs then
+        do Sys.error(404);
+        return null;
+    }
+}
