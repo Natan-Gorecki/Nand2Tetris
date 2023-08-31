@@ -1,0 +1,80 @@
+/** Class Snake */
+class Snake {
+    field SnakeSegment _head;
+
+    constructor Snake new() {
+        var SnakeSegment body;
+        let _head = SnakeSegment.new(2, 0, SquareType.SnakeHead(), Direction.Right());
+        let body = SnakeSegment.new(1, 0, SquareType.SnakeHead(), Direction.Right());
+
+        do _head.setNextSegment(body);
+
+        do _head.draw();
+        do body.draw();
+
+        return this;
+    }
+
+    method void dispose() {
+        do _head.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    // getters
+    method SnakeSegment getHead() { return _head; }
+    method SnakeSegment getLastSegment() {
+        var SnakeSegment current;
+        let current = _head;
+        while (~(current.getNextSegment() = null)) {
+            let current = current.getNextSegment();
+        }
+        return current;
+    }
+
+    method void move(Square square, boolean removeLast) {
+        var SnakeSegment oldHead;
+        let oldHead = _head;
+
+        let _head = SnakeSegment.new(square.getX(), square.getY(), SquareType.SnakeHead(), square.getDirection());
+        do _head.setNextSegment(oldHead);
+        do oldHead.setSquareType(SquareType.SnakeBody());
+        
+        do redrawSnake();
+
+        if (removeLast) {
+            do removeLastSegment();
+        }
+
+        return;
+    }
+
+    method void redrawSnake() {
+        var SnakeSegment segment;
+        let segment = _head.getNextSegment();
+
+        do _head.draw();
+        do segment.draw();
+
+        return;
+    }
+
+    method void removeLastSegment() {
+        var SnakeSegment beforeCurrent, current, next;
+    
+        let beforeCurrent = null;
+        let current = _head;
+        let next = _head.getNextSegment();
+
+        while (~(next = null)) {
+            let beforeCurrent = current;
+            let current = next;
+            let next = current.getNextSegment();
+        }
+
+        do beforeCurrent.setNextSegment(null);
+        do current.erase();
+        do current.dispose();
+        return;
+    }
+}

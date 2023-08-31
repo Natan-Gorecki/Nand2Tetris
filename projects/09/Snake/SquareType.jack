@@ -1,0 +1,7 @@
+/** Enum SquareType */
+class SquareType {
+    function int Empty() { return 0; }
+    function int SnakeBody() { return 1; }
+    function int SnakeHead() { return 2; }
+    function int Food() { return 3; }
+}

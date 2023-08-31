@@ -1,0 +1,28 @@
+/** Class Random */
+class Random {
+    static int _seed;
+
+    function void setSeed(int seed) {
+        let _seed = seed;
+        return;
+    }
+
+    /** Generates a random integer between 0 and the given upper bound. */
+    function int nextInt(int upperBound) {
+        var int x, y;
+        var int number;
+
+        // arbitrary values
+        let x = 8460;
+        let y = 20672;
+
+        let _seed = (x * _seed + y) & 32767;
+
+        let number = _seed;
+        while (number > upperBound) {
+            let number = number - upperBound;
+        }
+
+        return number;
+    }
+}

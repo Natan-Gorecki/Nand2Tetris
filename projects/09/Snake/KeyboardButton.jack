@@ -1,0 +1,40 @@
+/** Enum KeyboardButton */
+class KeyboardButton {
+    // space
+    function int Space() { return 32; }
+    
+    // letters
+    function int A() { return 65; }
+    function int B() { return 66; }
+    function int C() { return 67; }
+    function int D() { return 68; }
+    function int E() { return 69; }
+    function int F() { return 70; }
+    function int G() { return 71; }
+    function int H() { return 72; }
+    function int I() { return 73; }
+    function int J() { return 74; }
+    function int K() { return 75; }
+    function int L() { return 76; }
+    function int M() { return 77; }
+    function int N() { return 78; }
+    function int O() { return 79; }
+    function int P() { return 80; }
+    function int Q() { return 81; }
+    function int R() { return 82; }
+    function int S() { return 83; }
+    function int T() { return 84; }
+    function int U() { return 85; }
+    function int V() { return 86; } 
+    function int W() { return 87; }
+    function int X() { return 88; }
+    function int Y() { return 89; }
+    function int Z() { return 90; }
+
+    // special buttons
+    function int BackSpace() { return 129; }
+    function int LeftArrow() { return 130; }
+    function int UpArrow() { return 131; }
+    function int RightArrow() { return 132; }
+    function int DownArrow() { return 133; }
+}

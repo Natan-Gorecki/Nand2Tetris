@@ -1,0 +1,107 @@
+/** Class BitmapDrawer */
+class BitmapDrawer {
+    function void drawSquare(int x, int y) {
+        var int size;
+        let size = Square.getSize();
+
+        do Screen.setColor(true);
+        do Screen.drawRectangle(x * size, y * size, (x + 1) * size - 1, (y + 1) * size - 1);
+
+        return;
+    }
+
+    function void drawSnakeHead(int x, int y, int direction) {
+        var int memAddress;
+        let memAddress = 16384 + x + (512 * y);
+        do Screen.setColor(true);
+
+        if (direction = Direction.Left()) {
+            do Memory.poke(memAddress+0, -1);
+            do Memory.poke(memAddress+32, -1);
+            do Memory.poke(memAddress+64, -241);
+            do Memory.poke(memAddress+96, -241);
+            do Memory.poke(memAddress+128, -225);
+            do Memory.poke(memAddress+160, -225);
+            do Memory.poke(memAddress+192, -241);
+            do Memory.poke(memAddress+224, -1);
+            do Memory.poke(memAddress+256, -1);
+            do Memory.poke(memAddress+288, -241);
+            do Memory.poke(memAddress+320, -225);
+            do Memory.poke(memAddress+352, -225);
+            do Memory.poke(memAddress+384, -241);
+            do Memory.poke(memAddress+416, -241);
+            do Memory.poke(memAddress+448, -1);
+            do Memory.poke(memAddress+480, -1);
+        }
+
+        if (direction = Direction.Up()) {
+            do Memory.poke(memAddress+0, -1);
+            do Memory.poke(memAddress+32, -1);
+            do Memory.poke(memAddress+64, -1);
+            do Memory.poke(memAddress+96, -1);
+            do Memory.poke(memAddress+128, -12877);
+            do Memory.poke(memAddress+160, -15997);
+            do Memory.poke(memAddress+192, -15997);
+            do Memory.poke(memAddress+224, -15997);
+            do Memory.poke(memAddress+256, -1);
+            do Memory.poke(memAddress+288, -1);
+            do Memory.poke(memAddress+320, -1);
+            do Memory.poke(memAddress+352, -1);
+            do Memory.poke(memAddress+384, -1);
+            do Memory.poke(memAddress+416, -1);
+            do Memory.poke(memAddress+448, -1);
+            do Memory.poke(memAddress+480, -1);
+        }
+
+        if (direction = Direction.Right()) {
+            do Memory.poke(memAddress+0, -1);
+            do Memory.poke(memAddress+32, -1);
+            do Memory.poke(memAddress+64, -3841);
+            do Memory.poke(memAddress+96, -3841);
+            do Memory.poke(memAddress+128, -1793);
+            do Memory.poke(memAddress+160, -1793);
+            do Memory.poke(memAddress+192, -3841);
+            do Memory.poke(memAddress+224, -1);
+            do Memory.poke(memAddress+256, -1);
+            do Memory.poke(memAddress+288, -3841);
+            do Memory.poke(memAddress+320, -1793);
+            do Memory.poke(memAddress+352, -1793);
+            do Memory.poke(memAddress+384, -3841);
+            do Memory.poke(memAddress+416, -3841);
+            do Memory.poke(memAddress+448, -1);
+            do Memory.poke(memAddress+480, -1);
+        }
+
+        if (direction = Direction.Down()) {
+            do Memory.poke(memAddress+0, -1);
+            do Memory.poke(memAddress+32, -1);
+            do Memory.poke(memAddress+64, -1);
+            do Memory.poke(memAddress+96, -1);
+            do Memory.poke(memAddress+128, -1);
+            do Memory.poke(memAddress+160, -1);
+            do Memory.poke(memAddress+192, -1);
+            do Memory.poke(memAddress+224, -1);
+            do Memory.poke(memAddress+256, -15997);
+            do Memory.poke(memAddress+288, -15997);
+            do Memory.poke(memAddress+320, -15997);
+            do Memory.poke(memAddress+352, -12877);
+            do Memory.poke(memAddress+384, -1);
+            do Memory.poke(memAddress+416, -1);
+            do Memory.poke(memAddress+448, -1);
+            do Memory.poke(memAddress+480, -1);
+        }
+
+        return;
+    }
+
+    function void drawFood(int x, int y) {
+        var int size, r;
+        let size = Square.getSize();
+        let r = size / 2;
+
+        do Screen.setColor(true);
+        do Screen.drawCircle(x * size + r, y * size + r, r - 1);
+
+        return;
+    }
+}

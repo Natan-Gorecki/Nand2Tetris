@@ -1,0 +1,46 @@
+/** Class SnakeSegment represents single segment of Snake body */
+class SnakeSegment {
+    field Square _square;
+    field SnakeSegment _nextSegment;
+    
+    constructor SnakeSegment new(int x, int y, int squareType, int direction) {
+        let _square = Matrix.getCell(x, y);
+        let _nextSegment = null;
+
+        do _square.setSquareType(squareType);
+        do _square.setDirection(direction);
+
+        return this;
+    }
+
+    method void dispose() {
+        if (~(_nextSegment = null)) {
+            do _nextSegment.dispose();
+        }
+
+        do _square.setSquareType(SquareType.Empty());
+        do _square.setDirection(Direction.Undefined());
+
+        // Square is disposed by Matrix
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    // getters
+    method int getX() { return _square.getX(); }
+    method int getY() { return _square.getY(); }
+    method int getSquareType() { return _square.getSquareType(); }
+    method int getDirection() { return _square.getDirection(); }
+    method SnakeSegment getNextSegment() { return _nextSegment; }
+
+    // setters
+    method void setX(int x) { do _square.setX(x); return; }
+    method void setY(int y) { do _square.setY(y); return; }
+    method void setSquareType(int squareType) { do _square.setSquareType(squareType); return; }
+    method void setDirection(int direction) { do _square.setDirection(direction); return; }
+    method void setNextSegment(SnakeSegment nextSegment) { let _nextSegment = nextSegment; return; }
+
+    // methods
+    method void draw() { do _square.draw(); return; }
+    method void erase() { do _square.erase(); return; }
+}

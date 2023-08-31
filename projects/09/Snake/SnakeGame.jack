@@ -1,0 +1,115 @@
+/** Class SnakeGame */
+class SnakeGame {
+    field Snake _snake;
+    field FoodGenerator _foodGenerator;
+    field int _currentDirection, _direction;
+
+    constructor SnakeGame new() {
+        do Matrix.new();
+        do Random.setSeed(4567);
+        let _snake = Snake.new();
+        let _foodGenerator = FoodGenerator.new(2);
+        let _currentDirection = Direction.Right();
+        let _direction = Direction.Right();
+
+        do _foodGenerator.generateFood();
+
+        return this;
+    }
+
+    method void dispose() {
+        do _snake.dispose();
+        do _foodGenerator.dispose();
+        do Matrix.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void run() {
+        var char key;
+        var boolean exit;
+        var int iteration, score;
+        var Square nextSquare;
+        var SnakeSegment snakeHead;
+
+        let iteration = 0;
+        let score = 0;
+        let exit = false;
+
+        while (~exit) {
+            let key = Keyboard.keyPressed();
+
+            if ((key = KeyboardButton.LeftArrow()) & ~(_currentDirection = Direction.Right())) {
+                let _direction = Direction.Left();
+            }
+            if (key = KeyboardButton.UpArrow() & ~(_currentDirection = Direction.Down())) {
+                let _direction = Direction.Up();
+            }
+            if (key = KeyboardButton.RightArrow() & ~(_currentDirection = Direction.Left())) {
+                let _direction = Direction.Right();
+            }
+            if (key = KeyboardButton.DownArrow() & ~(_currentDirection = Direction.Up())) {
+                let _direction = Direction.Down();
+            }
+
+            if (iteration = 10) {
+                let iteration = 0;
+                let nextSquare = nextSquare();
+
+                let _currentDirection = _direction;
+
+                if (nextSquare.getSquareType() = SquareType.Food()) {
+                    let score = score + 1;
+
+                    do nextSquare.setDirection(_direction);
+                    do _snake.move(nextSquare, false);
+                    do _foodGenerator.generateFood();
+                }
+                if (nextSquare.getSquareType() = SquareType.Empty()) {
+                    do nextSquare.setDirection(_direction);
+                    do _snake.move(nextSquare, true);
+                }
+                if (nextSquare.getSquareType() = SquareType.SnakeBody()) {
+                    let snakeHead = _snake.getHead();
+                    do snakeHead.setDirection(_direction);
+                    do snakeHead.draw();
+                    let exit = true;
+                }
+            }
+            else {
+                let iteration = iteration + 1;
+            }
+
+            do Sys.wait(25);
+        }
+
+        do Output.printString("Score: ");
+        do Output.printInt(score);
+        return;
+    }
+
+    method Square nextSquare() {
+        var int nextX, nextY, nextDir;
+        var SnakeSegment snakeHead;
+        var Square cell;
+
+        let snakeHead = _snake.getHead();
+        let nextX = snakeHead.getX(); 
+        let nextY = snakeHead.getY();
+
+        if (_direction = Direction.Left()) { let nextX = nextX - 1; }
+        if (_direction = Direction.Up()) { let nextY = nextY - 1; }
+        if (_direction = Direction.Right()) { let nextX = nextX + 1; }
+        if (_direction = Direction.Down()) { let nextY = nextY + 1; }
+
+        // allow to go through wall
+        if (nextX < 0) { let nextX = nextX + Matrix.getWidth(); }
+        if (nextY < 0) { let nextY = nextY + Matrix.getHeight(); }
+        if ((nextX = Matrix.getWidth()) | (nextX > Matrix.getWidth())) { let nextX = 0; }
+        if ((nextY = Matrix.getHeight()) | (nextY > Matrix.getHeight())) { let nextY = 0; }
+
+        let cell = Matrix.getCell(nextX, nextY);
+        return cell;
+    }
+
+}
