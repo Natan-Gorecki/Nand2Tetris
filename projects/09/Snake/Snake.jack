@@ -3,17 +3,14 @@ class Snake {
     field SnakeSegment _head;
 
     constructor Snake new() {
-        var SnakeSegment body1, body2;
-        var SnakeSegment lastSegment;
+        var SnakeSegment body;
+        let _head = SnakeSegment.new(2, 0, SquareType.SnakeHead(), Direction.Right());
+        let body = SnakeSegment.new(1, 0, SquareType.SnakeHead(), Direction.Right());
 
-        let _head = SnakeSegment.new(3, 0, SquareType.SnakeHead(), Direction.Right());
-        let body1 = SnakeSegment.new(2, 0, SquareType.SnakeBody(), Direction.Right());
-        let body2 = SnakeSegment.new(1, 0, SquareType.SnakeBody(), Direction.Right());
-        
-        let lastSegment = getLastSegment();
-        do lastSegment.setNextSegment(body1);
-        let lastSegment = getLastSegment();
-        do lastSegment.setNextSegment(body2);
+        do _head.setNextSegment(body);
+
+        do _head.draw();
+        do body.draw();
 
         return this;
     }
@@ -76,6 +73,7 @@ class Snake {
         }
 
         do beforeCurrent.setNextSegment(null);
+        do current.erase();
         do current.dispose();
         return;
     }

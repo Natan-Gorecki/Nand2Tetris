@@ -8,7 +8,7 @@ class SnakeGame {
         do Matrix.new();
         do Random.setSeed(4567);
         let _snake = Snake.new();
-        let _foodGenerator = FoodGenerator.new(3);
+        let _foodGenerator = FoodGenerator.new(2);
         let _currentDirection = Direction.Right();
         let _direction = Direction.Right();
 
@@ -30,9 +30,12 @@ class SnakeGame {
         var int iteration, score;
         var Square nextSquare;
         var SquareType nextSquareType;
+        var SnakeSegment snakeHead;
+
         let iteration = 0;
         let score = 0;
         let exit = false;
+        let snakeHead = _snake.getHead();
 
         while (~exit) {
             let key = Keyboard.keyPressed();
@@ -69,6 +72,8 @@ class SnakeGame {
                     do _snake.move(nextSquare, true);
                 }
                 if (nextSquareType = SquareType.SnakeBody()) {
+                    do snakeHead.setDirection(_direction);
+                    do snakeHead.draw();
                     let exit = true;
                 }
             }

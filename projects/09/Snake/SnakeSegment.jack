@@ -9,7 +9,6 @@ class SnakeSegment {
 
         do _square.setSquareType(squareType);
         do _square.setDirection(direction);
-        do _square.draw();
 
         return this;
     }
@@ -21,7 +20,6 @@ class SnakeSegment {
 
         do _square.setSquareType(SquareType.Empty());
         do _square.setDirection(Direction.Undefined());
-        do _square.erase();
 
         // Square is disposed by Matrix
         do Memory.deAlloc(this);
