@@ -6,7 +6,7 @@ class Matrix {
 
     function void new() {
         var int x, y;
-        var Array columns;
+        var Array row;
         
         let _width = 32;
         let _height = 16;
@@ -17,15 +17,15 @@ class Matrix {
         do Square.setSize(16);
 
         while (x < _width) {
-            let columns = Array.new(_height);
+            let row = Array.new(_height);
             let y = 0;
 
             while (y < _height) {
-                let columns[y] = Square.new(x, y);
+                let row[y] = Square.new(x, y);
                 let y = y + 1;
             }
 
-            let _rows[x] = columns;
+            let _rows[x] = row;
             let x = x + 1;
         }
 
@@ -34,21 +34,21 @@ class Matrix {
 
     function void dispose() {
         var int x, y;
-        var Array columns;
+        var Array row;
         var Square cell;
         let x = 0;
 
         while (x < _width) {
-            let columns = _rows[x];
+            let row = _rows[x];
             let y = 0;
 
             while (y < _height) {
-                let cell = columns[y];
+                let cell = row[y];
                 do cell.dispose();
                 let y = y + 1;
             }
 
-            do columns.dispose();
+            do row.dispose();
             let x = x + 1;
         }
 
@@ -63,19 +63,19 @@ class Matrix {
 
     function Square getCell(int dx, int dy) {
         var int x, y;
-        var Array columns;
+        var Array row;
         var Square cell;
         let cell = null;
         let x = 0;
 
         while (x < _width) {
             if (x = dx) {
-                let columns = _rows[x];
+                let row = _rows[x];
                 let y = 0;
 
                 while (y < _height) {
                     if (y = dy) {
-                        let cell = columns[y];
+                        let cell = row[y];
                     }
                     let y = y + 1;
                 }

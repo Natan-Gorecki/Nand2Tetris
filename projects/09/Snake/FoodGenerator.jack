@@ -15,7 +15,7 @@ class FoodGenerator {
     method Square generateFood() {
         var inr currInt, nextInt;
         var int x, y;
-        var Array rows, columns;
+        var Array rows, row;
         var Square cell;
         var int squareType;
 
@@ -31,11 +31,11 @@ class FoodGenerator {
         let x = 0;
 
         while (x < Matrix.getWidth()) {
-            let columns = rows[x];
+            let row = rows[x];
             let y = 0;
             
             while (y < Matrix.getHeight()) {
-                let cell = columns[y];
+                let cell = row[y];
                 let squareType = cell.getSquareType();
 
                 if (squareType = SquareType.Empty()) {
