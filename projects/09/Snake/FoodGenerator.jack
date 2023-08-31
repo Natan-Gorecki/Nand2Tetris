@@ -3,11 +3,7 @@ class FoodGenerator {
     field int _freeCellsCount;
 
     constructor FoodGenerator new(int snakeCount) {
-        var int width, height;
-        let width = Matrix.getWidth();
-        let height = Matrix.getHeight();
-
-        let _freeCellsCount = width * height - snakeCount;
+        let _freeCellsCount = Matrix.getWidth() * Matrix.getHeight() - snakeCount;
         return this;
     }
 
@@ -19,7 +15,6 @@ class FoodGenerator {
     method Square generateFood() {
         var inr currInt, nextInt;
         var int x, y;
-        var int width, height;
         var Array rows, columns;
         var Square cell;
         var int squareType;
@@ -32,16 +27,14 @@ class FoodGenerator {
         let nextInt = Random.nextInt(_freeCellsCount);
         let _freeCellsCount = _freeCellsCount - 1;
 
-        let width = Matrix.getWidth();
-        let height = Matrix.getHeight();
         let rows = Matrix.getRows();
         let x = 0;
 
-        while (x < width) {
+        while (x < Matrix.getWidth()) {
             let columns = rows[x];
             let y = 0;
             
-            while (y < height) {
+            while (y < Matrix.getHeight()) {
                 let cell = columns[y];
                 let squareType = cell.getSquareType();
 

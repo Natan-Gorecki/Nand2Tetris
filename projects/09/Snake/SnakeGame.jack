@@ -29,13 +29,11 @@ class SnakeGame {
         var boolean exit;
         var int iteration, score;
         var Square nextSquare;
-        var SquareType nextSquareType;
         var SnakeSegment snakeHead;
 
         let iteration = 0;
         let score = 0;
         let exit = false;
-        let snakeHead = _snake.getHead();
 
         while (~exit) {
             let key = Keyboard.keyPressed();
@@ -56,22 +54,22 @@ class SnakeGame {
             if (iteration = 10) {
                 let iteration = 0;
                 let nextSquare = nextSquare();
-                let nextSquareType = nextSquare.getSquareType();
 
                 let _currentDirection = _direction;
 
-                if (nextSquareType = SquareType.Food()) {
+                if (nextSquare.getSquareType() = SquareType.Food()) {
                     let score = score + 1;
 
                     do nextSquare.setDirection(_direction);
                     do _snake.move(nextSquare, false);
                     do _foodGenerator.generateFood();
                 }
-                if (nextSquareType = SquareType.Empty()) {
+                if (nextSquare.getSquareType() = SquareType.Empty()) {
                     do nextSquare.setDirection(_direction);
                     do _snake.move(nextSquare, true);
                 }
-                if (nextSquareType = SquareType.SnakeBody()) {
+                if (nextSquare.getSquareType() = SquareType.SnakeBody()) {
+                    let snakeHead = _snake.getHead();
                     do snakeHead.setDirection(_direction);
                     do snakeHead.draw();
                     let exit = true;
