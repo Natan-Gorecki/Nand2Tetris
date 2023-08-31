@@ -15,10 +15,6 @@ class Snake {
         let lastSegment = getLastSegment();
         do lastSegment.setNextSegment(body2);
 
-        do _head.draw();
-        do body1.draw();
-        do body2.draw();
-
         return this;
     }
 
@@ -28,55 +24,8 @@ class Snake {
         return;
     }
 
-    method boolean move(int direction) {
-        var int prevX, prevY, prevDir;
-        var int curX, curY, curDir;
-        var SnakeSegment current;
-
-        let prevX = _head.getX(); 
-        let prevY = _head.getY();
-        let prevDir = direction;
-
-        if (direction = Direction.Left()) { let prevX = prevX - 1; }
-        if (direction = Direction.Up()) { let prevY = prevY - 1; }
-        if (direction = Direction.Right()) { let prevX = prevX + 1; }
-        if (direction = Direction.Down()) { let prevY = prevY + 1; }
-
-        // allow to go through wall
-        if (prevX < 0) { let prevX = prevX + Matrix.getWidth(); }
-        if (prevY < 0) { let prevY = prevY + Matrix.getHeight(); }
-        if ((prevX = Matrix.getWidth()) | (prevX > Matrix.getWidth())) { let prevX = 0; }
-        if ((prevY = Matrix.getHeight()) | (prevY > Matrix.getHeight())) { let prevY = 0; }
-
-        // erase last segment
-        let current = getLastSegment();
-        do current.erase();
-        let current = _head;
-
-        // update all coordinates
-        while (~(current = null)) {
-            let curX = current.getX();
-            let curY = current.getY();
-            let curDir = current.getDirection();
-
-            do current.setX(prevX);
-            do current.setY(prevY);
-            do current.setDirection(prevDir);
-
-            let prevX = curX;
-            let prevY = curY;
-            let prevDir = curDir;
-            let current = current.getNextSegment();
-        }
-
-        // update first two segments
-        do _head.draw();
-        let current = _head.getNextSegment();
-        do current.draw();
-
-        return true;
-    }
-
+    // getters
+    method SnakeSegment getHead() { return _head; }
     method SnakeSegment getLastSegment() {
         var SnakeSegment current;
         let current = _head;
@@ -84,5 +33,50 @@ class Snake {
             let current = current.getNextSegment();
         }
         return current;
+    }
+
+    method void move(Square square, boolean removeLast) {
+        var SnakeSegment oldHead;
+        let oldHead = _head;
+
+        let _head = SnakeSegment.new(square.getX(), square.getY(), SquareType.SnakeHead(), square.getDirection());
+        do _head.setNextSegment(oldHead);
+        do oldHead.setSquareType(SquareType.SnakeBody());
+        
+        do redrawSnake();
+
+        if (removeLast) {
+            do removeLastSegment();
+        }
+
+        return;
+    }
+
+    method void redrawSnake() {
+        var SnakeSegment segment;
+        let segment = _head.getNextSegment();
+
+        do _head.draw();
+        do segment.draw();
+
+        return;
+    }
+
+    method void removeLastSegment() {
+        var SnakeSegment beforeCurrent, current, next;
+    
+        let beforeCurrent = null;
+        let current = _head;
+        let next = _head.getNextSegment();
+
+        while (~(next = null)) {
+            let beforeCurrent = current;
+            let current = next;
+            let next = current.getNextSegment();
+        }
+
+        do beforeCurrent.setNextSegment(null);
+        do current.dispose();
+        return;
     }
 }
