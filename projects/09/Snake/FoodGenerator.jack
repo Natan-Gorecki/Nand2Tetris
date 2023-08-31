@@ -53,8 +53,6 @@ class FoodGenerator {
             let x = x + 1;
         }
 
-        // we shouldn't be here, the code has bugs then
-        do Sys.error(404);
         return null;
     }
 }
