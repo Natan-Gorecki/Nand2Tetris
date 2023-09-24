@@ -135,6 +135,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\CompilationEngine.h" />
+    <ClInclude Include="..\EKeyWord.h" />
+    <ClInclude Include="..\ETokenType.h" />
     <ClInclude Include="..\JackAnalyzer.h" />
     <ClInclude Include="..\JackTokenizer.h" />
   </ItemGroup>
