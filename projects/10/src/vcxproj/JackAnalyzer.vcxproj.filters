@@ -21,6 +21,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\main.cpp" />
+    <ClCompile Include="..\KeywordTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SymbolTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\JackAnalyzer.h">
@@ -35,7 +41,10 @@
     <ClInclude Include="..\ETokenType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\EKeyWord.h">
+    <ClInclude Include="..\KeywordTable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SymbolTable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

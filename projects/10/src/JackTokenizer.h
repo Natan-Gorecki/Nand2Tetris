@@ -1,6 +1,6 @@
 #pragma once
+#include <fstream>
 #include <string>
-#include "EKeyWord.h"
 #include "ETokenType.h"
 
 /// <summary>
@@ -39,7 +39,7 @@ public:
 	/// Returns the keyword which is the current token as a constant.
 	/// <para/> This method should be called only if tokenType is KEYWORD.
 	/// </summary>
-	EKeyWord keyWord();
+	std::string keyword();
 	/// <summary>
 	/// Returns the character which is the current token.
 	/// <para/> Should be called only if tokenType is SYMBOL.
@@ -60,4 +60,15 @@ public:
 	/// <para/> Should be called only if tokenType is STRING_CONST.
 	/// </summary>
 	std::string stringVal();
+
+private:
+	std::ifstream* mInputStream = NULL;
+	std::string mCurrentToken = "";
+
+	ETokenType mTokenType = ETokenType::UNDEFINED;
+	std::string mKeyWord = "";
+	char mSymbol = 0;
+	std::string mIdentifier = "";
+	int mIntegerValue = 0;
+	std::string mStringValue = "";
 };

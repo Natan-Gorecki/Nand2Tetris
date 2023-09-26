@@ -6,7 +6,11 @@
 /// <param name="filename">Name of the input file</param>
 JackTokenizer::JackTokenizer(std::string filename)
 {
-
+	mInputStream = new std::ifstream(filename);
+	if (!mInputStream->is_open())
+	{
+		throw std::runtime_error("Cannot open " + filename + " file");
+	}
 }
 
 /// <summary>
@@ -14,7 +18,12 @@ JackTokenizer::JackTokenizer(std::string filename)
 /// </summary>
 JackTokenizer::~JackTokenizer()
 {
-
+	if (mInputStream)
+	{
+		mInputStream->close();
+		delete mInputStream;
+		mInputStream = NULL;
+	}
 }
 
 /// <summary>
@@ -22,7 +31,7 @@ JackTokenizer::~JackTokenizer()
 /// </summary>
 bool JackTokenizer::hasMoreTokens()
 {
-
+	return this->mInputStream->peek() != EOF;
 }
 
 /// <summary>
@@ -40,16 +49,16 @@ void JackTokenizer::advance()
 /// </summary>
 ETokenType JackTokenizer::tokenType()
 {
-
+	return mTokenType;
 }
 
 /// <summary>
 /// Returns the keyword which is the current token as a constant.
 /// <para/> This method should be called only if tokenType is KEYWORD.
 /// </summary>
-EKeyWord JackTokenizer::keyWord()
+std::string JackTokenizer::keyword()
 {
-
+	return mKeyWord;
 }
 
 /// <summary>
@@ -58,7 +67,7 @@ EKeyWord JackTokenizer::keyWord()
 /// </summary>
 char JackTokenizer::symbol()
 {
-
+	return mSymbol;
 }
 
 /// <summary>
@@ -67,7 +76,7 @@ char JackTokenizer::symbol()
 /// </summary>
 std::string JackTokenizer::identifier()
 {
-
+	return mIdentifier;
 }
 
 /// <summary>
@@ -76,7 +85,7 @@ std::string JackTokenizer::identifier()
 /// </summary>
 int JackTokenizer::intVal()
 {
-
+	return mIntegerValue;
 }
 
 /// <summary>
@@ -85,5 +94,5 @@ int JackTokenizer::intVal()
 /// </summary>
 std::string JackTokenizer::stringVal()
 {
-
+	return mStringValue;
 }
