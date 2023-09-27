@@ -62,10 +62,18 @@ public:
 	std::string stringVal();
 
 private:
-	std::ifstream* mInputStream = NULL;
-	std::string mCurrentToken = "";
+	void resetFieldValues();
+	std::string readToWhiteSpace();
+	void parseStringValue();
+	void parseIntValue(std::string str);
 
+private:
+	std::ifstream* mInputStream = NULL;
+	
+	char mFirstChar = 0;
+	std::string mToken = "";
 	ETokenType mTokenType = ETokenType::UNDEFINED;
+
 	std::string mKeyWord = "";
 	char mSymbol = 0;
 	std::string mIdentifier = "";
