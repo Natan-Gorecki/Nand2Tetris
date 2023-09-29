@@ -9,35 +9,35 @@ namespace fs = std::filesystem;
 /// </summary>
 JackAnalyzer::JackAnalyzer(std::string path)
 {
-	fs::path filePath = path;
-	fs::path inputPath = filePath.is_relative()
-		? fs::current_path().string() + "\\" + filePath.string()
-		: filePath.string();
+    fs::path filePath = path;
+    fs::path inputPath = filePath.is_relative()
+        ? fs::current_path().string() + "\\" + filePath.string()
+        : filePath.string();
 
-	mInputFile = inputPath.string();
-	mIsDirectoryPath = inputPath.extension() == "";
+    mInputFile = inputPath.string();
+    mIsDirectoryPath = inputPath.extension() == "";
 
-	std::string outputPrefix = filePath.is_relative()
-		? fs::current_path().string() + "\\"
-		: "";
-	std::string outputPath = mIsDirectoryPath
-		? filePath.string()
-		: filePath.parent_path().string();
-	std::string outputFileName = mIsDirectoryPath
-		? filePath.filename().string()
-		: filePath.filename().stem().string();
+    std::string outputPrefix = filePath.is_relative()
+        ? fs::current_path().string() + "\\"
+        : "";
+    std::string outputPath = mIsDirectoryPath
+        ? filePath.string()
+        : filePath.parent_path().string();
+    std::string outputFileName = mIsDirectoryPath
+        ? filePath.filename().string()
+        : filePath.filename().stem().string();
 
-	mOutputFile = outputPrefix + outputPath + "\\" + outputFileName + "XT" + ".xml";
+    mOutputFile = outputPrefix + outputPath + "\\" + outputFileName + "XT" + ".xml";
 
-	if (!mIsDirectoryPath && !isupper(inputPath.filename().string()[0]))
-	{
-		throw std::runtime_error("Input file " + std::string(path) + " doesn't start with uppercase.");
-	}
+    if (!mIsDirectoryPath && !isupper(inputPath.filename().string()[0]))
+    {
+        throw std::runtime_error("Input file " + std::string(path) + " doesn't start with uppercase.");
+    }
 
-	if (!mIsDirectoryPath && inputPath.extension() != ".jack")
-	{
-		throw std::runtime_error("Input file " + std::string(path) + " doesn't have .jack extension");
-	}
+    if (!mIsDirectoryPath && inputPath.extension() != ".jack")
+    {
+        throw std::runtime_error("Input file " + std::string(path) + " doesn't have .jack extension");
+    }
 }
 
 /// <summary>
@@ -53,7 +53,7 @@ JackAnalyzer::~JackAnalyzer()
 /// </summary>
 bool JackAnalyzer::isDirectoryPath()
 {
-	return mIsDirectoryPath;
+    return mIsDirectoryPath;
 }
 
 /// <summary>
@@ -61,30 +61,30 @@ bool JackAnalyzer::isDirectoryPath()
 /// </summary>
 void JackAnalyzer::parseDirectory()
 {
-	fs::path filePath = fs::path(mInputFile);
-	if (!fs::exists(filePath))
-	{
-		throw std::runtime_error("Directory " + mInputFile + " doesn't exist.");
-	}
+    fs::path filePath = fs::path(mInputFile);
+    if (!fs::exists(filePath))
+    {
+        throw std::runtime_error("Directory " + mInputFile + " doesn't exist.");
+    }
 
-	std::vector<std::string> jackFiles = std::vector<std::string>();
-	for (const fs::directory_entry& entry : fs::directory_iterator(mInputFile))
-	{
-		if (entry.is_regular_file() && isupper(entry.path().filename().string()[0]) && entry.path().extension() == ".jack")
-		{
-			jackFiles.push_back(entry.path().string());
-		}
-	}
+    std::vector<std::string> jackFiles = std::vector<std::string>();
+    for (const fs::directory_entry& entry : fs::directory_iterator(mInputFile))
+    {
+        if (entry.is_regular_file() && isupper(entry.path().filename().string()[0]) && entry.path().extension() == ".jack")
+        {
+            jackFiles.push_back(entry.path().string());
+        }
+    }
 
-	if (jackFiles.size() == 0)
-	{
-		throw std::runtime_error("Directory " + mInputFile + " doesn't contain any file with .jack extension.");
-	}
+    if (jackFiles.size() == 0)
+    {
+        throw std::runtime_error("Directory " + mInputFile + " doesn't contain any file with .jack extension.");
+    }
 
-	for (std::string jackFile : jackFiles)
-	{
-		parseSingleFile(jackFile);
-	}
+    for (std::string jackFile : jackFiles)
+    {
+        parseSingleFile(jackFile);
+    }
 }
 
 /// <summary>
@@ -92,18 +92,18 @@ void JackAnalyzer::parseDirectory()
 /// </summary>
 void JackAnalyzer::parseSingleFile()
 {
-	fs::path filePath = fs::path(mInputFile);
-	if (!fs::exists(filePath))
-	{
-		throw std::runtime_error("File " + mInputFile + " doesn't exist.");
-	}
+    fs::path filePath = fs::path(mInputFile);
+    if (!fs::exists(filePath))
+    {
+        throw std::runtime_error("File " + mInputFile + " doesn't exist.");
+    }
 
-	parseSingleFile(mInputFile);
+    parseSingleFile(mInputFile);
 }
 
 std::string JackAnalyzer::getOutputFile()
 {
-	return this->mOutputFile;
+    return this->mOutputFile;
 }
 
 void JackAnalyzer::parseSingleFile(std::string path)

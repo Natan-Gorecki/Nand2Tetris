@@ -8,8 +8,8 @@
 class SymbolTable
 {
 public:
-	/// <summary>
-	/// Returns information if passed character is symbol.
-	/// </summary>
-	static bool isSymbol(char symbol);
+    /// <summary>
+    /// Returns information if passed character is symbol.
+    /// </summary>
+    static bool isSymbol(char symbol);
 };

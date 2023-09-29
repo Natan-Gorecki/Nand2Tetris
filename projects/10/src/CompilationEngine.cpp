@@ -7,7 +7,7 @@
 /// <param name="filename">Name of the output file</param>
 CompilationEngine::CompilationEngine(std::string filename)
 {
-
+    int temp;
 }
 
 /// <summary>
@@ -124,7 +124,7 @@ void CompilationEngine::compileExpression()
 
 /// <summary>
 /// Compiles a term. If the current token is an identifier, the routine must resolve it
-///		into a variable, an array element or a subroutine call.
+///     into a variable, an array element or a subroutine call.
 /// A single lookahead token, which may be [, ( or . suffices to distinguish between the possibilities.
 /// Any other token is not part of this term and should not be advanced over.
 /// </summary>

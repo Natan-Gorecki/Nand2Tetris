@@ -8,8 +8,8 @@
 class KeywordTable
 {
 public:
-	/// <summary>
-	/// Returns information if passed string is a keyword.
-	/// </summary>
-	static bool isKeyword(std::string name);
+    /// <summary>
+    /// Returns information if passed string is a keyword.
+    /// </summary>
+    static bool isKeyword(std::string name);
 };

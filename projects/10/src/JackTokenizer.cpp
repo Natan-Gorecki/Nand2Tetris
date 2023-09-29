@@ -9,11 +9,11 @@
 /// <param name="filename">Name of the input file</param>
 JackTokenizer::JackTokenizer(std::string filename)
 {
-	mInputStream = new std::ifstream(filename);
-	if (!mInputStream->is_open())
-	{
-		throw std::runtime_error("Cannot open " + filename + " file");
-	}
+    mInputStream = new std::ifstream(filename);
+    if (!mInputStream->is_open())
+    {
+        throw std::runtime_error("Cannot open " + filename + " file");
+    }
 }
 
 /// <summary>
@@ -21,12 +21,12 @@ JackTokenizer::JackTokenizer(std::string filename)
 /// </summary>
 JackTokenizer::~JackTokenizer()
 {
-	if (mInputStream)
-	{
-		mInputStream->close();
-		delete mInputStream;
-		mInputStream = NULL;
-	}
+    if (mInputStream)
+    {
+        mInputStream->close();
+        delete mInputStream;
+        mInputStream = NULL;
+    }
 }
 
 /// <summary>
@@ -34,15 +34,15 @@ JackTokenizer::~JackTokenizer()
 /// </summary>
 bool JackTokenizer::hasMoreTokens()
 {
-	do
-	{
-		if (!mInputStream->get(mFirstChar))
-		{
-			return false;
-		}
-	} while (isspace(mFirstChar));
+    do
+    {
+        if (!mInputStream->get(mFirstChar))
+        {
+            return false;
+        }
+    } while (isspace(mFirstChar));
 
-	return true;
+    return true;
 }
 
 /// <summary>
@@ -52,66 +52,66 @@ bool JackTokenizer::hasMoreTokens()
 /// </summary>
 void JackTokenizer::advance()
 {
-	resetFieldValues();
-	
-	if (mFirstChar == 0)
-	{
-		throw std::runtime_error("mFirstChar has default value. Call hasMoreTokens before advance.");
-	}
-	
-	if (SymbolTable::isSymbol(mFirstChar))
-	{
-		mToken = std::string(1, mFirstChar);
-		mTokenType = ETokenType::SYMBOL;
-		mSymbol = mFirstChar;
-		
-		mFirstChar = 0;
-		return;
-	}
+    resetFieldValues();
+    
+    if (mFirstChar == 0)
+    {
+        throw std::runtime_error("mFirstChar has default value. Call hasMoreTokens before advance.");
+    }
+    
+    if (SymbolTable::isSymbol(mFirstChar))
+    {
+        mToken = std::string(1, mFirstChar);
+        mTokenType = ETokenType::SYMBOL;
+        mSymbol = mFirstChar;
+        
+        mFirstChar = 0;
+        return;
+    }
 
-	if (mFirstChar == '"')
-	{
-		parseStringValue();
-		
-		mFirstChar = 0;
-		return;
-	}
-	
-	std::string word = readToWhiteSpace();
-	
-	if (isdigit(word[0]))
-	{
-		parseIntValue(word);
-		
-		mFirstChar = 0;
-		return;
-	}
-	
-	if (KeywordTable::isKeyword(word))
-	{
-		mToken = word;
-		mTokenType = ETokenType::KEYWORD;
-		mKeyWord = word;
+    if (mFirstChar == '"')
+    {
+        parseStringValue();
+        
+        mFirstChar = 0;
+        return;
+    }
+    
+    std::string word = readToWhiteSpace();
+    
+    if (isdigit(word[0]))
+    {
+        parseIntValue(word);
+        
+        mFirstChar = 0;
+        return;
+    }
+    
+    if (KeywordTable::isKeyword(word))
+    {
+        mToken = word;
+        mTokenType = ETokenType::KEYWORD;
+        mKeyWord = word;
 
-		mFirstChar = 0;
-		return;
-	}
+        mFirstChar = 0;
+        return;
+    }
 
-	bool isValidIdentifer = std::all_of(word.begin(), word.end(), [](char c)
-	{
-		return std::isalnum(c) || c == '_';
-	});
-	if (!isValidIdentifer)
-	{
-		throw std::runtime_error("Identifier " + word + " is not valid.");
-	}
+    bool isValidIdentifer = std::all_of(word.begin(), word.end(), [](char c)
+    {
+        return std::isalnum(c) || c == '_';
+    });
+    if (!isValidIdentifer)
+    {
+        throw std::runtime_error("Identifier " + word + " is not valid.");
+    }
 
-	mToken = word;
-	mTokenType = ETokenType::IDENTIFIER;
-	mIdentifier = word;
+    mToken = word;
+    mTokenType = ETokenType::IDENTIFIER;
+    mIdentifier = word;
 
-	mFirstChar = 0;
-	return;
+    mFirstChar = 0;
+    return;
 }
 
 /// <summary>
@@ -119,7 +119,7 @@ void JackTokenizer::advance()
 /// </summary>
 ETokenType JackTokenizer::tokenType()
 {
-	return mTokenType;
+    return mTokenType;
 }
 
 /// <summary>
@@ -128,7 +128,7 @@ ETokenType JackTokenizer::tokenType()
 /// </summary>
 std::string JackTokenizer::keyword()
 {
-	return mKeyWord;
+    return mKeyWord;
 }
 
 /// <summary>
@@ -137,7 +137,7 @@ std::string JackTokenizer::keyword()
 /// </summary>
 char JackTokenizer::symbol()
 {
-	return mSymbol;
+    return mSymbol;
 }
 
 /// <summary>
@@ -146,7 +146,7 @@ char JackTokenizer::symbol()
 /// </summary>
 std::string JackTokenizer::identifier()
 {
-	return mIdentifier;
+    return mIdentifier;
 }
 
 /// <summary>
@@ -155,7 +155,7 @@ std::string JackTokenizer::identifier()
 /// </summary>
 int JackTokenizer::intVal()
 {
-	return mIntegerValue;
+    return mIntegerValue;
 }
 
 /// <summary>
@@ -164,85 +164,85 @@ int JackTokenizer::intVal()
 /// </summary>
 std::string JackTokenizer::stringVal()
 {
-	return mStringValue;
+    return mStringValue;
 }
 
 void JackTokenizer::resetFieldValues()
 {
-	mToken = "";
-	mTokenType = ETokenType::UNDEFINED;
+    mToken = "";
+    mTokenType = ETokenType::UNDEFINED;
 
-	mKeyWord = "";
-	mSymbol = 0;
-	mIdentifier = "";
-	mIntegerValue = 0;
-	mStringValue = "";
+    mKeyWord = "";
+    mSymbol = 0;
+    mIdentifier = "";
+    mIntegerValue = 0;
+    mStringValue = "";
 }
 
 std::string JackTokenizer::readToWhiteSpace()
 {
-	std::string word = std::string(1, mFirstChar);
-	char nextChar = 0;
+    std::string word = std::string(1, mFirstChar);
+    char nextChar = 0;
 
-	while (true)
-	{
-		if (!mInputStream->get(nextChar))
-		{
-			throw std::runtime_error("Failed to read character from input file.");
-		}
+    while (true)
+    {
+        if (!mInputStream->get(nextChar))
+        {
+            throw std::runtime_error("Failed to read character from input file.");
+        }
 
-		if (isspace(nextChar))
-		{
-			return word;
-		}
+        if (isspace(nextChar))
+        {
+            return word;
+        }
 
-		word += nextChar;
-	}
+        word += nextChar;
+    }
 }
 
 void JackTokenizer::parseStringValue()
 {
-	std::string line = "";
-	char nextChar = 0;
+    std::string line = "";
+    char nextChar = 0;
 
-	while (true)
-	{
-		if (!mInputStream->get(nextChar))
-		{
-			throw std::runtime_error("Failed to read character from input file.");
-		}
+    while (true)
+    {
+        if (!mInputStream->get(nextChar))
+        {
+            throw std::runtime_error("Failed to read character from input file.");
+        }
 
-		if (nextChar == '"')
-		{
-			mToken = '"' + line + '"';
-			mTokenType = ETokenType::STRING_CONST;
-			mStringValue = line;
-			return;
-		}
+        if (nextChar == '"')
+        {
+            mToken = '"' + line + '"';
+            mTokenType = ETokenType::STRING_CONST;
+            mStringValue = line;
+            return;
+        }
 
-		if (nextChar == '\r' || nextChar == '\n')
-		{
-			throw std::runtime_error("New line detected. Failed to read string value.");
-		}
+        if (nextChar == '\r' || nextChar == '\n')
+        {
+            throw std::runtime_error("New line detected. Failed to read string value.");
+        }
 
-		line += nextChar;
-	}
+        line += nextChar;
+    }
 }
 
 void JackTokenizer::parseIntValue(std::string str)
 {
-	bool isDigits = std::all_of(str.begin(), str.end(), ::isdigit);
-	if (!isDigits)
-	{
-		throw std::runtime_error("Invalid number - " + str + " .");
-	}
+    bool isDigits = std::all_of(str.begin(), str.end(), ::isdigit);
+    if (!isDigits)
+    {
+        throw std::runtime_error("Invalid number - " + str + " .");
+    }
 
-	mToken = str;
-	mTokenType = ETokenType::INT_CONST;
-	mIntegerValue = std::stoi(str.c_str());
+    mToken = str;
+    mTokenType = ETokenType::INT_CONST;
+    mIntegerValue = std::stoi(str.c_str());
 
-	if (mIntegerValue < 0 || mIntegerValue > SHRT_MAX)
-	{
-		throw std::runtime_error("Number out of scope - " + str + " .");
-	}
+    if (mIntegerValue < 0 || mIntegerValue > SHRT_MAX)
+    {
+        throw std::runtime_error("Number out of scope - " + str + " .");
+    }
 }

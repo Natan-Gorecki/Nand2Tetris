@@ -2,14 +2,14 @@
 
 std::set<char> symbols =
 {
-	'{', '}',
-	'(', ')',
-	'[', ']',
-	'.', ',', ';',
-	'+', '-', '*', '/',
-	'&', '|',
-	'<', '>', '=',
-	'~'
+    '{', '}',
+    '(', ')',
+    '[', ']',
+    '.', ',', ';',
+    '+', '-', '*', '/',
+    '&', '|',
+    '<', '>', '=',
+    '~'
 };
 
 /// <summary>
@@ -17,5 +17,5 @@ std::set<char> symbols =
 /// </summary>
 bool SymbolTable::isSymbol(char symbol)
 {
-	return symbols.count(symbol) != 0;
+    return symbols.count(symbol) != 0;
 }
