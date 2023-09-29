@@ -26,7 +26,23 @@ int main(int argc, char* argv[])
 
 	try
 	{
-		
+		JackAnalyzer jackAnalyzer = JackAnalyzer(path);
+
+		auto startTime = std::chrono::high_resolution_clock::now();
+
+		if (jackAnalyzer.isDirectoryPath())
+		{
+			jackAnalyzer.parseDirectory();
+		}
+		else
+		{
+			jackAnalyzer.parseSingleFile();
+		}
+
+		auto endTime = std::chrono::high_resolution_clock::now();
+
+		std::cout << "Created tokens " << jackAnalyzer.getOutputFile() << " file in " << (endTime - startTime) / std::chrono::milliseconds(1) << " ms.\n";
+		return EXIT_SUCCESS;
 	}
 	catch (const std::runtime_error& error)
 	{

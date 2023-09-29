@@ -31,12 +31,17 @@ public:
 	/// Parses specified .jack file.
 	/// </summary>
 	void parseSingleFile();
+	/// <summary>
+	/// Gets output file name.
+	/// </summary>
+	/// <returns></returns>
+	std::string getOutputFile();
 
 private:
 	void parseSingleFile(std::string path);
 
 private:
-	std::string input_file;
-	std::string output_file;
-	bool is_directory_path;
+	std::string mInputFile;
+	std::string mOutputFile;
+	bool mIsDirectoryPath;
 };
