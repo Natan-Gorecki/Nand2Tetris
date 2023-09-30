@@ -196,21 +196,25 @@ std::string JackTokenizer::readToWhitespaceOrSymbol()
 
     while (true)
     {
+        nextChar = mInputStream->peek();
+        if (nextChar == EOF)
+        {
+            throw std::runtime_error("Failed to read character from input file.");
+        }
+
+        if (!std::isalnum(nextChar) && nextChar != '_')
+        {
+            break;
+        }
+
         if (!mInputStream->get(nextChar))
         {
             throw std::runtime_error("Failed to read character from input file.");
         }
 
-        if (std::isalnum(nextChar) || nextChar == '_')
-        {
-            word += nextChar;
-            continue;
-        }
-
-        break;
+        word += nextChar;
     }
 
-    mInputStream->seekg(-1, std::ios::cur);
     return word;
 }
 
@@ -268,14 +272,13 @@ bool JackTokenizer::skipLineComment()
         return true;
     }
 
-    char nextChar;
-    if (!mInputStream->get(nextChar))
+    char nextChar = mInputStream->peek();
+    if (nextChar == EOF)
     {
         return false;
     }
     if (nextChar != '/')
     {
-        mInputStream->seekg(-1, std::ios::cur);
         return true;
     }
 
@@ -302,11 +305,13 @@ bool JackTokenizer::skipMultilineComment()
         return true;
     }
 
-    char nextChar;
-    mInputStream->get(nextChar);
+    char nextChar = mInputStream->peek();
+    if (nextChar == EOF)
+    {
+        return false;
+    }
     if (nextChar != '*')
     {
-        mInputStream->seekg(-1, std::ios::cur);
         return true;
     }
 
