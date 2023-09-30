@@ -83,7 +83,4 @@ private:
     std::string mIdentifier = "";
     int mIntegerValue = 0;
     std::string mStringValue = "";
-
-private:
-    bool mDoubleQuotesStarted = false;
 };

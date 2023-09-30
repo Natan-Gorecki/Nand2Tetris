@@ -56,10 +56,6 @@ bool JackTokenizer::hasMoreTokens()
             continue;
         }
 
-        if (mFirstChar == '"')
-        {
-            mDoubleQuotesStarted = !mDoubleQuotesStarted;
-        }
         return true;
     }
 }
@@ -267,7 +263,7 @@ void JackTokenizer::parseIntValue(std::string str)
 
 bool JackTokenizer::skipLineComment()
 {
-    if (mFirstChar != '/' || mDoubleQuotesStarted)
+    if (mFirstChar != '/')
     {
         return true;
     }
@@ -300,7 +296,7 @@ bool JackTokenizer::skipLineComment()
 
 bool JackTokenizer::skipMultilineComment()
 {
-    if (mFirstChar != '/' || mDoubleQuotesStarted)
+    if (mFirstChar != '/')
     {
         return true;
     }
