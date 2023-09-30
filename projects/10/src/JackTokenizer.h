@@ -63,9 +63,13 @@ public:
 
 private:
     void resetFieldValues();
-    std::string readToWhiteSpace();
+    std::string readToWhitespaceOrSymbol();
     void parseStringValue();
     void parseIntValue(std::string str);
+
+private:
+    bool skipLineComment();
+    bool skipMultilineComment();
 
 private:
     std::ifstream* mInputStream = NULL;
@@ -79,4 +83,7 @@ private:
     std::string mIdentifier = "";
     int mIntegerValue = 0;
     std::string mStringValue = "";
+
+private:
+    bool mDoubleQuotesStarted = false;
 };

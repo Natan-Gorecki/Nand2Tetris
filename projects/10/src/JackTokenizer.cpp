@@ -34,15 +34,34 @@ JackTokenizer::~JackTokenizer()
 /// </summary>
 bool JackTokenizer::hasMoreTokens()
 {
-    do
+    while (true)
     {
         if (!mInputStream->get(mFirstChar))
         {
             return false;
         }
-    } while (isspace(mFirstChar));
 
-    return true;
+        if (!skipLineComment())
+        {
+            return false;
+        }
+
+        if (!skipMultilineComment())
+        {
+            return false;
+        }
+
+        if (isspace(mFirstChar))
+        {
+            continue;
+        }
+
+        if (mFirstChar == '"')
+        {
+            mDoubleQuotesStarted = !mDoubleQuotesStarted;
+        }
+        return true;
+    }
 }
 
 /// <summary>
@@ -77,7 +96,7 @@ void JackTokenizer::advance()
         return;
     }
     
-    std::string word = readToWhiteSpace();
+    std::string word = readToWhitespaceOrSymbol();
     
     if (isdigit(word[0]))
     {
@@ -95,15 +114,6 @@ void JackTokenizer::advance()
 
         mFirstChar = 0;
         return;
-    }
-
-    bool isValidIdentifer = std::all_of(word.begin(), word.end(), [](char c)
-    {
-        return std::isalnum(c) || c == '_';
-    });
-    if (!isValidIdentifer)
-    {
-        throw std::runtime_error("Identifier " + word + " is not valid.");
     }
 
     mToken = word;
@@ -179,7 +189,7 @@ void JackTokenizer::resetFieldValues()
     mStringValue = "";
 }
 
-std::string JackTokenizer::readToWhiteSpace()
+std::string JackTokenizer::readToWhitespaceOrSymbol()
 {
     std::string word = std::string(1, mFirstChar);
     char nextChar = 0;
@@ -191,13 +201,17 @@ std::string JackTokenizer::readToWhiteSpace()
             throw std::runtime_error("Failed to read character from input file.");
         }
 
-        if (isspace(nextChar))
+        if (std::isalnum(nextChar) || nextChar == '_')
         {
-            return word;
+            word += nextChar;
+            continue;
         }
 
-        word += nextChar;
+        break;
     }
+
+    mInputStream->seekg(-1, std::ios::cur);
+    return word;
 }
 
 void JackTokenizer::parseStringValue()
@@ -245,4 +259,81 @@ void JackTokenizer::parseIntValue(std::string str)
     {
         throw std::runtime_error("Number out of scope - " + str + " .");
     }
+}
+
+bool JackTokenizer::skipLineComment()
+{
+    if (mFirstChar != '/' || mDoubleQuotesStarted)
+    {
+        return true;
+    }
+
+    char nextChar;
+    if (!mInputStream->get(nextChar))
+    {
+        return false;
+    }
+    if (nextChar != '/')
+    {
+        mInputStream->seekg(-1, std::ios::cur);
+        return true;
+    }
+
+    while (mFirstChar != '\n')
+    {
+        if (!mInputStream->get(mFirstChar))
+        {
+            return false;
+        }
+    }
+
+    if (!mInputStream->get(mFirstChar))
+    {
+        return false;
+    }
+
+    return skipLineComment();
+}
+
+bool JackTokenizer::skipMultilineComment()
+{
+    if (mFirstChar != '/' || mDoubleQuotesStarted)
+    {
+        return true;
+    }
+
+    char nextChar;
+    mInputStream->get(nextChar);
+    if (nextChar != '*')
+    {
+        mInputStream->seekg(-1, std::ios::cur);
+        return true;
+    }
+
+    if (!mInputStream->get(mFirstChar))
+    {
+        return false;
+    }
+
+    char previousChar;
+    while (true)
+    {
+        previousChar = mFirstChar;
+        if (!mInputStream->get(mFirstChar))
+        {
+            return false;
+        }
+
+        if (previousChar == '*' && mFirstChar == '/')
+        {
+            break;
+        }
+    }
+
+    if (!mInputStream->get(mFirstChar))
+    {
+        return false;
+    }
+
+    return skipMultilineComment();
 }
