@@ -91,7 +91,9 @@ public:
     int compileExpressionList();
 
 private:
-    bool advanceTokenizer();
+    void advanceTokenizer();
+    void writeTokenToStreams();
+    void writeTokenToStream(std::ofstream* stream, bool writeToken);
     std::string encodeXmlSymbol(char symbol);
 
 private:

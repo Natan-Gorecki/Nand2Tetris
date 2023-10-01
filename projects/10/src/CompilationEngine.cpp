@@ -58,9 +58,50 @@ CompilationEngine::~CompilationEngine()
 /// </summary>
 void CompilationEngine::compileClass()
 {
-    while (advanceTokenizer())
+    *mOutputFile << "<class>\n";
+
+    advanceTokenizer();
+    if (!(mJackTokenizer->tokenType() == ETokenType::KEYWORD && mJackTokenizer->keyword() == "class"))
     {
+        throw std::runtime_error("compileClass - Class should start with 'class' keyword.");
     }
+    writeTokenToStreams();
+
+    advanceTokenizer();
+    if (!(mJackTokenizer->tokenType() == ETokenType::IDENTIFIER))
+    {
+        throw std::runtime_error("compileClass - Missing class name.");
+    }
+    writeTokenToStreams();
+
+    advanceTokenizer();
+    if (!(mJackTokenizer->tokenType() == ETokenType::SYMBOL && mJackTokenizer->symbol() == '{'))
+    {
+        throw std::runtime_error("compileClass - Missing '{' left curly bracket.");
+    }
+    writeTokenToStreams();
+
+    advanceTokenizer();
+    while (mJackTokenizer->tokenType() == ETokenType::KEYWORD && (mJackTokenizer->keyword() == "static" || mJackTokenizer->keyword() == "field"))
+    {
+        compileClassVarDec();
+        advanceTokenizer();
+    }
+
+    while (mJackTokenizer->tokenType() == ETokenType::KEYWORD 
+        && (mJackTokenizer->keyword() == "constructor" || mJackTokenizer->keyword() == "function" || mJackTokenizer->keyword() == "method"))
+    {
+        compileSubroutine();
+        advanceTokenizer();
+    }
+
+    if (!(mJackTokenizer->tokenType() == ETokenType::SYMBOL && mJackTokenizer->symbol() == '}'))
+    {
+        throw std::runtime_error("compileClass - Missing '}' right curly bracket.");
+    }
+    writeTokenToStreams();
+
+    *mOutputFile << "</class>";
 }
 
 /// <summary>
@@ -68,7 +109,45 @@ void CompilationEngine::compileClass()
 /// </summary>
 void CompilationEngine::compileClassVarDec()
 {
+    *mOutputFile << "<classVarDec>";
+    if (!(mJackTokenizer->tokenType() == ETokenType::KEYWORD && (mJackTokenizer->keyword() == "static" || mJackTokenizer->keyword() == "field")))
+    {
+        throw std::runtime_error("compileClassVarDec - Missing keyword 'static' or 'field'.");
+    }
+    writeTokenToStreams();
 
+    advanceTokenizer();
+    if (!(mJackTokenizer->tokenType() == ETokenType::KEYWORD && (mJackTokenizer->keyword() == "int" || mJackTokenizer->keyword() == "char" || mJackTokenizer->keyword() == "boolean"))
+        && !(mJackTokenizer->tokenType() == ETokenType::IDENTIFIER))
+    {
+        throw std::runtime_error("compileClassVarDec - Missing valid type for variable declaration.");
+    }
+    writeTokenToStreams();
+
+    do
+    {
+        advanceTokenizer();
+        if (!(mJackTokenizer->tokenType() == ETokenType::IDENTIFIER))
+        {
+            throw std::runtime_error("compileClassVarDec - Missing variable name.");
+        }
+        writeTokenToStreams();
+
+        advanceTokenizer();
+        if (!(mJackTokenizer->tokenType() == ETokenType::SYMBOL && mJackTokenizer->symbol() == ','))
+        {
+            break;
+        }
+        writeTokenToStreams();
+    } while (true);
+
+    if (!(mJackTokenizer->tokenType() == ETokenType::SYMBOL && mJackTokenizer->symbol() == ';'))
+    {
+        throw std::runtime_error("compileClassVarDec - Missing semi-colon ';' at the end of variable declaration.");
+    }
+    writeTokenToStreams();
+
+    *mOutputFile << "</classVarDec>";
 }
 
 /// <summary>
@@ -179,18 +258,27 @@ int CompilationEngine::compileExpressionList()
     return 0;
 }
 
-bool CompilationEngine::advanceTokenizer()
+void CompilationEngine::advanceTokenizer()
 {
     if (!mJackTokenizer->hasMoreTokens())
     {
-        return false;
+        throw std::runtime_error("Failed to read token.");
     }
 
     mJackTokenizer->advance();
-    
-    if (!mWriteTokens)
+}
+
+void CompilationEngine::writeTokenToStreams()
+{
+    writeTokenToStream(mOutputFile, true);
+    writeTokenToStream(mTokensFile, mWriteTokens);
+}
+
+void CompilationEngine::writeTokenToStream(std::ofstream* stream, bool writeToken)
+{
+    if (!writeToken)
     {
-        return true;
+        return;
     }
 
     ETokenType tokenType = mJackTokenizer->tokenType();
@@ -198,25 +286,23 @@ bool CompilationEngine::advanceTokenizer()
     switch (tokenType)
     {
     case ETokenType::KEYWORD:
-        *mTokensFile << "<keyword> " << mJackTokenizer->keyword() << " </keyword>\n";
+        *stream << "<keyword> " << mJackTokenizer->keyword() << " </keyword>\n";
         break;
     case ETokenType::SYMBOL:
-        *mTokensFile << "<symbol> " << encodeXmlSymbol(mJackTokenizer->symbol()) << " </symbol>\n";
+        *stream << "<symbol> " << encodeXmlSymbol(mJackTokenizer->symbol()) << " </symbol>\n";
         break;
     case ETokenType::IDENTIFIER:
-        *mTokensFile << "<identifier> " << mJackTokenizer->identifier() << " </identifier>\n";
+        *stream << "<identifier> " << mJackTokenizer->identifier() << " </identifier>\n";
         break;
     case ETokenType::INT_CONST:
-        *mTokensFile << "<integerConstant> " << mJackTokenizer->intVal() << " </integerConstant>\n";
+        *stream << "<integerConstant> " << mJackTokenizer->intVal() << " </integerConstant>\n";
         break;
     case ETokenType::STRING_CONST:
-        *mTokensFile << "<stringConstant> " << mJackTokenizer->stringVal() << " </stringConstant>\n";
+        *stream << "<stringConstant> " << mJackTokenizer->stringVal() << " </stringConstant>\n";
         break;
     case ETokenType::UNDEFINED:
         throw std::runtime_error("Undefined token.");
     }
-
-    return true;
 }
 
 std::string CompilationEngine::encodeXmlSymbol(char symbol)
