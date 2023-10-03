@@ -155,7 +155,49 @@ void CompilationEngine::compileClassVarDec()
 /// </summary>
 void CompilationEngine::compileSubroutine()
 {
+    *mOutputFile << "<subroutineDec>";
 
+    if (!(mJackTokenizer->tokenType() == ETokenType::KEYWORD
+        && (mJackTokenizer->keyword() == "constructor" || mJackTokenizer->keyword() == "function" || mJackTokenizer->keyword() == "method")))
+    {
+        throw std::runtime_error("compileSubroutine - Missing keyword 'constructor' or 'function' or 'method'.");
+    }
+    writeTokenToStreams();
+
+    advanceTokenizer();
+    if (!(mJackTokenizer->tokenType() == ETokenType::KEYWORD && mJackTokenizer->keyword() == "void")
+        && !(mJackTokenizer->tokenType() == ETokenType::IDENTIFIER))
+    {
+        throw std::runtime_error("compileSubroutine - Missing return type.");
+    }
+    writeTokenToStreams();
+
+    advanceTokenizer();
+    if (!(mJackTokenizer->tokenType() == ETokenType::IDENTIFIER))
+    {
+        throw std::runtime_error("compileSubroutine - Missing subroutine name.");
+    }
+    writeTokenToStreams();
+
+    advanceTokenizer();
+    if (!(mJackTokenizer->tokenType() == ETokenType::SYMBOL && mJackTokenizer->symbol() == '('))
+    {
+        throw std::runtime_error("compileSubroutine - Missing left bracket '('.");
+    }
+    writeTokenToStreams();
+
+    compileParameterList();
+
+    advanceTokenizer();
+    if (!(mJackTokenizer->tokenType() == ETokenType::SYMBOL && mJackTokenizer->symbol() == ')'))
+    {
+        throw std::runtime_error("compileSubroutine - Missing right bracket ')'.");
+    }
+    writeTokenToStreams();
+
+    compileSubroutineBody();
+
+    *mOutputFile << "</subroutineDec>";
 }
 
 /// <summary>
