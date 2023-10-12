@@ -18,6 +18,39 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Assert.cpp" />
+    <ClCompile Include="..\Check.cpp" />
+    <ClCompile Include="..\CompilationEngine.cpp" />
+    <ClCompile Include="..\Event.cpp" />
+    <ClCompile Include="..\JackAnalyzer.cpp" />
+    <ClCompile Include="..\JackTokenizer.cpp" />
+    <ClCompile Include="..\KeywordTable.cpp" />
+    <ClCompile Include="..\main.cpp" />
+    <ClCompile Include="..\Rules\BaseRules.cpp" />
+    <ClCompile Include="..\Rules\ExpressionRules.cpp" />
+    <ClCompile Include="..\Rules\LexicalRules.cpp" />
+    <ClCompile Include="..\Rules\ProgramStructureRules.cpp" />
+    <ClCompile Include="..\Rules\StatementRules.cpp" />
+    <ClCompile Include="..\SymbolTable.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Assert.h" />
+    <ClInclude Include="..\Check.h" />
+    <ClInclude Include="..\CompilationEngine.h" />
+    <ClInclude Include="..\EKeyWord.h" />
+    <ClInclude Include="..\ETokenType.h" />
+    <ClInclude Include="..\Event.h" />
+    <ClInclude Include="..\JackAnalyzer.h" />
+    <ClInclude Include="..\JackTokenizer.h" />
+    <ClInclude Include="..\KeywordTable.h" />
+    <ClInclude Include="..\Rules\ExpressionRules.h" />
+    <ClInclude Include="..\Rules\BaseRules.h" />
+    <ClInclude Include="..\Rules\LexicalRules.h" />
+    <ClInclude Include="..\Rules\ProgramStructureRules.h" />
+    <ClInclude Include="..\Rules\StatementRules.h" />
+    <ClInclude Include="..\SymbolTable.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -127,22 +160,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\CompilationEngine.cpp" />
-    <ClCompile Include="..\JackAnalyzer.cpp" />
-    <ClCompile Include="..\JackTokenizer.cpp" />
-    <ClCompile Include="..\KeywordTable.cpp" />
-    <ClCompile Include="..\main.cpp" />
-    <ClCompile Include="..\SymbolTable.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\CompilationEngine.h" />
-    <ClInclude Include="..\ETokenType.h" />
-    <ClInclude Include="..\JackAnalyzer.h" />
-    <ClInclude Include="..\JackTokenizer.h" />
-    <ClInclude Include="..\KeywordTable.h" />
-    <ClInclude Include="..\SymbolTable.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

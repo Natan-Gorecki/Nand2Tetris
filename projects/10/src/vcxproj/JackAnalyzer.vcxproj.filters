@@ -9,43 +9,34 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
+    <Filter Include="Header Files\Rules">
+      <UniqueIdentifier>{5aae2ccd-aa6d-4cb0-a3c5-a45a8b9ade8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rules">
+      <UniqueIdentifier>{68d9e5ee-9b78-4619-8ee7-90ce9ccf71a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rules\Expressions">
+      <UniqueIdentifier>{95defafb-1c4d-4afd-9484-38469bebb16b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rules\Base">
+      <UniqueIdentifier>{ec519988-602e-433d-937b-211caed43366}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\JackAnalyzer.cpp">
+    <ClCompile Include="..\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\JackTokenizer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CompilationEngine.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\Rules\*.cpp">
+      <Filter>Source Files\Rules</Filter>
     </ClCompile>
     <ClCompile Include="..\main.cpp" />
-    <ClCompile Include="..\KeywordTable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SymbolTable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\JackAnalyzer.h">
+    <ClInclude Include="..\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\JackTokenizer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CompilationEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ETokenType.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\KeywordTable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SymbolTable.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\Rules\*.h">
+      <Filter>Header Files\Rules</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
