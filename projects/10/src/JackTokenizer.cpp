@@ -1,7 +1,6 @@
 #include <algorithm>
 #include "JackTokenizer.h"
-#include "KeywordTable.h"
-#include "SymbolTable.h"
+#include "Rules/LexicalRules.h"
 
 /// <summary>
 /// Opens the input file and gets ready to tokenize it.
@@ -74,7 +73,7 @@ void JackTokenizer::advance()
         throw std::runtime_error("mFirstChar has default value. Call hasMoreTokens before advance.");
     }
     
-    if (SymbolTable::isSymbol(mFirstChar))
+    if (SymbolRule::isSymbol(mFirstChar))
     {
         mToken = std::string(1, mFirstChar);
         mTokenType = ETokenType::SYMBOL;
@@ -102,7 +101,7 @@ void JackTokenizer::advance()
         return;
     }
     
-    if (KeywordTable::isKeyword(word))
+    if (KeywordRule::isKeyword(word))
     {
         mToken = word;
         mTokenType = ETokenType::KEYWORD;
