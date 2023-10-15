@@ -16,47 +16,47 @@ class StatementsRule : public ParentRule
 {
 public:
     StatementsRule();
-    ~StatementsRule() {};
+    virtual ~StatementsRule() {};
 };
 
 class StatementRule : public ParentRule
 {
 public:
     StatementRule();
-    ~StatementRule() {};
+    virtual ~StatementRule() {};
 };
 
 class LetStatementRule : public ParentRule
 {
 public:
     LetStatementRule();
-    ~LetStatementRule() {};
+    virtual ~LetStatementRule() {};
 };
 
 class IfStatementRule : public ParentRule
 {
 public:
     IfStatementRule();
-    ~IfStatementRule() {};
+    virtual ~IfStatementRule() {};
 };
 
 class WhileStatementRule : public ParentRule
 {
 public:
     WhileStatementRule();
-    ~WhileStatementRule() {};
+    virtual ~WhileStatementRule() {};
 };
 
 class DoStatementRule : public ParentRule
 {
 public:
     DoStatementRule();
-    ~DoStatementRule() {};
+    virtual ~DoStatementRule() {};
 };
 
 class ReturnStatementRule : public ParentRule
 {
 public:
     ReturnStatementRule();
-    ~ReturnStatementRule() {};
+    virtual ~ReturnStatementRule() {};
 };

@@ -20,68 +20,71 @@ class ClassRule : public ParentRule
 {
 public:
     ClassRule();
-    ~ClassRule() {};
+    virtual ~ClassRule() {};
+
+public:
+    bool compile(JackTokenizer* pTokenizer) override;
 };
 
 class ClassVarDecRule : public ParentRule
 {
 public:
     ClassVarDecRule();
-    ~ClassVarDecRule() {};
+    virtual ~ClassVarDecRule() {};
 };
 
 class TypeRule : public ParentRule
 {
 public:
     TypeRule();
-    ~TypeRule() {};
+    virtual ~TypeRule() {};
 };
 
 class SubroutineDecRule : public ParentRule
 {
 public:
     SubroutineDecRule();
-    ~SubroutineDecRule() {};
+    virtual ~SubroutineDecRule() {};
 };
 
 class ParameterListRule : public ParentRule
 {
 public:
     ParameterListRule();
-    ~ParameterListRule() {};
+    virtual ~ParameterListRule() {};
 };
 
 class SubroutineBodyRule : public ParentRule
 {
 public:
     SubroutineBodyRule();
-    ~SubroutineBodyRule() {};
+    virtual ~SubroutineBodyRule() {};
 };
 
 class VarDecRule : public ParentRule
 {
 public:
     VarDecRule();
-    ~VarDecRule() {};
+    virtual ~VarDecRule() {};
 };
 
 class ClassNameRule : public IdentifierRule
 {
 public:
     ClassNameRule();
-    ~ClassNameRule() {};
+    virtual ~ClassNameRule() {};
 };
 
 class SubroutineNameRule : public IdentifierRule
 {
 public:
     SubroutineNameRule();
-    ~SubroutineNameRule() {};
+    virtual ~SubroutineNameRule() {};
 };
 
 class VarNameRule : public IdentifierRule
 {
 public:
     VarNameRule();
-    ~VarNameRule() {};
+    virtual ~VarNameRule() {};
 };

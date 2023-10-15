@@ -49,7 +49,7 @@ class SequenceRule : public ParentRule
 {
 public:
     SequenceRule(RuleVector rules);
-    ~SequenceRule() {};
+    virtual ~SequenceRule() {};
 
 public:
     bool compile(JackTokenizer* pTokenizer) override;
@@ -59,7 +59,7 @@ class AlternationRule : public ParentRule
 {
 public:
     AlternationRule(RuleVector rules);
-    ~AlternationRule() {};
+    virtual ~AlternationRule() {};
 
 public:
     bool compile(JackTokenizer* pTokenizer) override;
@@ -69,7 +69,7 @@ class ZeroOrMoreRule : public ParentRule
 {
 public:
     ZeroOrMoreRule(RuleVector rules);
-    ~ZeroOrMoreRule() {};
+    virtual ~ZeroOrMoreRule() {};
 
 public:
     bool compile(JackTokenizer* pTokenizer) override;
@@ -79,7 +79,7 @@ class ZeroOrOneRule : public ParentRule
 {
 public:
     ZeroOrOneRule(RuleVector rules);
-    ~ZeroOrOneRule() {};
+    virtual ~ZeroOrOneRule() {};
 
 public:
     bool compile(JackTokenizer* pTokenizer) override;

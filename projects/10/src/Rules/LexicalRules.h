@@ -15,7 +15,7 @@ class LexicalRule : public Rule
 {
 public:
     LexicalRule() {};
-    ~LexicalRule() {};
+    virtual ~LexicalRule() {};
 
 public:
     bool compile(JackTokenizer* pTokenizer) override final;
@@ -35,7 +35,7 @@ public:
 
 public:
     KeywordRule(std::string keyword);
-    ~KeywordRule() {};
+    virtual ~KeywordRule() {};
 
 protected:
     bool lexicalCompile(JackTokenizer* pTokenizer) override;
@@ -55,7 +55,7 @@ public:
 
 public:
     SymbolRule(char symbol);
-    ~SymbolRule() {};
+    virtual ~SymbolRule() {};
 
 protected:
     bool lexicalCompile(JackTokenizer* pTokenizer) override;
@@ -70,7 +70,7 @@ class IntegerConstantRule : public LexicalRule
 {
 public:
     IntegerConstantRule() {};
-    ~IntegerConstantRule() {};
+    virtual ~IntegerConstantRule() {};
 
 protected:
     bool lexicalCompile(JackTokenizer* pTokenizer) override;
@@ -81,7 +81,7 @@ class StringConstantRule : public LexicalRule
 {
 public:
     StringConstantRule() {};
-    ~StringConstantRule() {};
+    virtual ~StringConstantRule() {};
 
 protected:
     bool lexicalCompile(JackTokenizer* pTokenizer) override;
@@ -92,7 +92,7 @@ class IdentifierRule : public LexicalRule
 {
 public:
     IdentifierRule() {};
-    ~IdentifierRule() {};
+    virtual ~IdentifierRule() {};
 
 protected:
     bool lexicalCompile(JackTokenizer* pTokenizer) override;

@@ -15,47 +15,47 @@ class ExpressionRule : public ParentRule
 {
 public:
     ExpressionRule();
-    ~ExpressionRule() {};
+    virtual ~ExpressionRule() {};
 };
 
 class TermRule : public ParentRule
 {
 public:
     TermRule();
-    ~TermRule() {};
+    virtual ~TermRule() {};
 };
 
 class SubroutineCallRule : public ParentRule
 {
 public:
     SubroutineCallRule();
-    ~SubroutineCallRule() {};
+    virtual ~SubroutineCallRule() {};
 };
 
 class ExpressionListRule : public ParentRule
 {
 public:
     ExpressionListRule();
-    ~ExpressionListRule() {};
+    virtual ~ExpressionListRule() {};
 };
 
 class OpRule : public ParentRule
 {
 public:
     OpRule();
-    ~OpRule() {};
+    virtual ~OpRule() {};
 };
 
 class UnaryOpRule : public ParentRule
 {
 public:
     UnaryOpRule();
-    ~UnaryOpRule() {};
+    virtual ~UnaryOpRule() {};
 };
 
 class KeywordConstantRule : public ParentRule
 {
 public:
     KeywordConstantRule();
-    ~KeywordConstantRule() {};
+    virtual ~KeywordConstantRule() {};
 };
