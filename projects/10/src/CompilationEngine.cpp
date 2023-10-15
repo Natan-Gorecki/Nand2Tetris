@@ -1,6 +1,9 @@
 #include <filesystem>
+#include <functional>
 #include <iostream>
+#include "Assert.h"
 #include "CompilationEngine.h"
+#include "Rules/BaseRules.h"
 
 namespace fs = std::filesystem;
 
@@ -28,6 +31,13 @@ CompilationEngine::CompilationEngine(std::string filename, JackTokenizer* jackTo
         mTokensFile = new std::ofstream(mTokensFileName);
         *mTokensFile << "<tokens>\n";
     }
+
+    auto outputCallback = [this](const char* text) { this->writeOutput(text); };
+    auto tokenCallback = [this](const char* text) { this->writeToken(text); };
+    Rule::setOutputFunc(outputCallback);
+    Rule::setTokensFunc(tokenCallback);
+
+    //Assert::Initialize(mJackTokenizer);
 }
 
 /// <summary>

@@ -92,8 +92,8 @@ public:
 
 private:
     void advanceTokenizer();
-    void writeTokenToStreams();
-    void writeTokenToStream(std::ofstream* stream, bool writeToken);
+    void writeOutput(const char* text);
+    void writeToken(const char* text);
     std::string encodeXmlSymbol(char symbol);
 
 private:
