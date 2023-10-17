@@ -1,27 +1,40 @@
 #include "ProgramStructureRules.h"
 #include "ExpressionRules.h"
+#include "../CompilationEngine.h"
 
-ClassRule::ClassRule() : ParentRule(
+#pragma region ClassRule
+ClassRule::ClassRule() : SequenceRule(
     {
-        new SequenceRule(
+        new KeywordRule("class"),
+        new ClassNameRule(),
+        new SymbolRule('{'),
+        new ZeroOrMoreRule(
         {
-            new KeywordRule("class"),
-            new ClassNameRule(),
-            new SymbolRule('{'),
-            new ZeroOrMoreRule(
-            {
-                new ClassVarDecRule()
-            }),
-            new ZeroOrMoreRule(
-            {
-                new SubroutineDecRule()
-            }),
-            new SymbolRule('}')
-        })
+            new ClassVarDecRule()
+        }),
+        new ZeroOrMoreRule(
+        {
+            new SubroutineDecRule()
+        }),
+        new SymbolRule('}')
     })
 {
 }
 
+bool ClassRule::doCompile(JackTokenizer* pTokenizer)
+{
+    CompilationEngine::writeOutput("<class>\n");
+    bool compileResult = SequenceRule::doCompile(pTokenizer);
+    if (compileResult)
+    {
+        CompilationEngine::writeOutput("</class>\n");
+    }
+
+    return compileResult;
+}
+#pragma endregion
+
+#pragma region ClassVarDecRule
 ClassVarDecRule::ClassVarDecRule() : ParentRule(
     {
         new SequenceRule(
@@ -44,19 +57,15 @@ ClassVarDecRule::ClassVarDecRule() : ParentRule(
 {
 }
 
-TypeRule::TypeRule() : ParentRule(
-    {
-        new AlternationRule(
-        {
-            new KeywordRule("int"),
-            new KeywordRule("char"),
-            new KeywordRule("boolean"),
-            new ClassNameRule()
-        })
-    })
+bool ClassVarDecRule::doCompile(JackTokenizer* pTokenizer)
 {
+    CompilationEngine::writeOutput("<classVarDecRule>\n");
+    CompilationEngine::writeOutput("</classVarDecRule>\n");
+    return false;
 }
+#pragma endregion
 
+#pragma region SubroutineDecRule
 SubroutineDecRule::SubroutineDecRule() : ParentRule(
     {
         new SequenceRule(
@@ -77,6 +86,30 @@ SubroutineDecRule::SubroutineDecRule() : ParentRule(
             new ParameterListRule(),
             new SymbolRule(')'),
             new SubroutineBodyRule()
+        })
+    })
+{
+}
+
+bool SubroutineDecRule::doCompile(JackTokenizer* pTokenizer)
+{
+    CompilationEngine::writeOutput("<subroutineDecRule>\n");
+    CompilationEngine::writeOutput("</subroutineDecRule>\n");
+    return false;
+}
+#pragma endregion
+
+#pragma region others to implement
+
+
+TypeRule::TypeRule() : ParentRule(
+    {
+        new AlternationRule(
+        {
+            new KeywordRule("int"),
+            new KeywordRule("char"),
+            new KeywordRule("boolean"),
+            new ClassNameRule()
         })
     })
 {
@@ -141,3 +174,4 @@ VarDecRule::VarDecRule() : ParentRule(
     })
 {
 }
+#pragma endregion

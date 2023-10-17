@@ -1,6 +1,7 @@
 #include <set>
 #include <stdexcept>
 #include "LexicalRules.h"
+#include "../CompilationEngine.h"
 
 std::set<std::string> keywords =
 {
@@ -28,14 +29,14 @@ std::set<char> symbols =
 };
 
 #pragma region LexicalRule
-bool LexicalRule::compile(JackTokenizer* pTokenizer)
+CompileResult LexicalRule::afterCompile(JackTokenizer* pTokenizer, bool compileResult)
 {
-    bool result = lexicalCompile(pTokenizer);
-    if (result)
+    if (compileResult)
     {
-        onWriteOutput(toString(pTokenizer));
-        onWriteToken(toString(pTokenizer));
+        CompilationEngine::writeOutput(toString(pTokenizer));
+        CompilationEngine::writeToken(toString(pTokenizer));
     }
+    return { compileResult, compileResult };
 }
 #pragma endregion
 
@@ -58,7 +59,7 @@ KeywordRule::KeywordRule(std::string keyword)
     mKeyword = keyword;
 }
 
-bool KeywordRule::lexicalCompile(JackTokenizer* pTokenizer)
+bool KeywordRule::doCompile(JackTokenizer* pTokenizer)
 {
     if (pTokenizer->tokenType() == ETokenType::KEYWORD && pTokenizer->keyword() == mKeyword)
     {
@@ -93,7 +94,7 @@ SymbolRule::SymbolRule(char symbol)
     mSymbol = symbol;
 }
 
-bool SymbolRule::lexicalCompile(JackTokenizer* pTokenizer)
+bool SymbolRule::doCompile(JackTokenizer* pTokenizer)
 {
     if (pTokenizer->tokenType() == ETokenType::SYMBOL && pTokenizer->symbol() == mSymbol)
     {
@@ -127,7 +128,7 @@ std::string SymbolRule::encodeXmlSymbol(char symbol)
 #pragma endregion
 
 #pragma region IntegerConstantRule
-bool IntegerConstantRule::lexicalCompile(JackTokenizer* pTokenizer)
+bool IntegerConstantRule::doCompile(JackTokenizer* pTokenizer)
 {
     return pTokenizer->tokenType() == ETokenType::INT_CONST;
 }
@@ -139,7 +140,7 @@ std::string IntegerConstantRule::toString(JackTokenizer* pTokenizer)
 #pragma endregion
 
 #pragma region StringConstantRule
-bool StringConstantRule::lexicalCompile(JackTokenizer* pTokenizer)
+bool StringConstantRule::doCompile(JackTokenizer* pTokenizer)
 {
     return pTokenizer->tokenType() == ETokenType::STRING_CONST;
 }
@@ -151,7 +152,7 @@ std::string StringConstantRule::toString(JackTokenizer* pTokenizer)
 #pragma endregion
 
 #pragma region IdentifierRule
-bool IdentifierRule::lexicalCompile(JackTokenizer* pTokenizer)
+bool IdentifierRule::doCompile(JackTokenizer* pTokenizer)
 {
     return pTokenizer->tokenType() == ETokenType::IDENTIFIER;
 }

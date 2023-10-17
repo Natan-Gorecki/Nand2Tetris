@@ -3,7 +3,7 @@
 #include <iostream>
 #include "Assert.h"
 #include "CompilationEngine.h"
-#include "Rules/BaseRules.h"
+#include "Rules/ProgramStructureRules.h"
 
 namespace fs = std::filesystem;
 
@@ -32,12 +32,23 @@ CompilationEngine::CompilationEngine(std::string filename, JackTokenizer* jackTo
         *mTokensFile << "<tokens>\n";
     }
 
-    auto outputCallback = [this](const char* text) { this->writeOutput(text); };
-    auto tokenCallback = [this](const char* text) { this->writeToken(text); };
-    Rule::setOutputFunc(outputCallback);
-    Rule::setTokensFunc(tokenCallback);
+    onWriteOutput = [this](std::string text)
+    {
+        *mOutputFile << text;
+    };
+    onWriteToken = [this](std::string text)
+    {
+        *mTokensFile << text;
+    };
+    onAdvanceToken = [this]()
+    {
+        if (!mJackTokenizer->hasMoreTokens())
+        {
+            throw std::runtime_error("Failed to read token.");
+        }
 
-    //Assert::Initialize(mJackTokenizer);
+        mJackTokenizer->advance();
+    };
 }
 
 /// <summary>
@@ -68,50 +79,8 @@ CompilationEngine::~CompilationEngine()
 /// </summary>
 void CompilationEngine::compileClass()
 {
-    *mOutputFile << "<class>\n";
-
-    advanceTokenizer();
-    if (!(mJackTokenizer->tokenType() == ETokenType::KEYWORD && mJackTokenizer->keyword() == "class"))
-    {
-        throw std::runtime_error("compileClass - Class should start with 'class' keyword.");
-    }
-    writeTokenToStreams();
-
-    advanceTokenizer();
-    if (!(mJackTokenizer->tokenType() == ETokenType::IDENTIFIER))
-    {
-        throw std::runtime_error("compileClass - Missing class name.");
-    }
-    writeTokenToStreams();
-
-    advanceTokenizer();
-    if (!(mJackTokenizer->tokenType() == ETokenType::SYMBOL && mJackTokenizer->symbol() == '{'))
-    {
-        throw std::runtime_error("compileClass - Missing '{' left curly bracket.");
-    }
-    writeTokenToStreams();
-
-    advanceTokenizer();
-    while (mJackTokenizer->tokenType() == ETokenType::KEYWORD && (mJackTokenizer->keyword() == "static" || mJackTokenizer->keyword() == "field"))
-    {
-        compileClassVarDec();
-        advanceTokenizer();
-    }
-
-    while (mJackTokenizer->tokenType() == ETokenType::KEYWORD 
-        && (mJackTokenizer->keyword() == "constructor" || mJackTokenizer->keyword() == "function" || mJackTokenizer->keyword() == "method"))
-    {
-        compileSubroutine();
-        advanceTokenizer();
-    }
-
-    if (!(mJackTokenizer->tokenType() == ETokenType::SYMBOL && mJackTokenizer->symbol() == '}'))
-    {
-        throw std::runtime_error("compileClass - Missing '}' right curly bracket.");
-    }
-    writeTokenToStreams();
-
-    *mOutputFile << "</class>";
+    auto classRule = new ClassRule();
+    classRule->compile(mJackTokenizer);
 }
 
 /// <summary>
@@ -119,45 +88,44 @@ void CompilationEngine::compileClass()
 /// </summary>
 void CompilationEngine::compileClassVarDec()
 {
-    *mOutputFile << "<classVarDec>";
-    if (!(mJackTokenizer->tokenType() == ETokenType::KEYWORD && (mJackTokenizer->keyword() == "static" || mJackTokenizer->keyword() == "field")))
+    /**mOutputFile << "<classVarDec>";
+
+    if (!Assert::That(ETokenType::KEYWORD, "static", "field"))
     {
-        throw std::runtime_error("compileClassVarDec - Missing keyword 'static' or 'field'.");
+        throw new std::runtime_error("compileClassVarDec - Missing keyword 'static' or 'field'.");
     }
     writeTokenToStreams();
 
-    advanceTokenizer();
-    if (!(mJackTokenizer->tokenType() == ETokenType::KEYWORD && (mJackTokenizer->keyword() == "int" || mJackTokenizer->keyword() == "char" || mJackTokenizer->keyword() == "boolean"))
-        && !(mJackTokenizer->tokenType() == ETokenType::IDENTIFIER))
+    advanceToken();
+    if (!Assert::That(ETokenType::KEYWORD, "int", "char", "boolean") && !Assert::That(ETokenType::IDENTIFIER))
     {
-        throw std::runtime_error("compileClassVarDec - Missing valid type for variable declaration.");
+        throw std::runtime_error("compileType - Missing valid type: 'int', 'char', 'boolean' or class name.");
     }
     writeTokenToStreams();
 
     do
     {
-        advanceTokenizer();
-        if (!(mJackTokenizer->tokenType() == ETokenType::IDENTIFIER))
+        advanceToken();
+        if (!Assert::That(ETokenType::IDENTIFIER))
         {
             throw std::runtime_error("compileClassVarDec - Missing variable name.");
         }
         writeTokenToStreams();
 
-        advanceTokenizer();
-        if (!(mJackTokenizer->tokenType() == ETokenType::SYMBOL && mJackTokenizer->symbol() == ','))
+        advanceToken();
+        if (!Assert::That(ETokenType::SYMBOL, ','))
         {
             break;
         }
         writeTokenToStreams();
     } while (true);
 
-    if (!(mJackTokenizer->tokenType() == ETokenType::SYMBOL && mJackTokenizer->symbol() == ';'))
+    if (!Assert::That(ETokenType::SYMBOL, ';'))
     {
         throw std::runtime_error("compileClassVarDec - Missing semi-colon ';' at the end of variable declaration.");
     }
-    writeTokenToStreams();
 
-    *mOutputFile << "</classVarDec>";
+    *mOutputFile << "</classVarDec>";*/
 }
 
 /// <summary>
@@ -165,32 +133,32 @@ void CompilationEngine::compileClassVarDec()
 /// </summary>
 void CompilationEngine::compileSubroutine()
 {
-    *mOutputFile << "<subroutineDec>";
+    /**mOutputFile << "<subroutineDec>";
 
-    if (!(mJackTokenizer->tokenType() == ETokenType::KEYWORD
-        && (mJackTokenizer->keyword() == "constructor" || mJackTokenizer->keyword() == "function" || mJackTokenizer->keyword() == "method")))
+    if (!Assert::That(ETokenType::KEYWORD, "constructor", "function", "method"))
     {
         throw std::runtime_error("compileSubroutine - Missing keyword 'constructor' or 'function' or 'method'.");
-    }
+    }    
     writeTokenToStreams();
 
-    advanceTokenizer();
-    if (!(mJackTokenizer->tokenType() == ETokenType::KEYWORD && mJackTokenizer->keyword() == "void")
-        && !(mJackTokenizer->tokenType() == ETokenType::IDENTIFIER))
+
+
+    advanceToken();
+    if (!Assert::That(ETokenType::KEYWORD, "void") && !Assert::That(ETokenType::IDENTIFIER))
     {
         throw std::runtime_error("compileSubroutine - Missing return type.");
     }
     writeTokenToStreams();
 
-    advanceTokenizer();
-    if (!(mJackTokenizer->tokenType() == ETokenType::IDENTIFIER))
+    advanceToken();
+    if (!Assert::That(ETokenType::IDENTIFIER))
     {
         throw std::runtime_error("compileSubroutine - Missing subroutine name.");
     }
     writeTokenToStreams();
 
-    advanceTokenizer();
-    if (!(mJackTokenizer->tokenType() == ETokenType::SYMBOL && mJackTokenizer->symbol() == '('))
+    advanceToken();
+    if (!Assert::That(ETokenType::SYMBOL, '('))
     {
         throw std::runtime_error("compileSubroutine - Missing left bracket '('.");
     }
@@ -198,8 +166,8 @@ void CompilationEngine::compileSubroutine()
 
     compileParameterList();
 
-    advanceTokenizer();
-    if (!(mJackTokenizer->tokenType() == ETokenType::SYMBOL && mJackTokenizer->symbol() == ')'))
+    advanceToken();
+    if (!Assert::That(ETokenType::SYMBOL, ')'))
     {
         throw std::runtime_error("compileSubroutine - Missing right bracket ')'.");
     }
@@ -207,7 +175,7 @@ void CompilationEngine::compileSubroutine()
 
     compileSubroutineBody();
 
-    *mOutputFile << "</subroutineDec>";
+    *mOutputFile << "</subroutineDec>";*/
 }
 
 /// <summary>
@@ -310,66 +278,17 @@ int CompilationEngine::compileExpressionList()
     return 0;
 }
 
-void CompilationEngine::advanceTokenizer()
+void CompilationEngine::writeOutput(std::string text)
 {
-    if (!mJackTokenizer->hasMoreTokens())
-    {
-        throw std::runtime_error("Failed to read token.");
-    }
-
-    mJackTokenizer->advance();
+    onWriteOutput(text);
 }
 
-void CompilationEngine::writeTokenToStreams()
+void CompilationEngine::writeToken(std::string text)
 {
-    writeTokenToStream(mOutputFile, true);
-    writeTokenToStream(mTokensFile, mWriteTokens);
+    onWriteToken(text);
 }
 
-void CompilationEngine::writeTokenToStream(std::ofstream* stream, bool writeToken)
+void CompilationEngine::advanceToken()
 {
-    if (!writeToken)
-    {
-        return;
-    }
-
-    ETokenType tokenType = mJackTokenizer->tokenType();
-
-    switch (tokenType)
-    {
-    case ETokenType::KEYWORD:
-        *stream << "<keyword> " << mJackTokenizer->keyword() << " </keyword>\n";
-        break;
-    case ETokenType::SYMBOL:
-        *stream << "<symbol> " << encodeXmlSymbol(mJackTokenizer->symbol()) << " </symbol>\n";
-        break;
-    case ETokenType::IDENTIFIER:
-        *stream << "<identifier> " << mJackTokenizer->identifier() << " </identifier>\n";
-        break;
-    case ETokenType::INT_CONST:
-        *stream << "<integerConstant> " << mJackTokenizer->intVal() << " </integerConstant>\n";
-        break;
-    case ETokenType::STRING_CONST:
-        *stream << "<stringConstant> " << mJackTokenizer->stringVal() << " </stringConstant>\n";
-        break;
-    case ETokenType::UNDEFINED:
-        throw std::runtime_error("Undefined token.");
-    }
-}
-
-std::string CompilationEngine::encodeXmlSymbol(char symbol)
-{
-    switch (symbol)
-    {
-    case '<':
-        return "&lt;";
-    case '>':
-        return "&gt;";
-    case '"':
-        return "&quot;";
-    case '&':
-        return "&amp;";
-    default:
-        return std::string(1, symbol);
-    }
+    onAdvanceToken();
 }

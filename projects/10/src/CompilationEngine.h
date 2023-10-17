@@ -90,11 +90,14 @@ public:
     /// <returns>Returns the number of expressions in the list</returns>
     int compileExpressionList();
 
+public:
+    static void writeOutput(std::string text);
+    static void writeToken(std::string text);
+    static void advanceToken();
 private:
-    void advanceTokenizer();
-    void writeOutput(const char* text);
-    void writeToken(const char* text);
-    std::string encodeXmlSymbol(char symbol);
+    static std::function<void(std::string)> onWriteOutput;
+    static std::function<void(std::string)> onWriteToken;
+    static std::function<void()> onAdvanceToken;
 
 private:
     std::ofstream* mOutputFile = NULL;

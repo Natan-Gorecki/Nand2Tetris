@@ -14,8 +14,11 @@ class ZeroOrOneRule;
 
 
 using RuleVector = std::vector<Rule*>;
-using StreamWriteFunc = std::function<void(std::string)>;
-
+struct CompileResult
+{
+    bool compileResult;
+    bool tokenConsumed;
+};
 
 class Rule
 {
@@ -24,15 +27,22 @@ public:
     virtual ~Rule() {};
 
 public:
-    virtual bool compile(JackTokenizer* pTokenizer) {};
-
-public:
-    static void setOutputFunc(StreamWriteFunc pOutputStream);
-    static void setTokensFunc(StreamWriteFunc pTokenStream);
+    /// <summary>
+    /// Compiles the current rule.
+    /// </summary>
+    /// <param name="pTokenizer">A pointer to the JackTokenizer for tokens information.</param>
+    /// <param name="advanceToken">An information if tokenizer should be advanced to the next token.</param>
+    /// <returns>
+    /// A tuple containing two values:
+    ///   - First value is the compile result.
+    ///   - Second value indicates if the token was consumed.
+    /// </returns>
+    virtual CompileResult compile(JackTokenizer* pTokenizer, bool advanceToken = true) final;
 
 protected:
-    static StreamWriteFunc onWriteOutput;
-    static StreamWriteFunc onWriteToken;
+    virtual void beforeCompile(JackTokenizer* pTokenizer, bool advanceToken);
+    virtual bool doCompile(JackTokenizer* pTokenizer);
+    virtual CompileResult afterCompile(JackTokenizer* pTokenizer, bool compileResult);
 };
 
 class ParentRule : public Rule
@@ -51,8 +61,8 @@ public:
     SequenceRule(RuleVector rules);
     virtual ~SequenceRule() {};
 
-public:
-    bool compile(JackTokenizer* pTokenizer) override;
+protected:
+    bool doCompile(JackTokenizer* pTokenizer) override;
 };
 
 class AlternationRule : public ParentRule
@@ -61,8 +71,8 @@ public:
     AlternationRule(RuleVector rules);
     virtual ~AlternationRule() {};
 
-public:
-    bool compile(JackTokenizer* pTokenizer) override;
+protected:
+    bool doCompile(JackTokenizer* pTokenizer) override;
 };
 
 class ZeroOrMoreRule : public ParentRule
@@ -71,8 +81,9 @@ public:
     ZeroOrMoreRule(RuleVector rules);
     virtual ~ZeroOrMoreRule() {};
 
-public:
-    bool compile(JackTokenizer* pTokenizer) override;
+protected:
+    bool doCompile(JackTokenizer* pTokenizer) override;
+    CompileResult afterCompile(JackTokenizer* pTokenizer, bool compileResult) override;
 };
 
 class ZeroOrOneRule : public ParentRule
@@ -81,6 +92,7 @@ public:
     ZeroOrOneRule(RuleVector rules);
     virtual ~ZeroOrOneRule() {};
 
-public:
-    bool compile(JackTokenizer* pTokenizer) override;
+protected:
+    bool doCompile(JackTokenizer* pTokenizer) override;
+    CompileResult afterCompile(JackTokenizer* pTokenizer, bool compileResult);
 };

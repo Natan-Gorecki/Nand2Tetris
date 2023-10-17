@@ -17,11 +17,8 @@ public:
     LexicalRule() {};
     virtual ~LexicalRule() {};
 
-public:
-    bool compile(JackTokenizer* pTokenizer) override final;
-
 protected:
-    virtual bool lexicalCompile(JackTokenizer* pTokenizer) = 0;
+    CompileResult afterCompile(JackTokenizer* pTokenizer, bool compileResult) override final;
     virtual std::string toString(JackTokenizer* pTokenizer) = 0;
 };
 
@@ -38,7 +35,7 @@ public:
     virtual ~KeywordRule() {};
 
 protected:
-    bool lexicalCompile(JackTokenizer* pTokenizer) override;
+    bool doCompile(JackTokenizer* pTokenizer) override;
     std::string toString(JackTokenizer* pTokenizer) override;
 
 private:
@@ -58,7 +55,7 @@ public:
     virtual ~SymbolRule() {};
 
 protected:
-    bool lexicalCompile(JackTokenizer* pTokenizer) override;
+    bool doCompile(JackTokenizer* pTokenizer) override;
     std::string toString(JackTokenizer* pTokenizer) override;
 
 private:
@@ -73,7 +70,7 @@ public:
     virtual ~IntegerConstantRule() {};
 
 protected:
-    bool lexicalCompile(JackTokenizer* pTokenizer) override;
+    bool doCompile(JackTokenizer* pTokenizer) override;
     std::string toString(JackTokenizer* pTokenizer) override;
 };
 
@@ -84,7 +81,7 @@ public:
     virtual ~StringConstantRule() {};
 
 protected:
-    bool lexicalCompile(JackTokenizer* pTokenizer) override;
+    bool doCompile(JackTokenizer* pTokenizer) override;
     std::string toString(JackTokenizer* pTokenizer) override;
 };
 
@@ -95,6 +92,6 @@ public:
     virtual ~IdentifierRule() {};
 
 protected:
-    bool lexicalCompile(JackTokenizer* pTokenizer) override;
+    bool doCompile(JackTokenizer* pTokenizer) override;
     std::string toString(JackTokenizer* pTokenizer) override;
 };
