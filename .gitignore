@@ -1,2 +1,7 @@
+# Visual Studio files
+.vs/
+[Dd]ebug/
+[Rr]elease/
+
 tools/
 nand2tetris.zip
