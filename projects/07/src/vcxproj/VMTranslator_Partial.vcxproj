@@ -21,9 +21,10 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{8e0606bc-ce12-4bc7-8155-c4d65af7c833}</ProjectGuid>
+    <ProjectGuid>{C0F360DF-EFFD-4CCB-B27F-E3C8DCBF1A64}</ProjectGuid>
     <RootNamespace>VMTranslator</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>VMTranslator_Partial</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
