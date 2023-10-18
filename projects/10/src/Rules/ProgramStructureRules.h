@@ -77,20 +77,20 @@ public:
 class ClassNameRule : public IdentifierRule
 {
 public:
-    ClassNameRule();
+    ClassNameRule() {};
     virtual ~ClassNameRule() {};
 };
 
 class SubroutineNameRule : public IdentifierRule
 {
 public:
-    SubroutineNameRule();
+    SubroutineNameRule() {};
     virtual ~SubroutineNameRule() {};
 };
 
 class VarNameRule : public IdentifierRule
 {
 public:
-    VarNameRule();
+    VarNameRule() {};
     virtual ~VarNameRule() {};
 };

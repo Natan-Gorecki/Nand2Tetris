@@ -17,9 +17,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Check.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\CompilationEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -71,9 +68,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Check.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\CompilationEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>

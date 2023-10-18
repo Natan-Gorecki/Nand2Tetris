@@ -7,6 +7,10 @@
 
 namespace fs = std::filesystem;
 
+std::function<void(std::string)> CompilationEngine::onWriteOutput;
+std::function<void(std::string)> CompilationEngine::onWriteToken;
+std::function<void()> CompilationEngine::onAdvanceToken;
+
 /// <summary>
 /// Opens the output file and gets ready to write into it.
 /// <para/> The next routine called must be compileClass.
