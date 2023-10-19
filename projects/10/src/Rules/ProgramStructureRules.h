@@ -26,7 +26,7 @@ protected:
     bool doCompile(JackTokenizer* pTokenizer) override;
 };
 
-class ClassVarDecRule : public ParentRule
+class ClassVarDecRule : public SequenceRule
 {
 public:
     ClassVarDecRule();
@@ -36,14 +36,17 @@ protected:
     bool doCompile(JackTokenizer* pTokenizer) override;
 };
 
-class TypeRule : public ParentRule
+class TypeRule : public AlternationRule
 {
 public:
     TypeRule();
     virtual ~TypeRule() {};
+
+protected:
+    bool doCompile(JackTokenizer* pTokenizer) override;
 };
 
-class SubroutineDecRule : public ParentRule
+class SubroutineDecRule : public SequenceRule
 {
 public:
     SubroutineDecRule();
@@ -53,25 +56,34 @@ protected:
     bool doCompile(JackTokenizer* pTokenizer) override;
 };
 
-class ParameterListRule : public ParentRule
+class ParameterListRule : public ZeroOrOneRule
 {
 public:
     ParameterListRule();
     virtual ~ParameterListRule() {};
+
+protected:
+    bool doCompile(JackTokenizer* pTokenizer) override;
 };
 
-class SubroutineBodyRule : public ParentRule
+class SubroutineBodyRule : public SequenceRule
 {
 public:
     SubroutineBodyRule();
     virtual ~SubroutineBodyRule() {};
+
+protected:
+    bool doCompile(JackTokenizer* pTokenizer) override;
 };
 
-class VarDecRule : public ParentRule
+class VarDecRule : public SequenceRule
 {
 public:
     VarDecRule();
     virtual ~VarDecRule() {};
+
+protected:
+    bool doCompile(JackTokenizer* pTokenizer) override;
 };
 
 class ClassNameRule : public IdentifierRule

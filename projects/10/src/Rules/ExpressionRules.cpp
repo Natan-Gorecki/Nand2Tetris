@@ -5,14 +5,14 @@
 
 ExpressionRule::ExpressionRule() : ParentRule(
     {
-        new SequenceRule({
+        /*new SequenceRule({
             new TermRule(),
             new ZeroOrMoreRule(
             {
                 new OpRule(),
                 new TermRule()
             })
-        })
+        })*/
     })
 {
 }

@@ -2,16 +2,27 @@
 #include "LexicalRules.h"
 #include "ProgramStructureRules.h"
 #include "StatementRules.h"
+#include "../CompilationEngine.h"
 
+#pragma region StatementsRule
 StatementsRule::StatementsRule() : ParentRule(
     {
-        new ZeroOrMoreRule(
+        new KeywordRule("let"),
+        /*new ZeroOrMoreRule(
         {
             new StatementRule()
-        })
+        })*/
     })
 {
 }
+
+bool StatementsRule::doCompile(JackTokenizer* pTokenizer)
+{
+    CompilationEngine::writeOutput("<statements>\n");
+    CompilationEngine::writeOutput("</statements>\n");
+    return true;
+}
+#pragma endregion
 
 StatementRule::StatementRule() : ParentRule(
     {

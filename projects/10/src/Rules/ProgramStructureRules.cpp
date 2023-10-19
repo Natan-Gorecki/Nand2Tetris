@@ -1,5 +1,6 @@
-#include "ProgramStructureRules.h"
 #include "ExpressionRules.h"
+#include "ProgramStructureRules.h"
+#include "StatementRules.h"
 #include "../CompilationEngine.h"
 
 #pragma region ClassRule
@@ -29,30 +30,26 @@ bool ClassRule::doCompile(JackTokenizer* pTokenizer)
     {
         CompilationEngine::writeOutput("</class>\n");
     }
-
     return compileResult;
 }
 #pragma endregion
 
 #pragma region ClassVarDecRule
-ClassVarDecRule::ClassVarDecRule() : ParentRule(
+ClassVarDecRule::ClassVarDecRule() : SequenceRule(
     {
-        new SequenceRule(
+        new AlternationRule(
         {
-            new AlternationRule(
-            {
-                new KeywordRule("static"),
-                new KeywordRule("field")
-            }),
-            new TypeRule(),
-            new VarNameRule(),
-            new ZeroOrMoreRule(
-            {
-                new SymbolRule(','),
-                new VarNameRule()
-            }),
-            new SymbolRule(';')
-        })
+            new KeywordRule("static"),
+            new KeywordRule("field")
+        }),
+        new TypeRule(),
+        new VarNameRule(),
+        new ZeroOrMoreRule(
+        {
+            new SymbolRule(','),
+            new VarNameRule()
+        }),
+        new SymbolRule(';')
     })
 {
 }
@@ -60,33 +57,51 @@ ClassVarDecRule::ClassVarDecRule() : ParentRule(
 bool ClassVarDecRule::doCompile(JackTokenizer* pTokenizer)
 {
     CompilationEngine::writeOutput("<classVarDecRule>\n");
-    CompilationEngine::writeOutput("</classVarDecRule>\n");
-    return false;
+    bool compileResult = SequenceRule::doCompile(pTokenizer);
+    if (compileResult)
+    {
+        CompilationEngine::writeOutput("</classVarDecRule>\n");
+    }
+    return compileResult;
+}
+#pragma endregion
+
+#pragma region TypeRule
+TypeRule::TypeRule() : AlternationRule(
+    {
+        new KeywordRule("int"),
+        new KeywordRule("char"),
+        new KeywordRule("boolean"),
+        new ClassNameRule()
+    })
+{
+}
+
+bool TypeRule::doCompile(JackTokenizer* pTokenizer)
+{
+    return AlternationRule::doCompile(pTokenizer);
 }
 #pragma endregion
 
 #pragma region SubroutineDecRule
-SubroutineDecRule::SubroutineDecRule() : ParentRule(
+SubroutineDecRule::SubroutineDecRule() : SequenceRule(
     {
-        new SequenceRule(
+        new AlternationRule(
         {
-            new AlternationRule(
-            {
-                new KeywordRule("constructor"),
-                new KeywordRule("function"),
-                new KeywordRule("method")
-            }),
-            new AlternationRule(
-            {
-                new KeywordRule("void"),
-                new TypeRule()
-            }),
-            new SubroutineNameRule(),
-            new SymbolRule('('),
-            new ParameterListRule(),
-            new SymbolRule(')'),
-            new SubroutineBodyRule()
-        })
+            new KeywordRule("constructor"),
+            new KeywordRule("function"),
+            new KeywordRule("method")
+        }),
+        new AlternationRule(
+        {
+            new KeywordRule("void"),
+            new TypeRule()
+        }),
+        new SubroutineNameRule(),
+        new SymbolRule('('),
+        new ParameterListRule(),
+        new SymbolRule(')'),
+        new SubroutineBodyRule()
     })
 {
 }
@@ -94,84 +109,89 @@ SubroutineDecRule::SubroutineDecRule() : ParentRule(
 bool SubroutineDecRule::doCompile(JackTokenizer* pTokenizer)
 {
     CompilationEngine::writeOutput("<subroutineDecRule>\n");
-    CompilationEngine::writeOutput("</subroutineDecRule>\n");
-    return false;
+    bool compileResult = SequenceRule::doCompile(pTokenizer);
+    if (compileResult)
+    {
+        CompilationEngine::writeOutput("</subroutineDecRule>\n");
+    }
+    return compileResult;
 }
 #pragma endregion
 
-#pragma region others to implement
-
-
-TypeRule::TypeRule() : ParentRule(
+#pragma region ParameterListRule
+ParameterListRule::ParameterListRule() : ZeroOrOneRule(
     {
-        new AlternationRule(
+        new TypeRule(),
+        new VarNameRule(),
+        new ZeroOrMoreRule(
         {
-            new KeywordRule("int"),
-            new KeywordRule("char"),
-            new KeywordRule("boolean"),
-            new ClassNameRule()
-        })
-    })
-{
-}
-
-ParameterListRule::ParameterListRule() : ParentRule(
-    {
-        new ZeroOrOneRule(
-        {
+            new SymbolRule(','),
             new TypeRule(),
-            new VarNameRule(),
-            new ZeroOrMoreRule(
-            {
-                new SymbolRule(','),
-                new TypeRule(),
-                new VarNameRule()
-            })
+            new VarNameRule()
         })
     })
 {
 }
 
-SubroutineBodyRule::SubroutineBodyRule() : ParentRule(
+bool ParameterListRule::doCompile(JackTokenizer* pTokenizer)
+{
+    CompilationEngine::writeOutput("<parameterList>\n");
+    auto compileResult = ZeroOrOneRule::doCompile(pTokenizer);
+    CompilationEngine::writeOutput("</parameterList>\n");
+    return compileResult;
+}
+#pragma endregion
+
+#pragma region SubroutineBodyRule
+SubroutineBodyRule::SubroutineBodyRule() : SequenceRule(
     {
-        new SequenceRule(
+        new SymbolRule('{'),
+        new ZeroOrMoreRule(
         {
-            new AlternationRule(
-            {
-                new KeywordRule("constructor"),
-                new KeywordRule("function"),
-                new KeywordRule("method")
-            }),
-            new AlternationRule(
-            {
-                new KeywordRule("void"),
-                new TypeRule()
-            }),
-            new SubroutineNameRule(),
-            new SymbolRule('('),
-            new ParameterListRule(),
-            new SymbolRule(')'),
-            new SubroutineBodyRule()
-        })
+            new VarDecRule()
+        }),
+        new StatementsRule(),
+        new SymbolRule('}')
     })
 {
 }
 
-VarDecRule::VarDecRule() : ParentRule(
+bool SubroutineBodyRule::doCompile(JackTokenizer* pTokenizer)
+{
+    CompilationEngine::writeOutput("<subroutineBody>\n");
+    bool compileResult = SequenceRule::doCompile(pTokenizer);
+    if (compileResult)
     {
-        new SequenceRule(
+        CompilationEngine::writeOutput("</subroutineBody>\n");
+    }
+    return compileResult;
+}
+#pragma endregion
+
+#pragma region VarDecRule
+VarDecRule::VarDecRule() : SequenceRule(
+    {
+        new KeywordRule("var"),
+        new TypeRule(),
+        new VarNameRule(),
+        new ZeroOrMoreRule(
         {
-            new KeywordRule("var"),
-            new TypeRule(),
-            new VarNameRule(),
-            new ZeroOrMoreRule(
-            {
-                new SymbolRule(','),
-                new VarNameRule()
-            }),
-            new SymbolRule(';'),
-        })
+            new SymbolRule(','),
+            new VarNameRule()
+        }),
+        new SymbolRule(';')
     })
 {
+}
+
+bool VarDecRule::doCompile(JackTokenizer* pTokenizer)
+{
+    CompilationEngine::writeOutput("<varDec>\n");
+    bool compileResult = SequenceRule::doCompile(pTokenizer);
+    if (compileResult)
+    {
+        CompilationEngine::writeOutput("</varDec>\n");
+    }
+    return compileResult;
 }
 #pragma endregion

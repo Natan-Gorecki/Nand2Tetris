@@ -17,6 +17,9 @@ class StatementsRule : public ParentRule
 public:
     StatementsRule();
     virtual ~StatementsRule() {};
+
+protected:
+    bool doCompile(JackTokenizer* pTokenizer) override;
 };
 
 class StatementRule : public ParentRule

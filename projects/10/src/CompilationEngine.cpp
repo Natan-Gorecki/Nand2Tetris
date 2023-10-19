@@ -46,10 +46,10 @@ CompilationEngine::CompilationEngine(std::string filename, JackTokenizer* jackTo
     };
     onAdvanceToken = [this]()
     {
-        if (!mJackTokenizer->hasMoreTokens())
+        /*if (!mJackTokenizer->hasMoreTokens())
         {
             throw std::runtime_error("Failed to read token.");
-        }
+        }*/
 
         mJackTokenizer->advance();
     };

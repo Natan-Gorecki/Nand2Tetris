@@ -101,10 +101,25 @@ ZeroOrMoreRule::ZeroOrMoreRule(RuleVector rules)
 bool ZeroOrMoreRule::doCompile(JackTokenizer* pTokenizer)
 {
     CompileResult compileResult = { true, false };
+    
     while (compileResult.compileResult)
     {
-        compileResult = mChildRules[0]->compile(pTokenizer, compileResult.tokenConsumed);
+        for (int i = 0; i < mChildRules.size(); i++)
+        {
+            compileResult = mChildRules[i]->compile(pTokenizer, compileResult.tokenConsumed);
+
+            if (!compileResult.compileResult && i > 0)
+            {
+                throw std::runtime_error("ZeroOrMoreRule failed - tokenizer advanced without going back.");
+            }
+
+            if (!compileResult.compileResult)
+            {
+                break;
+            }
+        }
     }
+
     return true;
 }
 
@@ -122,7 +137,23 @@ ZeroOrOneRule::ZeroOrOneRule(RuleVector rules)
 
 bool ZeroOrOneRule::doCompile(JackTokenizer* pTokenizer)
 {
-    auto compileResult = mChildRules[0]->compile(pTokenizer, false);
+    CompileResult compileResult = { false, false };
+
+    for (int i = 0; i < mChildRules.size(); i++)
+    {
+        compileResult = mChildRules[i]->compile(pTokenizer, compileResult.tokenConsumed);
+
+        if (!compileResult.compileResult && i > 0)
+        {
+            throw std::runtime_error("ZeroOrOneRule failed - tokenizer advanced without going back.");
+        }
+
+        if (!compileResult.compileResult)
+        {
+            break;
+        }
+    }
+
     return compileResult.compileResult;
 }
 
