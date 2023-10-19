@@ -64,59 +64,46 @@ bool JackTokenizer::hasMoreTokens()
 /// <para/> This method should be called only if hasMoreTokens is true.
 /// <para/> Initially there is no current token.
 /// </summary>
-void JackTokenizer::advance()
+bool JackTokenizer::advance()
 {
-    resetFieldValues();
-    
-    if (mFirstChar == 0)
+    auto nextPosition = mCurrentPosition + 1;
+    if (nextPosition < mTokens.size())
     {
-        throw std::runtime_error("mFirstChar has default value. Call hasMoreTokens before advance.");
-    }
-    
-    if (SymbolRule::isSymbol(mFirstChar))
-    {
-        mToken = std::string(1, mFirstChar);
-        mTokenType = ETokenType::SYMBOL;
-        mSymbol = mFirstChar;
-        
-        mFirstChar = 0;
-        return;
+        mCurrentToken = mTokens.at(nextPosition);
+        mCurrentPosition = nextPosition;
+        return true;
     }
 
-    if (mFirstChar == '"')
+    if (!hasMoreTokens())
     {
-        parseStringValue();
-        
-        mFirstChar = 0;
-        return;
-    }
-    
-    std::string word = readToWhitespaceOrSymbol();
-    
-    if (isdigit(word[0]))
-    {
-        parseIntValue(word);
-        
-        mFirstChar = 0;
-        return;
-    }
-    
-    if (KeywordRule::isKeyword(word))
-    {
-        mToken = word;
-        mTokenType = ETokenType::KEYWORD;
-        mKeyWord = word;
-
-        mFirstChar = 0;
-        return;
+        return false;
     }
 
-    mToken = word;
-    mTokenType = ETokenType::IDENTIFIER;
-    mIdentifier = word;
+    mCurrentToken = Token();
+    mCurrentPosition = nextPosition;
 
-    mFirstChar = 0;
-    return;
+    advanceNew();
+    mTokens.push_back(mCurrentToken);
+    
+    return true;
+}
+
+bool JackTokenizer::reverse()
+{
+    auto previousPosition = mCurrentPosition - 1;
+    if (previousPosition < 0)
+    {
+        return false;
+    }
+
+    if (mTokens.size() <= previousPosition)
+    {
+        return false;
+    }
+
+    mCurrentToken = mTokens.at(previousPosition);
+    mCurrentPosition = previousPosition;
+    return true;
 }
 
 /// <summary>
@@ -124,7 +111,7 @@ void JackTokenizer::advance()
 /// </summary>
 ETokenType JackTokenizer::tokenType()
 {
-    return mTokenType;
+    return mCurrentToken.tokenType;
 }
 
 /// <summary>
@@ -133,7 +120,7 @@ ETokenType JackTokenizer::tokenType()
 /// </summary>
 std::string JackTokenizer::keyword()
 {
-    return mKeyWord;
+    return mCurrentToken.keyword;
 }
 
 /// <summary>
@@ -142,7 +129,7 @@ std::string JackTokenizer::keyword()
 /// </summary>
 char JackTokenizer::symbol()
 {
-    return mSymbol;
+    return mCurrentToken.symbol;
 }
 
 /// <summary>
@@ -151,7 +138,7 @@ char JackTokenizer::symbol()
 /// </summary>
 std::string JackTokenizer::identifier()
 {
-    return mIdentifier;
+    return mCurrentToken.identifier;
 }
 
 /// <summary>
@@ -160,7 +147,7 @@ std::string JackTokenizer::identifier()
 /// </summary>
 int JackTokenizer::intVal()
 {
-    return mIntegerValue;
+    return mCurrentToken.integerValue;
 }
 
 /// <summary>
@@ -169,19 +156,55 @@ int JackTokenizer::intVal()
 /// </summary>
 std::string JackTokenizer::stringVal()
 {
-    return mStringValue;
+    return mCurrentToken.stringValue;
 }
 
-void JackTokenizer::resetFieldValues()
+void JackTokenizer::advanceNew()
 {
-    mToken = "";
-    mTokenType = ETokenType::UNDEFINED;
+    if (SymbolRule::isSymbol(mFirstChar))
+    {
+        mCurrentToken.token = std::string(1, mFirstChar);
+        mCurrentToken.tokenType = ETokenType::SYMBOL;
+        mCurrentToken.symbol = mFirstChar;
 
-    mKeyWord = "";
-    mSymbol = 0;
-    mIdentifier = "";
-    mIntegerValue = 0;
-    mStringValue = "";
+        mFirstChar = 0;
+        return;
+    }
+
+    if (mFirstChar == '"')
+    {
+        parseStringValue();
+
+        mFirstChar = 0;
+        return;
+    }
+
+    std::string word = readToWhitespaceOrSymbol();
+
+    if (isdigit(word[0]))
+    {
+        parseIntValue(word);
+
+        mFirstChar = 0;
+        return;
+    }
+
+    if (KeywordRule::isKeyword(word))
+    {
+        mCurrentToken.token = word;
+        mCurrentToken.tokenType = ETokenType::KEYWORD;
+        mCurrentToken.keyword = word;
+
+        mFirstChar = 0;
+        return;
+    }
+
+    mCurrentToken.token = word;
+    mCurrentToken.tokenType = ETokenType::IDENTIFIER;
+    mCurrentToken.identifier = word;
+
+    mFirstChar = 0;
+    return;
 }
 
 std::string JackTokenizer::readToWhitespaceOrSymbol()
@@ -227,9 +250,9 @@ void JackTokenizer::parseStringValue()
 
         if (nextChar == '"')
         {
-            mToken = '"' + line + '"';
-            mTokenType = ETokenType::STRING_CONST;
-            mStringValue = line;
+            mCurrentToken.token = '"' + line + '"';
+            mCurrentToken.tokenType = ETokenType::STRING_CONST;
+            mCurrentToken.stringValue = line;
             return;
         }
 
@@ -250,11 +273,11 @@ void JackTokenizer::parseIntValue(std::string str)
         throw std::runtime_error("Invalid number - " + str + " .");
     }
 
-    mToken = str;
-    mTokenType = ETokenType::INT_CONST;
-    mIntegerValue = std::stoi(str.c_str());
+    mCurrentToken.token = str;
+    mCurrentToken.tokenType = ETokenType::INT_CONST;
+    mCurrentToken.integerValue = std::stoi(str.c_str());
 
-    if (mIntegerValue < 0 || mIntegerValue > SHRT_MAX)
+    if (mCurrentToken.integerValue < 0 || mCurrentToken.integerValue > SHRT_MAX)
     {
         throw std::runtime_error("Number out of scope - " + str + " .");
     }

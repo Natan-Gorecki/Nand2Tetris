@@ -1,7 +1,20 @@
 #pragma once
 #include <fstream>
 #include <string>
+#include <vector>
 #include "ETokenType.h"
+
+struct Token
+{
+    std::string token = "";
+    ETokenType tokenType = ETokenType::UNDEFINED;
+
+    std::string keyword = "";
+    char symbol = 0;
+    std::string identifier = "";
+    int integerValue = 0;
+    std::string stringValue = "";
+};
 
 /// <summary>
 /// The module ignores all comments and white space in the input stream and enables accessing the input one token at a time.
@@ -20,17 +33,22 @@ public:
     /// </summary>
     ~JackTokenizer();
 
-public:
+private:
     /// <summary>
     /// Are there more tokens in the input?
     /// </summary>
     bool hasMoreTokens();
+public:
     /// <summary>
     /// Gets the next token from the input and makes it the current token.
-    /// <para/> This method should be called only if hasMoreTokens is true.
     /// <para/> Initially there is no current token.
     /// </summary>
-    void advance();
+    bool advance();
+    /// <summary>
+    /// Makes the previous token the current token.
+    /// <para/> If there are no previous tokens, the current token remains unchanged.
+    /// </summary>
+    bool reverse();
     /// <summary>
     /// Returns the type of the current token as a constant.
     /// </summary>
@@ -62,7 +80,7 @@ public:
     std::string stringVal();
 
 private:
-    void resetFieldValues();
+    void advanceNew();
     std::string readToWhitespaceOrSymbol();
     void parseStringValue();
     void parseIntValue(std::string str);
@@ -73,14 +91,9 @@ private:
 
 private:
     std::ifstream* mInputStream = NULL;
-    
     char mFirstChar = 0;
-    std::string mToken = "";
-    ETokenType mTokenType = ETokenType::UNDEFINED;
-
-    std::string mKeyWord = "";
-    char mSymbol = 0;
-    std::string mIdentifier = "";
-    int mIntegerValue = 0;
-    std::string mStringValue = "";
+    
+    std::vector<Token> mTokens;
+    int mCurrentPosition = -1;
+    Token mCurrentToken;
 };
