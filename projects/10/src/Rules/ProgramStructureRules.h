@@ -22,8 +22,8 @@ public:
     ClassRule();
     virtual ~ClassRule() {};
 
-protected:
-    bool doCompile(JackTokenizer* pTokenizer) override;
+public:
+    void compile() override;
 };
 
 class ClassVarDecRule : public SequenceRule
@@ -32,8 +32,8 @@ public:
     ClassVarDecRule();
     virtual ~ClassVarDecRule() {};
 
-protected:
-    bool doCompile(JackTokenizer* pTokenizer) override;
+public:
+    void compile() override;
 };
 
 class TypeRule : public AlternationRule
@@ -41,9 +41,6 @@ class TypeRule : public AlternationRule
 public:
     TypeRule();
     virtual ~TypeRule() {};
-
-protected:
-    bool doCompile(JackTokenizer* pTokenizer) override;
 };
 
 class SubroutineDecRule : public SequenceRule
@@ -52,8 +49,8 @@ public:
     SubroutineDecRule();
     virtual ~SubroutineDecRule() {};
 
-protected:
-    bool doCompile(JackTokenizer* pTokenizer) override;
+public:
+    void compile() override;
 };
 
 class ParameterListRule : public ZeroOrOneRule
@@ -62,8 +59,8 @@ public:
     ParameterListRule();
     virtual ~ParameterListRule() {};
 
-protected:
-    bool doCompile(JackTokenizer* pTokenizer) override;
+public:
+    void compile() override;
 };
 
 class SubroutineBodyRule : public SequenceRule
@@ -72,8 +69,8 @@ public:
     SubroutineBodyRule();
     virtual ~SubroutineBodyRule() {};
 
-protected:
-    bool doCompile(JackTokenizer* pTokenizer) override;
+public:
+    void compile() override;
 };
 
 class VarDecRule : public SequenceRule
@@ -82,8 +79,8 @@ public:
     VarDecRule();
     virtual ~VarDecRule() {};
 
-protected:
-    bool doCompile(JackTokenizer* pTokenizer) override;
+public:
+    void compile() override;
 };
 
 class ClassNameRule : public IdentifierRule

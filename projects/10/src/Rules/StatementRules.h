@@ -19,7 +19,7 @@ public:
     virtual ~StatementsRule() {};
 
 protected:
-    bool doCompile(JackTokenizer* pTokenizer) override;
+    void compile() override;
 };
 
 class StatementRule : public ParentRule

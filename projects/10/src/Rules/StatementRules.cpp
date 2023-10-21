@@ -16,11 +16,10 @@ StatementsRule::StatementsRule() : ParentRule(
 {
 }
 
-bool StatementsRule::doCompile(JackTokenizer* pTokenizer)
+void StatementsRule::compile()
 {
-    CompilationEngine::writeOutput("<statements>\n");
-    CompilationEngine::writeOutput("</statements>\n");
-    return true;
+    writeOutput("<statements>");
+    writeOutput("</statements>");
 }
 #pragma endregion
 
@@ -40,7 +39,7 @@ StatementRule::StatementRule() : ParentRule(
 
 LetStatementRule::LetStatementRule() : ParentRule(
     {
-        new SequenceRule(
+        /*new SequenceRule(
         {
             new KeywordRule("let"),
             new VarNameRule(),
@@ -53,14 +52,14 @@ LetStatementRule::LetStatementRule() : ParentRule(
             new SymbolRule('='),
             new ExpressionRule(),
             new SymbolRule(';')
-        })
+        })*/
     })
 {
 }
 
 IfStatementRule::IfStatementRule() : ParentRule(
     {
-        new SequenceRule(
+        /*new SequenceRule(
         {
             new KeywordRule("if"),
             new SymbolRule('('),
@@ -76,7 +75,7 @@ IfStatementRule::IfStatementRule() : ParentRule(
                 new StatementsRule(),
                 new SymbolRule('}')
             })
-        })
+        })*/
     })
 {
 }
@@ -111,7 +110,7 @@ DoStatementRule::DoStatementRule() : ParentRule(
 
 ReturnStatementRule::ReturnStatementRule() : ParentRule(
     {
-        new SequenceRule(
+        /*new SequenceRule(
         {
             new KeywordRule("return"),
             new ZeroOrOneRule(
@@ -119,7 +118,7 @@ ReturnStatementRule::ReturnStatementRule() : ParentRule(
                 new ExpressionRule()
             }),
             new SymbolRule(';')
-        })
+        })*/
     })
 {
 }

@@ -2,29 +2,30 @@
 #include "../CompilationEngine.h"
 
 #pragma region Rule
-CompileResult Rule::compile(JackTokenizer* pTokenizer, bool advanceToken)
-{
-    beforeCompile(pTokenizer, advanceToken);
-    bool compileResult = doCompile(pTokenizer);
-    return afterCompile(pTokenizer, compileResult);
-}
-
-void Rule::beforeCompile(JackTokenizer* pTokenizer, bool advanceToken)
-{
-    if (advanceToken)
-    {
-        CompilationEngine::advanceToken();
-    }
-}
-
-bool Rule::doCompile(JackTokenizer* pTokenizer)
+bool Rule::initialize(JackTokenizer* pTokenizer)
 {
     return true;
 }
 
-CompileResult Rule::afterCompile(JackTokenizer* pTokenizer, bool compileResult)
+void Rule::compile()
 {
-    return { compileResult, true };
+
+}
+
+void Rule::setRuleLevel(int ruleLevel)
+{
+    mRuleLevel = ruleLevel;
+}
+
+void Rule::writeOutput(std::string text)
+{
+    std::string tabs = std::string(mRuleLevel * 2, ' ');
+    CompilationEngine::writeOutput(tabs + text + "\n");
+}
+
+void Rule::writeToken(std::string text)
+{
+    CompilationEngine::writeToken(text + "\n");
 }
 #pragma endregion
 
@@ -47,26 +48,33 @@ ParentRule::~ParentRule()
 #pragma endregion
 
 #pragma region SequenceRule
-SequenceRule::SequenceRule(RuleVector rules) 
+SequenceRule::SequenceRule(RuleVector rules)
     : ParentRule(rules)
 {
 }
 
-bool SequenceRule::doCompile(JackTokenizer* pTokenizer)
+bool SequenceRule::initialize(JackTokenizer* pTokenizer)
 {
-    bool advanceToken = false;
     for (Rule* pRule : mChildRules)
     {
-        auto compileResult = pRule->compile(pTokenizer, advanceToken);
-        advanceToken = compileResult.tokenConsumed;
-
-        if (!compileResult.compileResult)
+        auto result = pRule->initialize(pTokenizer);
+        pRule->setRuleLevel(mRuleLevel + 1);
+        
+        if (!result)
         {
             return false;
         }
     }
 
     return true;
+}
+
+void SequenceRule::compile()
+{
+    for (Rule* pRule : mChildRules)
+    {
+        pRule->compile();
+    }
 }
 #pragma endregion
 
@@ -76,89 +84,100 @@ AlternationRule::AlternationRule(RuleVector rules)
 {
 }
 
-bool AlternationRule::doCompile(JackTokenizer* pTokenizer)
+bool AlternationRule::initialize(JackTokenizer* pTokenizer)
 {
     for (Rule* pRule : mChildRules)
     {
-        auto compileResult = pRule->compile(pTokenizer, false);
+        auto result = pRule->initialize(pTokenizer);
 
-        if (compileResult.compileResult)
+        if (result)
         {
+            mCompileRule = pRule;
             return true;
         }
     }
 
     return false;
 }
+
+void AlternationRule::compile()
+{
+    if (!mCompileRule)
+    {
+        throw std::runtime_error("Failed to compile AlternationRule.");
+    }
+
+    mCompileRule->compile();
+}
 #pragma endregion
 
 #pragma region ZeroOrMoreRule
-ZeroOrMoreRule::ZeroOrMoreRule(RuleVector rules)
-    : ParentRule(rules)
+ZeroOrMoreRule::ZeroOrMoreRule(CreateRuleFunc createRuleFunc)
+    : ParentRule({ })
 {
+    onCreateRule = createRuleFunc;
 }
 
-bool ZeroOrMoreRule::doCompile(JackTokenizer* pTokenizer)
+bool ZeroOrMoreRule::initialize(JackTokenizer* pTokenizer)
 {
-    CompileResult compileResult = { true, false };
-    
-    while (compileResult.compileResult)
+    bool result = true;
+
+    while (result)
     {
-        for (int i = 0; i < mChildRules.size(); i++)
+        auto pRule = onCreateRule();
+
+        auto initializeResult = pRule->initialize(pTokenizer);
+        pRule->setRuleLevel(mRuleLevel + 1);
+
+        if (!initializeResult)
         {
-            compileResult = mChildRules[i]->compile(pTokenizer, compileResult.tokenConsumed);
-
-            if (!compileResult.compileResult && i > 0)
-            {
-                throw std::runtime_error("ZeroOrMoreRule failed - tokenizer advanced without going back.");
-            }
-
-            if (!compileResult.compileResult)
-            {
-                break;
-            }
+            delete pRule;
+            break;
         }
+
+        mChildRules.push_back(pRule);
     }
 
     return true;
 }
 
-CompileResult ZeroOrMoreRule::afterCompile(JackTokenizer* pTokenizer, bool compileResult)
+void ZeroOrMoreRule::compile()
 {
-    return { compileResult, false };
+    for (Rule* pRule : mChildRules)
+    {
+        pRule->compile();
+    }
 }
 #pragma endregion
 
 #pragma region ZeroOrOneRule
-ZeroOrOneRule::ZeroOrOneRule(RuleVector rules)
-    : ParentRule(rules)
+ZeroOrOneRule::ZeroOrOneRule(CreateRuleFunc createRuleFunc)
+    : ParentRule({ })
 {
+    onCreateRule = createRuleFunc;
 }
 
-bool ZeroOrOneRule::doCompile(JackTokenizer* pTokenizer)
+bool ZeroOrOneRule::initialize(JackTokenizer* pTokenizer)
 {
-    CompileResult compileResult = { false, false };
+    auto pRule = onCreateRule();
+    auto initializeResult = pRule->initialize(pTokenizer);
+    pRule->setRuleLevel(mRuleLevel + 1);
 
-    for (int i = 0; i < mChildRules.size(); i++)
+    if (!initializeResult)
     {
-        compileResult = mChildRules[i]->compile(pTokenizer, compileResult.tokenConsumed);
-
-        if (!compileResult.compileResult && i > 0)
-        {
-            throw std::runtime_error("ZeroOrOneRule failed - tokenizer advanced without going back.");
-        }
-
-        if (!compileResult.compileResult)
-        {
-            break;
-        }
+        delete pRule;
+        return true;
     }
 
-    return compileResult.compileResult;
+    mChildRules.push_back(pRule);
+    return true;
 }
 
-CompileResult ZeroOrOneRule::afterCompile(JackTokenizer* pTokenizer, bool compileResult)
+void ZeroOrOneRule::compile()
 {
-    return { true, compileResult };
+    for (Rule* pRule : mChildRules)
+    {
+        pRule->compile();
+    }
 }
 #pragma endregion

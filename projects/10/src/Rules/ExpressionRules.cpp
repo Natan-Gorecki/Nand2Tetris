@@ -78,7 +78,7 @@ SubroutineCallRule::SubroutineCallRule() : ParentRule(
 
 ExpressionListRule::ExpressionListRule() : ParentRule(
     {
-        new ZeroOrOneRule(
+        /*new ZeroOrOneRule(
         {
             new ExpressionRule(),
             new ZeroOrMoreRule(
@@ -86,7 +86,7 @@ ExpressionListRule::ExpressionListRule() : ParentRule(
                 new SymbolRule(','),
                 new ExpressionRule(),
             })
-        })
+        })*/
     })
 {
 }

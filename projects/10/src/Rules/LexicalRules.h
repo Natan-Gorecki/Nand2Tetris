@@ -17,9 +17,13 @@ public:
     LexicalRule() {};
     virtual ~LexicalRule() {};
 
+public:
+    bool initialize(JackTokenizer* pTokenizer) final;
+    void compile() final;
+
 protected:
-    CompileResult afterCompile(JackTokenizer* pTokenizer, bool compileResult) override final;
-    virtual std::string toString(JackTokenizer* pTokenizer) = 0;
+    virtual bool isFullfiled(JackTokenizer* pTokenizer) = 0;
+    virtual std::string toString() = 0;
 };
 
 class KeywordRule : public LexicalRule
@@ -35,8 +39,8 @@ public:
     virtual ~KeywordRule() {};
 
 protected:
-    bool doCompile(JackTokenizer* pTokenizer) override;
-    std::string toString(JackTokenizer* pTokenizer) override;
+    bool isFullfiled(JackTokenizer* pTokenizer) override;
+    std::string toString() override;
 
 private:
     std::string mKeyword;
@@ -55,8 +59,8 @@ public:
     virtual ~SymbolRule() {};
 
 protected:
-    bool doCompile(JackTokenizer* pTokenizer) override;
-    std::string toString(JackTokenizer* pTokenizer) override;
+    bool isFullfiled(JackTokenizer* pTokenizer) override;
+    std::string toString() override;
 
 private:
     std::string encodeXmlSymbol(char symbol);
@@ -70,8 +74,11 @@ public:
     virtual ~IntegerConstantRule() {};
 
 protected:
-    bool doCompile(JackTokenizer* pTokenizer) override;
-    std::string toString(JackTokenizer* pTokenizer) override;
+    bool isFullfiled(JackTokenizer* pTokenizer) override;
+    std::string toString() override;
+
+private:
+    int mIntVal;
 };
 
 class StringConstantRule : public LexicalRule
@@ -81,8 +88,11 @@ public:
     virtual ~StringConstantRule() {};
 
 protected:
-    bool doCompile(JackTokenizer* pTokenizer) override;
-    std::string toString(JackTokenizer* pTokenizer) override;
+    bool isFullfiled(JackTokenizer* pTokenizer) override;
+    std::string toString() override;
+
+private:
+    std::string mStringVal;
 };
 
 class IdentifierRule : public LexicalRule
@@ -92,6 +102,9 @@ public:
     virtual ~IdentifierRule() {};
 
 protected:
-    bool doCompile(JackTokenizer* pTokenizer) override;
-    std::string toString(JackTokenizer* pTokenizer) override;
+    bool isFullfiled(JackTokenizer* pTokenizer) override;
+    std::string toString() override;
+
+private:
+    std::string mIdentifier;
 };

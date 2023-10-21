@@ -29,14 +29,27 @@ std::set<char> symbols =
 };
 
 #pragma region LexicalRule
-CompileResult LexicalRule::afterCompile(JackTokenizer* pTokenizer, bool compileResult)
+bool LexicalRule::initialize(JackTokenizer* pTokenizer)
 {
-    if (compileResult)
+    if (!pTokenizer->advance())
     {
-        CompilationEngine::writeOutput(toString(pTokenizer));
-        CompilationEngine::writeToken(toString(pTokenizer));
+        return false;
     }
-    return { compileResult, compileResult };
+
+    auto result = isFullfiled(pTokenizer);
+
+    if (!result)
+    {
+        pTokenizer->reverse();
+    }
+
+    return result;
+}
+
+void LexicalRule::compile()
+{
+    writeOutput(toString());
+    writeToken(toString());
 }
 #pragma endregion
 
@@ -59,7 +72,7 @@ KeywordRule::KeywordRule(std::string keyword)
     mKeyword = keyword;
 }
 
-bool KeywordRule::doCompile(JackTokenizer* pTokenizer)
+bool KeywordRule::isFullfiled(JackTokenizer* pTokenizer)
 {
     if (pTokenizer->tokenType() == ETokenType::KEYWORD && pTokenizer->keyword() == mKeyword)
     {
@@ -69,9 +82,9 @@ bool KeywordRule::doCompile(JackTokenizer* pTokenizer)
     return false;
 }
 
-std::string KeywordRule::toString(JackTokenizer* pTokenizer)
+std::string KeywordRule::toString()
 {
-    return "<keyword> " + pTokenizer->keyword() + " </keyword>\n";
+    return "<keyword> " + mKeyword + " </keyword>";
 }
 #pragma endregion
 
@@ -94,7 +107,7 @@ SymbolRule::SymbolRule(char symbol)
     mSymbol = symbol;
 }
 
-bool SymbolRule::doCompile(JackTokenizer* pTokenizer)
+bool SymbolRule::isFullfiled(JackTokenizer* pTokenizer)
 {
     if (pTokenizer->tokenType() == ETokenType::SYMBOL && pTokenizer->symbol() == mSymbol)
     {
@@ -104,9 +117,9 @@ bool SymbolRule::doCompile(JackTokenizer* pTokenizer)
     return false;
 }
 
-std::string SymbolRule::toString(JackTokenizer* pTokenizer)
+std::string SymbolRule::toString()
 {
-    return "<symbol> " + encodeXmlSymbol(pTokenizer->symbol()) + " </symbol>\n";
+    return "<symbol> " + encodeXmlSymbol(mSymbol) + " </symbol>";
 }
 
 std::string SymbolRule::encodeXmlSymbol(char symbol)
@@ -128,37 +141,55 @@ std::string SymbolRule::encodeXmlSymbol(char symbol)
 #pragma endregion
 
 #pragma region IntegerConstantRule
-bool IntegerConstantRule::doCompile(JackTokenizer* pTokenizer)
+bool IntegerConstantRule::isFullfiled(JackTokenizer* pTokenizer)
 {
-    return pTokenizer->tokenType() == ETokenType::INT_CONST;
+    if (pTokenizer->tokenType() == ETokenType::INT_CONST)
+    {
+        mIntVal = pTokenizer->intVal();
+        return true;
+    }
+
+    return false;
 }
 
-std::string IntegerConstantRule::toString(JackTokenizer* pTokenizer)
+std::string IntegerConstantRule::toString()
 {
-    return "<integerConstant> " + std::to_string(pTokenizer->intVal()) + " </integerConstant>\n";
+    return "<integerConstant> " + std::to_string(mIntVal) + " </integerConstant>";
 }
 #pragma endregion
 
 #pragma region StringConstantRule
-bool StringConstantRule::doCompile(JackTokenizer* pTokenizer)
+bool StringConstantRule::isFullfiled(JackTokenizer* pTokenizer)
 {
-    return pTokenizer->tokenType() == ETokenType::STRING_CONST;
+    if (pTokenizer->tokenType() == ETokenType::STRING_CONST)
+    {
+        mStringVal = pTokenizer->stringVal();
+        return true;
+    }
+
+    return false;
 }
 
-std::string StringConstantRule::toString(JackTokenizer* pTokenizer)
+std::string StringConstantRule::toString()
 {
-    return "<stringConstant> " + pTokenizer->stringVal() + " </stringConstant>\n";
+    return "<stringConstant> " + mStringVal + " </stringConstant>";
 }
 #pragma endregion
 
 #pragma region IdentifierRule
-bool IdentifierRule::doCompile(JackTokenizer* pTokenizer)
+bool IdentifierRule::isFullfiled(JackTokenizer* pTokenizer)
 {
-    return pTokenizer->tokenType() == ETokenType::IDENTIFIER;
+    if (pTokenizer->tokenType() == ETokenType::IDENTIFIER)
+    {
+        mIdentifier = pTokenizer->identifier();
+        return true;
+    }
+
+    return false;
 }
 
-std::string IdentifierRule::toString(JackTokenizer* pTokenizer)
+std::string IdentifierRule::toString()
 {
-    return "<identifier> " + pTokenizer->identifier() + " </identifier>\n";
+    return "<identifier> " + mIdentifier + " </identifier>";
 }
 #pragma endregion

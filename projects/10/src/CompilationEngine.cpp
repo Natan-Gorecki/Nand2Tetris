@@ -84,7 +84,8 @@ CompilationEngine::~CompilationEngine()
 void CompilationEngine::compileClass()
 {
     auto classRule = new ClassRule();
-    classRule->compile(mJackTokenizer);
+    classRule->initialize(mJackTokenizer);
+    classRule->compile();
 }
 
 /// <summary>
