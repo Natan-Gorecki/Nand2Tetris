@@ -12,54 +12,69 @@ class DoStatementRule;
 class ReturnStatementRule;
 
 
-class StatementsRule : public ParentRule
+class StatementsRule : public ZeroOrMoreRule
 {
 public:
     StatementsRule();
     virtual ~StatementsRule() {};
 
-protected:
+public:
     void compile() override;
 };
 
-class StatementRule : public ParentRule
+class StatementRule : public AlternationRule
 {
 public:
     StatementRule();
     virtual ~StatementRule() {};
 };
 
-class LetStatementRule : public ParentRule
+class LetStatementRule : public SequenceRule
 {
 public:
     LetStatementRule();
     virtual ~LetStatementRule() {};
+
+public:
+    void compile() override;
 };
 
-class IfStatementRule : public ParentRule
+class IfStatementRule : public SequenceRule
 {
 public:
     IfStatementRule();
     virtual ~IfStatementRule() {};
+
+public:
+    void compile() override;
 };
 
-class WhileStatementRule : public ParentRule
+class WhileStatementRule : public SequenceRule
 {
 public:
     WhileStatementRule();
     virtual ~WhileStatementRule() {};
+
+public:
+    void compile() override;
 };
 
-class DoStatementRule : public ParentRule
+class DoStatementRule : public SequenceRule
 {
 public:
     DoStatementRule();
     virtual ~DoStatementRule() {};
+
+public:
+    void compile() override;
 };
 
-class ReturnStatementRule : public ParentRule
+class ReturnStatementRule : public SequenceRule
 {
 public:
     ReturnStatementRule();
     virtual ~ReturnStatementRule() {};
+
+public:
+    void compile() override;
 };

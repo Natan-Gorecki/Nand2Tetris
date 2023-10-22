@@ -3,132 +3,165 @@
 #include "LexicalRules.h"
 #include "ProgramStructureRules.h"
 
-ExpressionRule::ExpressionRule() : ParentRule(
+#pragma region ExpressionRule
+ExpressionRule::ExpressionRule() : SequenceRule(
     {
-        /*new SequenceRule({
-            new TermRule(),
-            new ZeroOrMoreRule(
+        new TermRule,
+        new ZeroOrMoreRule([]
+        {
+            return new SequenceRule(
             {
-                new OpRule(),
-                new TermRule()
-            })
-        })*/
-    })
-{
-}
-
-TermRule::TermRule() : ParentRule(
-    {
-        new AlternationRule({
-            new IntegerConstantRule(),
-            new StringConstantRule(),
-            new KeywordConstantRule(),
-            new VarNameRule(),
-            new SequenceRule(
-            {
-                new VarNameRule(),
-                new SymbolRule('['),
-                new ExpressionRule(),
-                new SymbolRule(']'),
-            }),
-            new SequenceRule(
-            {
-                new SymbolRule('('),
-                new ExpressionRule(),
-                new SymbolRule(')'),
-            }),
-            new SequenceRule(
-            {
-                new UnaryOpRule(),
-                new TermRule(),
-            }),
-            new SubroutineCallRule()
+                new OpRule,
+                new TermRule
+            });
         })
     })
 {
 }
 
-SubroutineCallRule::SubroutineCallRule() : ParentRule(
+void ExpressionRule::compile()
+{
+    writeOutput("<expression>");
+    SequenceRule::compile();
+    writeOutput("</expression>");
+}
+#pragma endregion
+
+#pragma region TermRule
+TermRule::TermRule() : AlternationRule(
     {
-        new AlternationRule({
-            new SequenceRule(
+        new IntegerConstantRule,
+        new StringConstantRule,
+        new KeywordConstantRule,
+        new VarNameRule,
+        /*new SequenceRule(
+        {
+            new VarNameRule,
+            new SymbolRule('['),
+            new ExpressionRule,
+            new SymbolRule(']'),
+        }),*/
+        /*new SequenceRule(
+        {
+            new SymbolRule('('),
+            new ExpressionRule,
+            new SymbolRule(')'),
+        }),*/
+        /*new SequenceRule(
+        {
+            new UnaryOpRule,
+            new TermRule,
+        }),*/
+        new SubroutineCallRule
+    })
+{
+}
+
+//bool TermRule::initialize(JackTokenizer* pTokenizer)
+//{
+//    while ()
+//    for (Rule* pRule : mChildRules)
+//    {
+//        auto result = pRule->initialize(pTokenizer);
+//
+//        if (result)
+//        {
+//            mCompileRule = pRule;
+//            return true;
+//        }
+//    }
+//
+//    return false;
+//}
+#pragma endregion
+
+#pragma region SubroutineCallRule
+SubroutineCallRule::SubroutineCallRule() : AlternationRule(
+    {
+        new SequenceRule(
+        {
+            new SubroutineNameRule,
+            new SymbolRule('('),
+            new ExpressionListRule,
+            new SymbolRule(')')
+        }),
+        new SequenceRule(
+        {
+            new AlternationRule(
             {
-                new SubroutineNameRule(),
-                new SymbolRule('('),
-                new ExpressionListRule(),
-                new SymbolRule(')')
+                new ClassNameRule,
+                new VarNameRule
             }),
-            new SequenceRule(
+            new SymbolRule('.'),
+            new SubroutineNameRule,
+            new SymbolRule('('),
+            new ExpressionListRule,
+            new SymbolRule(')')
+        })
+    })
+{
+}
+#pragma endregion
+
+#pragma region ExpressionListRule
+ExpressionListRule::ExpressionListRule() : ZeroOrOneRule([]
+    {
+        return new SequenceRule(
+        {
+            new ZeroOrOneRule([]
             {
-                new AlternationRule(
+                return new IdentifierRule;
+            })
+            /*new ExpressionRule,
+            new ZeroOrMoreRule([]
+            {
+                return new SequenceRule(
                 {
-                    new ClassNameRule(),
-                    new VarNameRule()
-                }),
-                new SymbolRule('.'),
-                new SubroutineNameRule(),
-                new SymbolRule('('),
-                new ExpressionListRule(),
-                new SymbolRule(')')
-            })
-        })
+                    new SymbolRule(','),
+                    new ExpressionRule,
+                });
+            })*/
+        });
     })
 {
 }
+#pragma endregion
 
-ExpressionListRule::ExpressionListRule() : ParentRule(
+#pragma region OpRule
+OpRule::OpRule() : AlternationRule(
     {
-        /*new ZeroOrOneRule(
-        {
-            new ExpressionRule(),
-            new ZeroOrMoreRule(
-            {
-                new SymbolRule(','),
-                new ExpressionRule(),
-            })
-        })*/
+        new SymbolRule('+'),
+        new SymbolRule('-'),
+        new SymbolRule('*'),
+        new SymbolRule('/'),
+        new SymbolRule('&'),
+        new SymbolRule('|'),
+        new SymbolRule('<'),
+        new SymbolRule('>'),
+        new SymbolRule('=')
     })
 {
 }
+#pragma endregion
 
-OpRule::OpRule() : ParentRule(
+#pragma region UnaryOpRule
+UnaryOpRule::UnaryOpRule() : AlternationRule(
     {
-        new AlternationRule(
-        {
-            new SymbolRule('+'),
-            new SymbolRule('-'),
-            new SymbolRule('*'),
-            new SymbolRule('/'),
-            new SymbolRule('&'),
-            new SymbolRule('|'),
-            new SymbolRule('<'),
-            new SymbolRule('>'),
-            new SymbolRule('=')
-        })
+        new SymbolRule('-'),
+        new SymbolRule('~')
     })
 {
 }
+#pragma endregion
 
-UnaryOpRule::UnaryOpRule() : ParentRule(
+#pragma region KeywordConstantRule
+KeywordConstantRule::KeywordConstantRule() : AlternationRule(
     {
-        new AlternationRule(
-        {
-            new SymbolRule('-'),
-            new SymbolRule('~')
-        })
+        new KeywordRule("true"),
+        new KeywordRule("false"),
+        new KeywordRule("null"),
+        new KeywordRule("this")
     })
 {
 }
-
-KeywordConstantRule::KeywordConstantRule() : ParentRule(
-    {
-        new AlternationRule(
-        {
-            new KeywordRule("true"),
-            new KeywordRule("false"),
-            new KeywordRule("null"),
-            new KeywordRule("this")
-        })
-    })
-{
-}
+#pragma endregion
