@@ -12,7 +12,7 @@ class DoStatementRule;
 class ReturnStatementRule;
 
 
-class StatementsRule : public ZeroOrMoreRule
+class StatementsRule : public SequenceRule
 {
 public:
     StatementsRule();

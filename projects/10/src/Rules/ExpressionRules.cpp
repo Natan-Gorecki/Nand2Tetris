@@ -28,51 +28,44 @@ void ExpressionRule::compile()
 #pragma endregion
 
 #pragma region TermRule
-TermRule::TermRule() : AlternationRule(
+TermRule::TermRule() : SequenceRule(
     {
-        new IntegerConstantRule,
-        new StringConstantRule,
-        new KeywordConstantRule,
-        new VarNameRule,
-        /*new SequenceRule(
+        new AlternationRule(
         {
+            new IntegerConstantRule,
+            new StringConstantRule,
+            new KeywordConstantRule,
             new VarNameRule,
-            new SymbolRule('['),
-            new ExpressionRule,
-            new SymbolRule(']'),
-        }),*/
-        /*new SequenceRule(
-        {
-            new SymbolRule('('),
-            new ExpressionRule,
-            new SymbolRule(')'),
-        }),*/
-        /*new SequenceRule(
-        {
-            new UnaryOpRule,
-            new TermRule,
-        }),*/
-        new SubroutineCallRule
+            /*new SequenceRule(
+            {
+                new VarNameRule,
+                new SymbolRule('['),
+                new ExpressionRule,
+                new SymbolRule(']'),
+            }),*/
+            /*new SequenceRule(
+            {
+                new SymbolRule('('),
+                new ExpressionRule,
+                new SymbolRule(')'),
+            }),*/
+            /*new SequenceRule(
+            {
+                new UnaryOpRule,
+                new TermRule,
+            }),*/
+            new SubroutineCallRule
+        })
     })
 {
 }
 
-//bool TermRule::initialize(JackTokenizer* pTokenizer)
-//{
-//    while ()
-//    for (Rule* pRule : mChildRules)
-//    {
-//        auto result = pRule->initialize(pTokenizer);
-//
-//        if (result)
-//        {
-//            mCompileRule = pRule;
-//            return true;
-//        }
-//    }
-//
-//    return false;
-//}
+void TermRule::compile()
+{
+    writeOutput("<term>");
+    SequenceRule::compile();
+    writeOutput("</term>");
+}
 #pragma endregion
 
 #pragma region SubroutineCallRule
@@ -101,6 +94,11 @@ SubroutineCallRule::SubroutineCallRule() : AlternationRule(
     })
 {
 }
+
+void SubroutineCallRule::setRuleLevel(int ruleLevel)
+{
+    AlternationRule::setRuleLevel(ruleLevel - 1);
+}
 #pragma endregion
 
 #pragma region ExpressionListRule
@@ -124,6 +122,12 @@ ExpressionListRule::ExpressionListRule() : ZeroOrOneRule([]
         });
     })
 {
+}
+
+void ExpressionListRule::compile()
+{
+    writeOutput("<expressionList>");
+    writeOutput("</expressionList>");
 }
 #pragma endregion
 

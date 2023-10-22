@@ -21,11 +21,14 @@ public:
     void compile() override;
 };
 
-class TermRule : public AlternationRule
+class TermRule : public SequenceRule
 {
 public:
     TermRule();
     virtual ~TermRule() {};
+
+public:
+    void compile() override;
 };
 
 class SubroutineCallRule : public AlternationRule
@@ -33,6 +36,9 @@ class SubroutineCallRule : public AlternationRule
 public:
     SubroutineCallRule();
     virtual ~SubroutineCallRule() {};
+
+public:
+    void setRuleLevel(int ruleLevel) override;
 };
 
 class ExpressionListRule : public ZeroOrOneRule
@@ -40,6 +46,9 @@ class ExpressionListRule : public ZeroOrOneRule
 public:
     ExpressionListRule();
     virtual ~ExpressionListRule() {};
+
+public:
+    void compile() override;
 };
 
 class OpRule : public AlternationRule

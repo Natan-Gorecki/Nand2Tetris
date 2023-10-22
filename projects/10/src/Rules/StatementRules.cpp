@@ -5,9 +5,12 @@
 #include "../CompilationEngine.h"
 
 #pragma region StatementsRule
-StatementsRule::StatementsRule() : ZeroOrMoreRule([]
+StatementsRule::StatementsRule() : SequenceRule(
     {
-        return new StatementRule;
+        new ZeroOrMoreRule([]
+        {
+            return new StatementRule;
+        })
     })
 {
 }
@@ -15,7 +18,7 @@ StatementsRule::StatementsRule() : ZeroOrMoreRule([]
 void StatementsRule::compile()
 {
     writeOutput("<statements>");
-    ZeroOrMoreRule::compile();
+    SequenceRule::compile();
     writeOutput("</statements>");
 }
 #pragma endregion

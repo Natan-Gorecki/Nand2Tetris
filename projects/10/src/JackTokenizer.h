@@ -50,6 +50,17 @@ public:
     /// </summary>
     bool reverse();
     /// <summary>
+    /// Gets the current position of the token in the input.
+    /// </summary>
+    /// <returns>The current token position in the input.</returns>
+    int getPosition();
+    /// <summary>
+    /// Restores the current position to the specified token position.
+    /// </summary>
+    /// <param name="position">The token position to set as the current position.</param>
+    /// <returns>True if the operation was successful, false otherwise.</returns>
+    bool setPosition(int position);
+    /// <summary>
     /// Returns the type of the current token as a constant.
     /// </summary>
     ETokenType tokenType();

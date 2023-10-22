@@ -88,6 +88,10 @@ bool JackTokenizer::advance()
     return true;
 }
 
+/// <summary>
+/// Makes the previous token the current token.
+/// <para/> If there are no previous tokens, the current token remains unchanged.
+/// </summary>
 bool JackTokenizer::reverse()
 {
     auto previousPosition = mCurrentPosition - 1;
@@ -103,6 +107,32 @@ bool JackTokenizer::reverse()
 
     mCurrentToken = mTokens.at(previousPosition);
     mCurrentPosition = previousPosition;
+    return true;
+}
+
+/// <summary>
+/// Gets the current position of the token in the input.
+/// </summary>
+/// <returns>The current token position in the input.</returns>
+int JackTokenizer::getPosition()
+{
+    return mCurrentPosition;
+}
+
+/// <summary>
+/// Restores the current position to the specified token position.
+/// </summary>
+/// <param name="position">The token position to set as the current position.</param>
+/// <returns>True if the operation was successful, false otherwise.</returns>
+bool JackTokenizer::setPosition(int position)
+{
+    if (position < 0 || position >= mTokens.size())
+    {
+        return false;
+    }
+
+    mCurrentToken = mTokens.at(position);
+    mCurrentPosition = position;
     return true;
 }
 

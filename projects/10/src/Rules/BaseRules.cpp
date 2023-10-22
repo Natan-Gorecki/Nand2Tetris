@@ -56,6 +56,8 @@ SequenceRule::SequenceRule(RuleVector rules)
 
 bool SequenceRule::initialize(JackTokenizer* pTokenizer)
 {
+    auto initialPosition = pTokenizer->getPosition();
+
     for (Rule* pRule : mChildRules)
     {
         pRule->setRuleLevel(mRuleLevel + 1);
@@ -63,6 +65,7 @@ bool SequenceRule::initialize(JackTokenizer* pTokenizer)
         
         if (!result)
         {
+            pTokenizer->setPosition(initialPosition);
             return false;
         }
     }
