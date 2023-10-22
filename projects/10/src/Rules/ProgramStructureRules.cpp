@@ -100,9 +100,9 @@ SubroutineDecRule::SubroutineDecRule() : SequenceRule(
 
 void SubroutineDecRule::compile()
 {
-    writeOutput("<subroutineDecRule>");
+    writeOutput("<subroutineDec>");
     SequenceRule::compile();
-    writeOutput("</subroutineDecRule>");
+    writeOutput("</subroutineDec>");
 }
 #pragma endregion
 

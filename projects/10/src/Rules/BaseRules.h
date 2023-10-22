@@ -28,7 +28,7 @@ public:
     virtual void compile();
 
 public:
-    void setRuleLevel(int ruleLevel);
+    virtual void setRuleLevel(int ruleLevel);
 protected:
     void writeOutput(std::string text);
     void writeToken(std::string text);
@@ -67,6 +67,9 @@ public:
 public:
     bool initialize(JackTokenizer* pTokenizer) override;
     void compile() override;
+
+public:
+    void setRuleLevel(int ruleLevel);
 
 private:
     Rule* mCompileRule = nullptr;

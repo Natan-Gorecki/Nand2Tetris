@@ -1,3 +1,4 @@
+#include <typeinfo>
 #include "BaseRules.h"
 #include "../CompilationEngine.h"
 
@@ -57,8 +58,8 @@ bool SequenceRule::initialize(JackTokenizer* pTokenizer)
 {
     for (Rule* pRule : mChildRules)
     {
-        auto result = pRule->initialize(pTokenizer);
         pRule->setRuleLevel(mRuleLevel + 1);
+        auto result = pRule->initialize(pTokenizer);
         
         if (!result)
         {
@@ -109,6 +110,15 @@ void AlternationRule::compile()
 
     mCompileRule->compile();
 }
+
+void AlternationRule::setRuleLevel(int ruleLevel)
+{
+    mRuleLevel = ruleLevel;
+    for (Rule* pRule : mChildRules)
+    {
+        pRule->setRuleLevel(ruleLevel);
+    }
+}
 #pragma endregion
 
 #pragma region ZeroOrMoreRule
@@ -126,8 +136,10 @@ bool ZeroOrMoreRule::initialize(JackTokenizer* pTokenizer)
     {
         auto pRule = onCreateRule();
 
+        int ruleLevel = typeid(*pRule) != typeid(SequenceRule) ? mRuleLevel : mRuleLevel - 1;
+        pRule->setRuleLevel(ruleLevel);
+
         auto initializeResult = pRule->initialize(pTokenizer);
-        pRule->setRuleLevel(mRuleLevel + 1);
 
         if (!initializeResult)
         {
@@ -160,8 +172,11 @@ ZeroOrOneRule::ZeroOrOneRule(CreateRuleFunc createRuleFunc)
 bool ZeroOrOneRule::initialize(JackTokenizer* pTokenizer)
 {
     auto pRule = onCreateRule();
+
+    int ruleLevel = typeid(*pRule) != typeid(SequenceRule) ? mRuleLevel : mRuleLevel - 1;
+    pRule->setRuleLevel(ruleLevel);
+
     auto initializeResult = pRule->initialize(pTokenizer);
-    pRule->setRuleLevel(mRuleLevel + 1);
 
     if (!initializeResult)
     {
