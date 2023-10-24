@@ -43,6 +43,9 @@ public:
     ParentRule(RuleVector rules);
     virtual ~ParentRule();
 
+public:
+    void compile() override;
+
 protected:
     std::vector<Rule*> mChildRules;
 };
@@ -55,7 +58,6 @@ public:
 
 public:
     bool initialize(JackTokenizer* pTokenizer) override;
-    void compile() override;
 };
 
 class AlternationRule : public ParentRule
@@ -83,7 +85,6 @@ public:
 
 public:
     bool initialize(JackTokenizer* pTokenizer) override;
-    void compile() override;
 
 private:
     CreateRuleFunc onCreateRule;
@@ -97,7 +98,6 @@ public:
 
 public:
     bool initialize(JackTokenizer* pTokenizer) override;
-    void compile() override;
 
 private:
     CreateRuleFunc onCreateRule;

@@ -21,14 +21,18 @@ public:
     void compile() override;
 };
 
-class TermRule : public SequenceRule
+class TermRule : public ParentRule
 {
 public:
     TermRule();
     virtual ~TermRule() {};
 
 public:
+    bool initialize(JackTokenizer* pTokenizer) override;
     void compile() override;
+
+private:
+    std::vector<CreateRuleFunc> mCreateRuleFuncs;
 };
 
 class SubroutineCallRule : public AlternationRule
@@ -41,7 +45,7 @@ public:
     void setRuleLevel(int ruleLevel) override;
 };
 
-class ExpressionListRule : public ZeroOrOneRule
+class ExpressionListRule : public SequenceRule
 {
 public:
     ExpressionListRule();

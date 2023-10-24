@@ -46,6 +46,14 @@ ParentRule::~ParentRule()
         delete rule;
     }
 }
+
+void ParentRule::compile()
+{
+    for (Rule* pRule : mChildRules)
+    {
+        pRule->compile();
+    }
+}
 #pragma endregion
 
 #pragma region SequenceRule
@@ -71,14 +79,6 @@ bool SequenceRule::initialize(JackTokenizer* pTokenizer)
     }
 
     return true;
-}
-
-void SequenceRule::compile()
-{
-    for (Rule* pRule : mChildRules)
-    {
-        pRule->compile();
-    }
 }
 #pragma endregion
 
@@ -155,14 +155,6 @@ bool ZeroOrMoreRule::initialize(JackTokenizer* pTokenizer)
 
     return true;
 }
-
-void ZeroOrMoreRule::compile()
-{
-    for (Rule* pRule : mChildRules)
-    {
-        pRule->compile();
-    }
-}
 #pragma endregion
 
 #pragma region ZeroOrOneRule
@@ -189,13 +181,5 @@ bool ZeroOrOneRule::initialize(JackTokenizer* pTokenizer)
 
     mChildRules.push_back(pRule);
     return true;
-}
-
-void ZeroOrOneRule::compile()
-{
-    for (Rule* pRule : mChildRules)
-    {
-        pRule->compile();
-    }
 }
 #pragma endregion

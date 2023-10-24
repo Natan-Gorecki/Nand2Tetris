@@ -28,42 +28,63 @@ void ExpressionRule::compile()
 #pragma endregion
 
 #pragma region TermRule
-TermRule::TermRule() : SequenceRule(
-    {
-        new AlternationRule(
-        {
-            new IntegerConstantRule,
-            new StringConstantRule,
-            new KeywordConstantRule,
-            new VarNameRule,
-            /*new SequenceRule(
-            {
-                new VarNameRule,
-                new SymbolRule('['),
-                new ExpressionRule,
-                new SymbolRule(']'),
-            }),*/
-            /*new SequenceRule(
-            {
-                new SymbolRule('('),
-                new ExpressionRule,
-                new SymbolRule(')'),
-            }),*/
-            /*new SequenceRule(
-            {
-                new UnaryOpRule,
-                new TermRule,
-            }),*/
-            new SubroutineCallRule
-        })
-    })
+TermRule::TermRule() : ParentRule({ })
 {
+    mCreateRuleFuncs =
+    {
+        [] { return new SubroutineCallRule; },
+        [] { return new SequenceRule(
+        {
+            new UnaryOpRule,
+            new TermRule,
+        }); },
+        [] { return new SequenceRule(
+        {
+            new SymbolRule('('),
+            new ExpressionRule,
+            new SymbolRule(')'),
+        }); },
+        [] { return new SequenceRule(
+        {
+            new VarNameRule,
+            new SymbolRule('['),
+            new ExpressionRule,
+            new SymbolRule(']'),
+        }); },
+        [] { return new IntegerConstantRule; },
+        [] { return new StringConstantRule; },
+        [] { return new KeywordConstantRule; },
+        [] { return new VarNameRule; }
+    };
+}
+
+bool TermRule::initialize(JackTokenizer* pTokenizer)
+{
+    for (auto& onCreateRule : mCreateRuleFuncs)
+    {
+        auto pRule = onCreateRule();
+
+        int ruleLevel = typeid(*pRule) != typeid(SequenceRule) ? mRuleLevel + 1 : mRuleLevel;
+        pRule->setRuleLevel(ruleLevel);
+
+        auto result = pRule->initialize(pTokenizer);
+
+        if (result)
+        {
+            mChildRules.push_back(pRule);
+            return true;
+        }
+
+        delete pRule;
+    }
+
+    return false;
 }
 
 void TermRule::compile()
 {
     writeOutput("<term>");
-    SequenceRule::compile();
+    ParentRule::compile();
     writeOutput("</term>");
 }
 #pragma endregion
@@ -102,24 +123,23 @@ void SubroutineCallRule::setRuleLevel(int ruleLevel)
 #pragma endregion
 
 #pragma region ExpressionListRule
-ExpressionListRule::ExpressionListRule() : ZeroOrOneRule([]
+ExpressionListRule::ExpressionListRule() : SequenceRule(
     {
-        return new SequenceRule(
+        new ZeroOrOneRule([]
         {
-            new ZeroOrOneRule([]
+            return new SequenceRule(
             {
-                return new IdentifierRule;
-            })
-            /*new ExpressionRule,
-            new ZeroOrMoreRule([]
-            {
-                return new SequenceRule(
+                new ExpressionRule,
+                new ZeroOrMoreRule([]
                 {
-                    new SymbolRule(','),
-                    new ExpressionRule,
-                });
-            })*/
-        });
+                    return new SequenceRule(
+                    {
+                        new SymbolRule(','),
+                        new ExpressionRule,
+                    });
+                })
+            });
+        })
     })
 {
 }
@@ -127,6 +147,7 @@ ExpressionListRule::ExpressionListRule() : ZeroOrOneRule([]
 void ExpressionListRule::compile()
 {
     writeOutput("<expressionList>");
+    SequenceRule::compile();
     writeOutput("</expressionList>");
 }
 #pragma endregion
