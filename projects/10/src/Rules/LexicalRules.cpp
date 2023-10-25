@@ -2,8 +2,11 @@
 #include <stdexcept>
 #include "LexicalRules.h"
 #include "../CompilationEngine.h"
+#include "../JackAnalyzerError.h"
 
-std::set<std::string> keywords =
+using namespace std;
+
+const set<string, less<>> keywords =
 {
     "class",
     "constructor", "function", "method",
@@ -16,7 +19,7 @@ std::set<std::string> keywords =
     "let", "do", "if", "else", "while", "return"
 };
 
-std::set<char> symbols =
+const set<char> symbols =
 {
     '{', '}',
     '(', ')',
@@ -57,16 +60,16 @@ void LexicalRule::compile()
 /// <summary>
 /// Returns information if passed string is a keyword.
 /// </summary>
-bool KeywordRule::isKeyword(std::string name)
+bool KeywordRule::isKeyword(string const& name)
 {
     return keywords.count(name) != 0;
 }
 
-KeywordRule::KeywordRule(std::string keyword)
+KeywordRule::KeywordRule(string const& keyword)
 {
     if (!isKeyword(keyword))
     {
-        throw std::runtime_error("Invalid keyword: " + keyword);
+        throw JackAnalyzerError("Invalid keyword: " + keyword);
     }
 
     mKeyword = keyword;
@@ -82,7 +85,7 @@ bool KeywordRule::isFullfiled(JackTokenizer* pTokenizer)
     return false;
 }
 
-std::string KeywordRule::toString()
+string KeywordRule::toString()
 {
     return "<keyword> " + mKeyword + " </keyword>";
 }
@@ -101,7 +104,7 @@ SymbolRule::SymbolRule(char symbol)
 {
     if (!isSymbol(symbol))
     {
-        throw std::runtime_error("Invalid symbol: " + symbol);
+        throw JackAnalyzerError("Invalid symbol: " + symbol);
     }
 
     mSymbol = symbol;
@@ -117,12 +120,12 @@ bool SymbolRule::isFullfiled(JackTokenizer* pTokenizer)
     return false;
 }
 
-std::string SymbolRule::toString()
+string SymbolRule::toString()
 {
     return "<symbol> " + encodeXmlSymbol(mSymbol) + " </symbol>";
 }
 
-std::string SymbolRule::encodeXmlSymbol(char symbol)
+string SymbolRule::encodeXmlSymbol(char symbol) const
 {
     switch (symbol)
     {
@@ -135,7 +138,7 @@ std::string SymbolRule::encodeXmlSymbol(char symbol)
     case '&':
         return "&amp;";
     default:
-        return std::string(1, symbol);
+        return string(1, symbol);
     }
 }
 #pragma endregion
@@ -152,9 +155,9 @@ bool IntegerConstantRule::isFullfiled(JackTokenizer* pTokenizer)
     return false;
 }
 
-std::string IntegerConstantRule::toString()
+string IntegerConstantRule::toString()
 {
-    return "<integerConstant> " + std::to_string(mIntVal) + " </integerConstant>";
+    return "<integerConstant> " + to_string(mIntVal) + " </integerConstant>";
 }
 #pragma endregion
 
@@ -170,7 +173,7 @@ bool StringConstantRule::isFullfiled(JackTokenizer* pTokenizer)
     return false;
 }
 
-std::string StringConstantRule::toString()
+string StringConstantRule::toString()
 {
     return "<stringConstant> " + mStringVal + " </stringConstant>";
 }
@@ -188,7 +191,7 @@ bool IdentifierRule::isFullfiled(JackTokenizer* pTokenizer)
     return false;
 }
 
-std::string IdentifierRule::toString()
+string IdentifierRule::toString()
 {
     return "<identifier> " + mIdentifier + " </identifier>";
 }

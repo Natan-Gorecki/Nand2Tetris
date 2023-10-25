@@ -1,30 +1,21 @@
 #include <algorithm>
+#include <iostream>
 #include "JackTokenizer.h"
 #include "Rules/LexicalRules.h"
+#include "JackAnalyzerError.h"
+
+using namespace std;
 
 /// <summary>
 /// Opens the input file and gets ready to tokenize it.
 /// </summary>
 /// <param name="filename">Name of the input file</param>
-JackTokenizer::JackTokenizer(std::string filename)
+JackTokenizer::JackTokenizer(std::string& filename)
 {
-    mInputStream = new std::ifstream(filename);
+    mInputStream = make_unique<ifstream>(filename);
     if (!mInputStream->is_open())
     {
-        throw std::runtime_error("Cannot open " + filename + " file");
-    }
-}
-
-/// <summary>
-/// Closes input file and cleans up.
-/// </summary>
-JackTokenizer::~JackTokenizer()
-{
-    if (mInputStream)
-    {
-        mInputStream->close();
-        delete mInputStream;
-        mInputStream = NULL;
+        throw JackAnalyzerError("Cannot open " + filename + " file");
     }
 }
 
@@ -114,7 +105,7 @@ bool JackTokenizer::reverse()
 /// Gets the current position of the token in the input.
 /// </summary>
 /// <returns>The current token position in the input.</returns>
-int JackTokenizer::getPosition()
+int JackTokenizer::getPosition() const
 {
     return mCurrentPosition;
 }
@@ -139,7 +130,7 @@ bool JackTokenizer::setPosition(int position)
 /// <summary>
 /// Returns the type of the current token as a constant.
 /// </summary>
-ETokenType JackTokenizer::tokenType()
+ETokenType JackTokenizer::tokenType() const
 {
     return mCurrentToken.tokenType;
 }
@@ -148,7 +139,7 @@ ETokenType JackTokenizer::tokenType()
 /// Returns the keyword which is the current token as a constant.
 /// <para/> This method should be called only if tokenType is KEYWORD.
 /// </summary>
-std::string JackTokenizer::keyword()
+std::string JackTokenizer::keyword() const
 {
     return mCurrentToken.keyword;
 }
@@ -157,7 +148,7 @@ std::string JackTokenizer::keyword()
 /// Returns the character which is the current token.
 /// <para/> Should be called only if tokenType is SYMBOL.
 /// </summary>
-char JackTokenizer::symbol()
+char JackTokenizer::symbol() const
 {
     return mCurrentToken.symbol;
 }
@@ -166,7 +157,7 @@ char JackTokenizer::symbol()
 /// Returns the string which is the current token.
 /// <para/> Should be called only if tokenType is IDENTIFIER.
 /// </summary>
-std::string JackTokenizer::identifier()
+std::string JackTokenizer::identifier() const
 {
     return mCurrentToken.identifier;
 }
@@ -175,7 +166,7 @@ std::string JackTokenizer::identifier()
 /// Returns the integer value of the current token.
 /// <para/> Should be called only if tokenType is INT_CONST.
 /// </summary>
-int JackTokenizer::intVal()
+int JackTokenizer::intVal() const
 {
     return mCurrentToken.integerValue;
 }
@@ -184,7 +175,7 @@ int JackTokenizer::intVal()
 /// Returns the string value of the current token, without opening and closing double quotes.
 /// <para/> Should be called only if tokenType is STRING_CONST.
 /// </summary>
-std::string JackTokenizer::stringVal()
+std::string JackTokenizer::stringVal() const
 {
     return mCurrentToken.stringValue;
 }
@@ -209,7 +200,7 @@ void JackTokenizer::advanceNew()
         return;
     }
 
-    std::string word = readToWhitespaceOrSymbol();
+    auto word = readToWhitespaceOrSymbol();
 
     if (isdigit(word[0]))
     {
@@ -239,15 +230,15 @@ void JackTokenizer::advanceNew()
 
 std::string JackTokenizer::readToWhitespaceOrSymbol()
 {
-    std::string word = std::string(1, mFirstChar);
+    auto word = std::string(1, mFirstChar);
     char nextChar = 0;
 
     while (true)
     {
-        nextChar = mInputStream->peek();
+        nextChar = (char)mInputStream->peek();
         if (nextChar == EOF)
         {
-            throw std::runtime_error("Failed to read character from input file.");
+            throw JackAnalyzerError("Failed to read character from input file.");
         }
 
         if (!std::isalnum(nextChar) && nextChar != '_')
@@ -257,7 +248,7 @@ std::string JackTokenizer::readToWhitespaceOrSymbol()
 
         if (!mInputStream->get(nextChar))
         {
-            throw std::runtime_error("Failed to read character from input file.");
+            throw JackAnalyzerError("Failed to read character from input file.");
         }
 
         word += nextChar;
@@ -275,7 +266,7 @@ void JackTokenizer::parseStringValue()
     {
         if (!mInputStream->get(nextChar))
         {
-            throw std::runtime_error("Failed to read character from input file.");
+            throw JackAnalyzerError("Failed to read character from input file.");
         }
 
         if (nextChar == '"')
@@ -288,7 +279,7 @@ void JackTokenizer::parseStringValue()
 
         if (nextChar == '\r' || nextChar == '\n')
         {
-            throw std::runtime_error("New line detected. Failed to read string value.");
+            throw JackAnalyzerError("New line detected. Failed to read string value.");
         }
 
         line += nextChar;
@@ -297,10 +288,9 @@ void JackTokenizer::parseStringValue()
 
 void JackTokenizer::parseIntValue(std::string str)
 {
-    bool isDigits = std::all_of(str.begin(), str.end(), ::isdigit);
-    if (!isDigits)
+    if (!std::all_of(str.begin(), str.end(), ::isdigit))
     {
-        throw std::runtime_error("Invalid number - " + str + " .");
+        throw JackAnalyzerError("Invalid number - " + str + " .");
     }
 
     mCurrentToken.token = str;
@@ -309,7 +299,7 @@ void JackTokenizer::parseIntValue(std::string str)
 
     if (mCurrentToken.integerValue < 0 || mCurrentToken.integerValue > SHRT_MAX)
     {
-        throw std::runtime_error("Number out of scope - " + str + " .");
+        throw JackAnalyzerError("Number out of scope - " + str + " .");
     }
 }
 
@@ -320,7 +310,7 @@ bool JackTokenizer::skipLineComment()
         return true;
     }
 
-    char nextChar = mInputStream->peek();
+    auto nextChar = (char)mInputStream->peek();
     if (nextChar == EOF)
     {
         return false;
@@ -353,7 +343,7 @@ bool JackTokenizer::skipMultilineComment()
         return true;
     }
 
-    char nextChar = mInputStream->peek();
+    auto nextChar = mInputStream->peek();
     if (nextChar == EOF)
     {
         return false;

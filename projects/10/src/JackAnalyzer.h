@@ -12,30 +12,28 @@ public:
     /// Validates provided path, creates JackTokenizer and CompilationEngine.
     /// May throw a runtime exception.
     /// </summary>
-    JackAnalyzer(std::string path);
+    explicit JackAnalyzer(std::string const& path);
     /// <summary>
     /// Releases allocated memory.
     /// </summary>
-    ~JackAnalyzer();
+    ~JackAnalyzer() = default;
 
-public:
     /// <summary>
     /// Returns an information, whether provided path is directory or single file.
     /// </summary>
-    bool isDirectoryPath();
+    bool isDirectoryPath() const;
     /// <summary>
     /// Parses all .jack files from specified directory.
     /// </summary>
-    void parseDirectory();
+    void parseDirectory() const;
     /// <summary>
     /// Parses specified .jack file.
     /// </summary>
-    void parseSingleFile();
+    void parseSingleFile() const;
 
 private:
-    void parseSingleFile(std::string path);
+    void parseSingleFile(std::string path) const;
 
-private:
     std::string mInputPath;
     bool mIsDirectoryPath;
 };

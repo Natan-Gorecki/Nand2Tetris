@@ -1,26 +1,28 @@
+#include <functional>
 #include "ExpressionRules.h"
 #include "ProgramStructureRules.h"
 #include "StatementRules.h"
 #include "../CompilationEngine.h"
 
+using namespace std;
+
 #pragma region ClassRule
 ClassRule::ClassRule() : SequenceRule(
     {
-        new KeywordRule("class"),
-        new ClassNameRule,
-        new SymbolRule('{'),
-        new ZeroOrMoreRule([]
+        make_shared<KeywordRule>("class"),
+        make_shared<ClassNameRule>(),
+        make_shared<SymbolRule>('{'),
+        make_shared<ZeroOrMoreRule>([]
         {
-            return new ClassVarDecRule;
+            return make_shared<ClassVarDecRule>();
         }),
-        new ZeroOrMoreRule([]
+        make_shared<ZeroOrMoreRule>([]
         {
-            return new SubroutineDecRule;
+            return make_shared<SubroutineDecRule>();
         }),
-        new SymbolRule('}')
+        make_shared<SymbolRule>('}')
     })
 {
-    CreateRuleFunc createRuleFunc = []() { return new ClassVarDecRule; };
 }
 
 void ClassRule::compile()
@@ -35,22 +37,22 @@ void ClassRule::compile()
 #pragma region ClassVarDecRule
 ClassVarDecRule::ClassVarDecRule() : SequenceRule(
     {
-        new AlternationRule(
+        make_shared<AlternationRule>(RuleVector
         {
-            new KeywordRule("static"),
-            new KeywordRule("field")
+            make_shared<KeywordRule>("static"),
+            make_shared<KeywordRule>("field")
         }),
-        new TypeRule,
-        new VarNameRule,
-        new ZeroOrMoreRule([]
+        make_shared<TypeRule>(),
+        make_shared<VarNameRule>(),
+        make_shared<ZeroOrMoreRule>([]
         {
-            return new SequenceRule(
+            return make_shared<SequenceRule>(RuleVector
             {
-                new SymbolRule(','),
-                new VarNameRule
+                make_shared<SymbolRule>(','),
+                make_shared<VarNameRule>()
             });
         }),
-        new SymbolRule(';')
+        make_shared<SymbolRule>(';')
     })
 {
 }
@@ -66,10 +68,10 @@ void ClassVarDecRule::compile()
 #pragma region TypeRule
 TypeRule::TypeRule() : AlternationRule(
     {
-        new KeywordRule("int"),
-        new KeywordRule("char"),
-        new KeywordRule("boolean"),
-        new ClassNameRule
+        make_shared<KeywordRule>("int"),
+        make_shared<KeywordRule>("char"),
+        make_shared<KeywordRule>("boolean"),
+        make_shared<ClassNameRule>()
     })
 {
 }
@@ -78,22 +80,22 @@ TypeRule::TypeRule() : AlternationRule(
 #pragma region SubroutineDecRule
 SubroutineDecRule::SubroutineDecRule() : SequenceRule(
     {
-        new AlternationRule(
+        make_shared<AlternationRule>(RuleVector
         {
-            new KeywordRule("constructor"),
-            new KeywordRule("function"),
-            new KeywordRule("method")
+            make_shared<KeywordRule>("constructor"),
+            make_shared<KeywordRule>("function"),
+            make_shared<KeywordRule>("method")
         }),
-        new AlternationRule(
+        make_shared<AlternationRule>(RuleVector
         {
-            new KeywordRule("void"),
-            new TypeRule
+            make_shared<KeywordRule>("void"),
+            make_shared<TypeRule>()
         }),
-        new SubroutineNameRule,
-        new SymbolRule('('),
-        new ParameterListRule,
-        new SymbolRule(')'),
-        new SubroutineBodyRule
+        make_shared<SubroutineNameRule>(),
+        make_shared<SymbolRule>('('),
+        make_shared<ParameterListRule>(),
+        make_shared<SymbolRule>(')'),
+        make_shared<SubroutineBodyRule>()
     })
 {
 }
@@ -109,17 +111,17 @@ void SubroutineDecRule::compile()
 #pragma region ParameterListRule
 ParameterListRule::ParameterListRule() : ZeroOrOneRule([]
     {
-        return new SequenceRule(
+        return make_shared<SequenceRule>(RuleVector
         {
-            new TypeRule,
-            new VarNameRule,
-            new ZeroOrMoreRule([]
+            make_shared<TypeRule>(),
+            make_shared<VarNameRule>(),
+            make_shared<ZeroOrMoreRule>([]
             {
-                return new SequenceRule(
+                return make_shared<SequenceRule>(RuleVector
                 {
-                    new SymbolRule(','),
-                    new TypeRule,
-                    new VarNameRule
+                    make_shared<SymbolRule>(','),
+                    make_shared<TypeRule>(),
+                    make_shared<VarNameRule>()
                 });
             })
         });
@@ -138,13 +140,13 @@ void ParameterListRule::compile()
 #pragma region SubroutineBodyRule
 SubroutineBodyRule::SubroutineBodyRule() : SequenceRule(
     {
-        new SymbolRule('{'),
-        new ZeroOrMoreRule([]
+        make_shared<SymbolRule>('{'),
+        make_shared<ZeroOrMoreRule>([]
         {
-            return new VarDecRule;
+            return make_shared<VarDecRule>();
         }),
-        new StatementsRule,
-        new SymbolRule('}')
+        make_shared<StatementsRule>(),
+        make_shared<SymbolRule>('}')
     })
 {
 }
@@ -160,18 +162,18 @@ void SubroutineBodyRule::compile()
 #pragma region VarDecRule
 VarDecRule::VarDecRule() : SequenceRule(
     {
-        new KeywordRule("var"),
-        new TypeRule,
-        new VarNameRule,
-        new ZeroOrMoreRule([]
+        make_shared<KeywordRule>("var"),
+        make_shared<TypeRule>(),
+        make_shared<VarNameRule>(),
+        make_shared<ZeroOrMoreRule>([]
         {
-            return new SequenceRule(
+            return make_shared<SequenceRule>(RuleVector
             {
-                new SymbolRule(','),
-                new VarNameRule
+                make_shared<SymbolRule>(','),
+                make_shared<VarNameRule>()
             });
         }),
-        new SymbolRule(';')
+        make_shared<SymbolRule>(';')
     })
 {
 }

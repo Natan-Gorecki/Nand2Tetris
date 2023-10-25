@@ -1,15 +1,18 @@
+#include <functional>
 #include "ExpressionRules.h"
 #include "LexicalRules.h"
 #include "ProgramStructureRules.h"
 #include "StatementRules.h"
 #include "../CompilationEngine.h"
 
+using namespace std;
+
 #pragma region StatementsRule
 StatementsRule::StatementsRule() : SequenceRule(
     {
-        new ZeroOrMoreRule([]
+        make_shared<ZeroOrMoreRule>([]
         {
-            return new StatementRule;
+            return make_shared<StatementRule>();
         })
     })
 {
@@ -26,11 +29,11 @@ void StatementsRule::compile()
 #pragma region StatementRule
 StatementRule::StatementRule() : AlternationRule(
     {
-        new LetStatementRule,
-        new IfStatementRule,
-        new WhileStatementRule,
-        new DoStatementRule,
-        new ReturnStatementRule
+        make_shared<LetStatementRule>(),
+        make_shared<IfStatementRule>(),
+        make_shared<WhileStatementRule>(),
+        make_shared<DoStatementRule>(),
+        make_shared<ReturnStatementRule>()
     })
 {
 }
@@ -39,20 +42,20 @@ StatementRule::StatementRule() : AlternationRule(
 #pragma region LetStatementRule
 LetStatementRule::LetStatementRule() : SequenceRule(
     {
-        new KeywordRule("let"),
-        new VarNameRule,
-        new ZeroOrOneRule([]
+        make_shared<KeywordRule>("let"),
+        make_shared<VarNameRule>(),
+        make_shared<ZeroOrOneRule>([]
         {
-            return new SequenceRule(
+            return make_shared<SequenceRule>(RuleVector
             {
-                new SymbolRule('['),
-                new ExpressionRule,
-                new SymbolRule(']'),
+                make_shared<SymbolRule>('['),
+                make_shared<ExpressionRule>(),
+                make_shared<SymbolRule>(']'),
             });
         }),
-        new SymbolRule('='),
-        new ExpressionRule,
-        new SymbolRule(';')
+        make_shared<SymbolRule>('='),
+        make_shared<ExpressionRule>(),
+        make_shared<SymbolRule>(';')
     })
 {
 }
@@ -68,21 +71,21 @@ void LetStatementRule::compile()
 #pragma region IfStatementRule
 IfStatementRule::IfStatementRule() : SequenceRule(
     {
-        new KeywordRule("if"),
-        new SymbolRule('('),
-        new ExpressionRule,
-        new SymbolRule(')'),
-        new SymbolRule('{'),
-        new StatementsRule,
-        new SymbolRule('}'),
-        new ZeroOrOneRule([]
+        make_shared<KeywordRule>("if"),
+        make_shared<SymbolRule>('('),
+        make_shared<ExpressionRule>(),
+        make_shared<SymbolRule>(')'),
+        make_shared<SymbolRule>('{'),
+        make_shared<StatementsRule>(),
+        make_shared<SymbolRule>('}'),
+        make_shared<ZeroOrOneRule>([]
         {
-            return new SequenceRule(
+            return make_shared<SequenceRule>(RuleVector
             {
-                new KeywordRule("else"),
-                new SymbolRule('{'),
-                new StatementsRule,
-                new SymbolRule('}')
+                make_shared<KeywordRule>("else"),
+                make_shared<SymbolRule>('{'),
+                make_shared<StatementsRule>(),
+                make_shared<SymbolRule>('}')
             });
         })
     })
@@ -100,13 +103,13 @@ void IfStatementRule::compile()
 #pragma region WhileStatementRule
 WhileStatementRule::WhileStatementRule() : SequenceRule(
     {
-        new KeywordRule("while"),
-        new SymbolRule('('),
-        new ExpressionRule,
-        new SymbolRule(')'),
-        new SymbolRule('{'),
-        new StatementsRule,
-        new SymbolRule('}')
+        make_shared<KeywordRule>("while"),
+        make_shared<SymbolRule>('('),
+        make_shared<ExpressionRule>(),
+        make_shared<SymbolRule>(')'),
+        make_shared<SymbolRule>('{'),
+        make_shared<StatementsRule>(),
+        make_shared<SymbolRule>('}')
     })
 {
 }
@@ -122,9 +125,9 @@ void WhileStatementRule::compile()
 #pragma region DoStatementRule
 DoStatementRule::DoStatementRule() : SequenceRule(
     {
-        new KeywordRule("do"),
-        new SubroutineCallRule,
-        new SymbolRule(';')
+        make_shared<KeywordRule>("do"),
+        make_shared<SubroutineCallRule>(),
+        make_shared<SymbolRule>(';')
     })
 {
 }
@@ -140,12 +143,12 @@ void DoStatementRule::compile()
 #pragma region ReturnStatementRule
 ReturnStatementRule::ReturnStatementRule() : SequenceRule(
     {
-        new KeywordRule("return"),
-        new ZeroOrOneRule([]
+        make_shared<KeywordRule>("return"),
+        make_shared<ZeroOrOneRule>([]
         {
-            return new ExpressionRule;
+            return make_shared<ExpressionRule>();
         }),
-        new SymbolRule(';')
+        make_shared<SymbolRule>(';')
     })
 {
 }

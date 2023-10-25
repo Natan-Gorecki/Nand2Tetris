@@ -16,9 +16,8 @@ class StatementsRule : public SequenceRule
 {
 public:
     StatementsRule();
-    virtual ~StatementsRule() {};
+    ~StatementsRule() override = default;
 
-public:
     void compile() override;
 };
 
@@ -26,16 +25,15 @@ class StatementRule : public AlternationRule
 {
 public:
     StatementRule();
-    virtual ~StatementRule() {};
+    ~StatementRule() override = default;
 };
 
 class LetStatementRule : public SequenceRule
 {
 public:
     LetStatementRule();
-    virtual ~LetStatementRule() {};
+    ~LetStatementRule() override = default;
 
-public:
     void compile() override;
 };
 
@@ -43,9 +41,8 @@ class IfStatementRule : public SequenceRule
 {
 public:
     IfStatementRule();
-    virtual ~IfStatementRule() {};
+    ~IfStatementRule() override = default;
 
-public:
     void compile() override;
 };
 
@@ -53,9 +50,8 @@ class WhileStatementRule : public SequenceRule
 {
 public:
     WhileStatementRule();
-    virtual ~WhileStatementRule() {};
+    ~WhileStatementRule() override = default;
 
-public:
     void compile() override;
 };
 
@@ -63,9 +59,8 @@ class DoStatementRule : public SequenceRule
 {
 public:
     DoStatementRule();
-    virtual ~DoStatementRule() {};
+    ~DoStatementRule() override = default;
 
-public:
     void compile() override;
 };
 
@@ -73,8 +68,7 @@ class ReturnStatementRule : public SequenceRule
 {
 public:
     ReturnStatementRule();
-    virtual ~ReturnStatementRule() {};
+    ~ReturnStatementRule() override = default;
 
-public:
     void compile() override;
 };

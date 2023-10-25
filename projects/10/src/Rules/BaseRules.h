@@ -14,76 +14,74 @@ class ZeroOrMoreRule;
 class ZeroOrOneRule;
 
 
-using RuleVector = std::vector<Rule*>;
-using CreateRuleFunc = std::function<Rule* (void)>;
+using RuleVector = std::vector<std::shared_ptr<Rule>>;
+using CreateRuleFunc = std::function<std::shared_ptr<Rule>(void)>;
 
 class Rule
 {
 public:
-    Rule() {};
-    virtual ~Rule() {};
+    Rule() = default;
+    virtual ~Rule() = default;
 
-public:
     virtual bool initialize(JackTokenizer* pTokenizer);
     virtual void compile();
 
-public:
+    int getRuleLevel() const;
     virtual void setRuleLevel(int ruleLevel);
-protected:
-    void writeOutput(std::string text);
-    void writeToken(std::string text);
 
 protected:
+    void writeOutput(std::string const& text) const;
+    void writeToken(std::string const& text) const;
+
+private:
     int mRuleLevel = 0;
 };
 
 class ParentRule : public Rule
 {
 public:
-    ParentRule(RuleVector rules);
-    virtual ~ParentRule();
+    explicit ParentRule(RuleVector const& rules);
+    ~ParentRule() override = default;
 
-public:
     void compile() override;
 
 protected:
-    std::vector<Rule*> mChildRules;
+    RuleVector& getChildRules();
+
+private:
+    RuleVector mChildRules;
 };
 
 class SequenceRule : public ParentRule
 {
 public:
-    SequenceRule(RuleVector rules);
-    virtual ~SequenceRule() {};
+    explicit SequenceRule(RuleVector const& rules);
+    ~SequenceRule() override = default;
 
-public:
     bool initialize(JackTokenizer* pTokenizer) override;
 };
 
 class AlternationRule : public ParentRule
 {
 public:
-    AlternationRule(RuleVector rules);
-    virtual ~AlternationRule() {};
+    explicit AlternationRule(RuleVector const& rules);
+    ~AlternationRule() override = default;
 
-public:
     bool initialize(JackTokenizer* pTokenizer) override;
     void compile() override;
 
-public:
-    void setRuleLevel(int ruleLevel);
+    void setRuleLevel(int ruleLevel) override;
 
 private:
-    Rule* mCompileRule = nullptr;
+    std::shared_ptr<Rule> mCompileRule = nullptr;
 };
 
 class ZeroOrMoreRule : public ParentRule
 {
 public:
-    ZeroOrMoreRule(CreateRuleFunc createRuleFunc);
-    virtual ~ZeroOrMoreRule() {};
+    explicit ZeroOrMoreRule(CreateRuleFunc const& createRuleFunc);
+    ~ZeroOrMoreRule() override = default;
 
-public:
     bool initialize(JackTokenizer* pTokenizer) override;
 
 private:
@@ -93,10 +91,9 @@ private:
 class ZeroOrOneRule : public ParentRule
 {
 public:
-    ZeroOrOneRule(CreateRuleFunc createRuleFunc);
-    virtual ~ZeroOrOneRule() {};
+    explicit ZeroOrOneRule(CreateRuleFunc const& createRuleFunc);
+    ~ZeroOrOneRule() override = default;
 
-public:
     bool initialize(JackTokenizer* pTokenizer) override;
 
 private:

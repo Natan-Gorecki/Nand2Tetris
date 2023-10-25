@@ -1,18 +1,21 @@
+#include <functional>
 #include "BaseRules.h"
 #include "ExpressionRules.h"
 #include "LexicalRules.h"
 #include "ProgramStructureRules.h"
 
+using namespace std;
+
 #pragma region ExpressionRule
 ExpressionRule::ExpressionRule() : SequenceRule(
     {
-        new TermRule,
-        new ZeroOrMoreRule([]
+        make_shared<TermRule>(),
+        make_shared<ZeroOrMoreRule>([]
         {
-            return new SequenceRule(
+            return make_shared<SequenceRule>(RuleVector
             {
-                new OpRule,
-                new TermRule
+                make_shared<OpRule>(),
+                make_shared<TermRule>()
             });
         })
     })
@@ -32,50 +35,47 @@ TermRule::TermRule() : ParentRule({ })
 {
     mCreateRuleFuncs =
     {
-        [] { return new SubroutineCallRule; },
-        [] { return new SequenceRule(
+        [] { return make_shared<SubroutineCallRule>(); },
+        [] { return make_shared<SequenceRule>(RuleVector
         {
-            new UnaryOpRule,
-            new TermRule,
+            make_shared<UnaryOpRule>(),
+            make_shared<TermRule>(),
         }); },
-        [] { return new SequenceRule(
+        [] { return make_shared<SequenceRule>(RuleVector
         {
-            new SymbolRule('('),
-            new ExpressionRule,
-            new SymbolRule(')'),
+            make_shared<SymbolRule>('('),
+            make_shared<ExpressionRule>(),
+            make_shared<SymbolRule>(')'),
         }); },
-        [] { return new SequenceRule(
+        [] { return make_shared<SequenceRule>(RuleVector
         {
-            new VarNameRule,
-            new SymbolRule('['),
-            new ExpressionRule,
-            new SymbolRule(']'),
+            make_shared<VarNameRule>(),
+            make_shared<SymbolRule>('['),
+            make_shared<ExpressionRule>(),
+            make_shared<SymbolRule>(']'),
         }); },
-        [] { return new IntegerConstantRule; },
-        [] { return new StringConstantRule; },
-        [] { return new KeywordConstantRule; },
-        [] { return new VarNameRule; }
+        [] { return make_shared<IntegerConstantRule>(); },
+        [] { return make_shared<StringConstantRule>(); },
+        [] { return make_shared<KeywordConstantRule>(); },
+        [] { return make_shared<VarNameRule>(); }
     };
 }
 
 bool TermRule::initialize(JackTokenizer* pTokenizer)
 {
-    for (auto& onCreateRule : mCreateRuleFuncs)
+    for (const auto& onCreateRule : mCreateRuleFuncs)
     {
         auto pRule = onCreateRule();
 
-        int ruleLevel = typeid(*pRule) != typeid(SequenceRule) ? mRuleLevel + 1 : mRuleLevel;
+        const Rule& rule = *pRule;
+        int ruleLevel = typeid(rule) != typeid(SequenceRule) ? getRuleLevel() + 1 : getRuleLevel();
         pRule->setRuleLevel(ruleLevel);
 
-        auto result = pRule->initialize(pTokenizer);
-
-        if (result)
+        if (pRule->initialize(pTokenizer))
         {
-            mChildRules.push_back(pRule);
+            getChildRules().push_back(pRule);
             return true;
         }
-
-        delete pRule;
     }
 
     return false;
@@ -92,25 +92,25 @@ void TermRule::compile()
 #pragma region SubroutineCallRule
 SubroutineCallRule::SubroutineCallRule() : AlternationRule(
     {
-        new SequenceRule(
+        make_shared<SequenceRule>(RuleVector
         {
-            new SubroutineNameRule,
-            new SymbolRule('('),
-            new ExpressionListRule,
-            new SymbolRule(')')
+            make_shared<SubroutineNameRule>(),
+            make_shared<SymbolRule>('('),
+            make_shared<ExpressionListRule>(),
+            make_shared<SymbolRule>(')')
         }),
-        new SequenceRule(
+        make_shared<SequenceRule>(RuleVector
         {
-            new AlternationRule(
+            make_shared<AlternationRule>(RuleVector
             {
-                new ClassNameRule,
-                new VarNameRule
+                make_shared<ClassNameRule>(),
+                make_shared<VarNameRule>()
             }),
-            new SymbolRule('.'),
-            new SubroutineNameRule,
-            new SymbolRule('('),
-            new ExpressionListRule,
-            new SymbolRule(')')
+            make_shared<SymbolRule>('.'),
+            make_shared<SubroutineNameRule>(),
+            make_shared<SymbolRule>('('),
+            make_shared<ExpressionListRule>(),
+            make_shared<SymbolRule>(')')
         })
     })
 {
@@ -125,17 +125,17 @@ void SubroutineCallRule::setRuleLevel(int ruleLevel)
 #pragma region ExpressionListRule
 ExpressionListRule::ExpressionListRule() : SequenceRule(
     {
-        new ZeroOrOneRule([]
+        make_shared<ZeroOrOneRule>([]
         {
-            return new SequenceRule(
+            return make_shared<SequenceRule>(RuleVector
             {
-                new ExpressionRule,
-                new ZeroOrMoreRule([]
+                make_shared<ExpressionRule>(),
+                make_shared<ZeroOrMoreRule>([]
                 {
-                    return new SequenceRule(
+                    return make_shared<SequenceRule>(RuleVector
                     {
-                        new SymbolRule(','),
-                        new ExpressionRule,
+                        make_shared<SymbolRule>(','),
+                        make_shared<ExpressionRule>(),
                     });
                 })
             });
@@ -155,15 +155,15 @@ void ExpressionListRule::compile()
 #pragma region OpRule
 OpRule::OpRule() : AlternationRule(
     {
-        new SymbolRule('+'),
-        new SymbolRule('-'),
-        new SymbolRule('*'),
-        new SymbolRule('/'),
-        new SymbolRule('&'),
-        new SymbolRule('|'),
-        new SymbolRule('<'),
-        new SymbolRule('>'),
-        new SymbolRule('=')
+        make_shared<SymbolRule>('+'),
+        make_shared<SymbolRule>('-'),
+        make_shared<SymbolRule>('*'),
+        make_shared<SymbolRule>('/'),
+        make_shared<SymbolRule>('&'),
+        make_shared<SymbolRule>('|'),
+        make_shared<SymbolRule>('<'),
+        make_shared<SymbolRule>('>'),
+        make_shared<SymbolRule>('=')
     })
 {
 }
@@ -172,8 +172,8 @@ OpRule::OpRule() : AlternationRule(
 #pragma region UnaryOpRule
 UnaryOpRule::UnaryOpRule() : AlternationRule(
     {
-        new SymbolRule('-'),
-        new SymbolRule('~')
+        make_shared<SymbolRule>('-'),
+        make_shared<SymbolRule>('~')
     })
 {
 }
@@ -182,10 +182,10 @@ UnaryOpRule::UnaryOpRule() : AlternationRule(
 #pragma region KeywordConstantRule
 KeywordConstantRule::KeywordConstantRule() : AlternationRule(
     {
-        new KeywordRule("true"),
-        new KeywordRule("false"),
-        new KeywordRule("null"),
-        new KeywordRule("this")
+        make_shared<KeywordRule>("true"),
+        make_shared<KeywordRule>("false"),
+        make_shared<KeywordRule>("null"),
+        make_shared<KeywordRule>("this")
     })
 {
 }

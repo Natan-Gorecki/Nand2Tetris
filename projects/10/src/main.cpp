@@ -2,6 +2,7 @@
 #include<filesystem>
 #include<iostream>
 #include "JackAnalyzer.h"
+#include "JackAnalyzerError.h"
 
 int main(int argc, char* argv[])
 {
@@ -26,7 +27,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        JackAnalyzer jackAnalyzer = JackAnalyzer(path);
+        auto jackAnalyzer = JackAnalyzer(path);
 
         auto startTime = std::chrono::high_resolution_clock::now();
 
@@ -44,7 +45,7 @@ int main(int argc, char* argv[])
         std::cout << "Finished compilation in " << (endTime - startTime) / std::chrono::milliseconds(1) << " ms.\n";
         return EXIT_SUCCESS;
     }
-    catch (const std::runtime_error& error)
+    catch (const JackAnalyzerError& error)
     {
         std::cout << "Error: " << error.what() << "\n";
         return EXIT_FAILURE;

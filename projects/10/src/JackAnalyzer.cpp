@@ -2,14 +2,16 @@
 #include "CompilationEngine.h"
 #include "JackAnalyzer.h"
 #include "JackTokenizer.h"
+#include "JackAnalyzerError.h"
 
+using namespace std;
 namespace fs = std::filesystem;
 
 /// <summary>
 /// Validates provided path, creates JackTokenizer and CompilationEngine.
 /// May throw a runtime exception.
 /// </summary>
-JackAnalyzer::JackAnalyzer(std::string path)
+JackAnalyzer::JackAnalyzer(std::string const& path)
 {
     fs::path filePath = path;
     fs::path inputPath = filePath.is_relative()
@@ -21,27 +23,19 @@ JackAnalyzer::JackAnalyzer(std::string path)
 
     if (!mIsDirectoryPath && !isupper(inputPath.filename().string()[0]))
     {
-        throw std::runtime_error("Input file " + std::string(path) + " doesn't start with uppercase.");
+        throw JackAnalyzerError("Input file " + std::string(path) + " doesn't start with uppercase.");
     }
 
     if (!mIsDirectoryPath && inputPath.extension() != ".jack")
     {
-        throw std::runtime_error("Input file " + std::string(path) + " doesn't have .jack extension");
+        throw JackAnalyzerError("Input file " + std::string(path) + " doesn't have .jack extension");
     }
-}
-
-/// <summary>
-/// Releases allocated memory.
-/// </summary>
-JackAnalyzer::~JackAnalyzer()
-{
-
 }
 
 /// <summary>
 /// Returns an information, whether provided path is directory or single file.
 /// </summary>
-bool JackAnalyzer::isDirectoryPath()
+bool JackAnalyzer::isDirectoryPath() const
 {
     return mIsDirectoryPath;
 }
@@ -49,15 +43,14 @@ bool JackAnalyzer::isDirectoryPath()
 /// <summary>
 /// Parses all .jack files from specified directory.
 /// </summary>
-void JackAnalyzer::parseDirectory()
+void JackAnalyzer::parseDirectory() const
 {
-    fs::path filePath = fs::path(mInputPath);
-    if (!fs::exists(filePath))
+    if (!fs::exists(fs::path(mInputPath)))
     {
-        throw std::runtime_error("Directory " + mInputPath + " doesn't exist.");
+        throw JackAnalyzerError("Directory " + mInputPath + " doesn't exist.");
     }
 
-    std::vector<std::string> jackFiles = std::vector<std::string>();
+    auto jackFiles = std::vector<std::string>();
     for (const fs::directory_entry& entry : fs::directory_iterator(mInputPath))
     {
         if (entry.is_regular_file() && isupper(entry.path().filename().string()[0]) && entry.path().extension() == ".jack")
@@ -66,9 +59,9 @@ void JackAnalyzer::parseDirectory()
         }
     }
 
-    if (jackFiles.size() == 0)
+    if (jackFiles.empty())
     {
-        throw std::runtime_error("Directory " + mInputPath + " doesn't contain any file with .jack extension.");
+        throw JackAnalyzerError("Directory " + mInputPath + " doesn't contain any file with .jack extension.");
     }
 
     for (std::string jackFile : jackFiles)
@@ -80,33 +73,29 @@ void JackAnalyzer::parseDirectory()
 /// <summary>
 /// Parses specified .jack file.
 /// </summary>
-void JackAnalyzer::parseSingleFile()
+void JackAnalyzer::parseSingleFile() const
 {
-    fs::path filePath = fs::path(mInputPath);
-    if (!fs::exists(filePath))
+    if (!fs::exists(fs::path(mInputPath)))
     {
-        throw std::runtime_error("File " + mInputPath + " doesn't exist.");
+        throw JackAnalyzerError("File " + mInputPath + " doesn't exist.");
     }
 
     parseSingleFile(mInputPath);
 }
 
-void JackAnalyzer::parseSingleFile(std::string path)
+void JackAnalyzer::parseSingleFile(std::string path) const
 {
     fs::path outputPath = path;
     std::string filename = outputPath.filename().stem().string();
     std::string outputFile = outputPath.replace_filename(filename + "_VS.xml").string();
 
-    JackTokenizer* jackTokenizer = new JackTokenizer(path);
-    CompilationEngine* compilationEngine = new CompilationEngine(outputFile, jackTokenizer);
+    auto jackTokenizer = make_shared<JackTokenizer>(path);
+    auto compilationEngine = make_unique<CompilationEngine>(outputFile, jackTokenizer);
 
     compilationEngine->compileClass();
 
     if (jackTokenizer->advance())
     {
-        throw std::runtime_error("JackTokenizer has more tokens. Only one class per file is allowed.");
+        throw JackAnalyzerError("JackTokenizer has more tokens. Only one class per file is allowed.");
     }
-
-    delete compilationEngine;
-    delete jackTokenizer;
 }

@@ -34,6 +34,7 @@
     <ClInclude Include="..\ETokenType.h" />
     <ClInclude Include="..\JackAnalyzer.h" />
     <ClInclude Include="..\JackTokenizer.h" />
+    <ClInclude Include="..\JackAnalyzerError.h" />
     <ClInclude Include="..\Rules\ExpressionRules.h" />
     <ClInclude Include="..\Rules\BaseRules.h" />
     <ClInclude Include="..\Rules\LexicalRules.h" />

@@ -15,9 +15,8 @@ class ExpressionRule : public SequenceRule
 {
 public:
     ExpressionRule();
-    virtual ~ExpressionRule() {};
+    ~ExpressionRule() override = default;
 
-public:
     void compile() override;
 };
 
@@ -25,9 +24,8 @@ class TermRule : public ParentRule
 {
 public:
     TermRule();
-    virtual ~TermRule() {};
+    ~TermRule() override = default;
 
-public:
     bool initialize(JackTokenizer* pTokenizer) override;
     void compile() override;
 
@@ -39,9 +37,8 @@ class SubroutineCallRule : public AlternationRule
 {
 public:
     SubroutineCallRule();
-    virtual ~SubroutineCallRule() {};
+    ~SubroutineCallRule() override = default;
 
-public:
     void setRuleLevel(int ruleLevel) override;
 };
 
@@ -49,9 +46,8 @@ class ExpressionListRule : public SequenceRule
 {
 public:
     ExpressionListRule();
-    virtual ~ExpressionListRule() {};
+    ~ExpressionListRule() override = default;
 
-public:
     void compile() override;
 };
 
@@ -59,19 +55,19 @@ class OpRule : public AlternationRule
 {
 public:
     OpRule();
-    virtual ~OpRule() {};
+    ~OpRule() override = default;
 };
 
 class UnaryOpRule : public AlternationRule
 {
 public:
     UnaryOpRule();
-    virtual ~UnaryOpRule() {};
+    ~UnaryOpRule() override = default;
 };
 
 class KeywordConstantRule : public AlternationRule
 {
 public:
     KeywordConstantRule();
-    virtual ~KeywordConstantRule() {};
+    ~KeywordConstantRule() override = default;
 };

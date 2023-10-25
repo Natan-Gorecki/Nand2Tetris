@@ -95,9 +95,6 @@
     <ClInclude Include="..\CompilationEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\EKeyWord.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\ETokenType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -121,6 +118,9 @@
     </ClInclude>
     <ClInclude Include="..\Rules\StatementRules.h">
       <Filter>Header Files\Rules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JackAnalyzerError.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

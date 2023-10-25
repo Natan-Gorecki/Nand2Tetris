@@ -14,10 +14,9 @@ class IdentifierRule;
 class LexicalRule : public Rule
 {
 public:
-    LexicalRule() {};
-    virtual ~LexicalRule() {};
+    LexicalRule() = default;
+    ~LexicalRule() override = default;
 
-public:
     bool initialize(JackTokenizer* pTokenizer) final;
     void compile() final;
 
@@ -32,11 +31,10 @@ public:
     /// <summary>
     /// Returns information if passed string is a keyword.
     /// </summary>
-    static bool isKeyword(std::string name);
+    static bool isKeyword(std::string const& name);
 
-public:
-    KeywordRule(std::string keyword);
-    virtual ~KeywordRule() {};
+    explicit KeywordRule(std::string const& keyword);
+    ~KeywordRule() override = default;
 
 protected:
     bool isFullfiled(JackTokenizer* pTokenizer) override;
@@ -54,38 +52,37 @@ public:
     /// </summary>
     static bool isSymbol(char symbol);
 
-public:
-    SymbolRule(char symbol);
-    virtual ~SymbolRule() {};
+    explicit SymbolRule(char symbol);
+    ~SymbolRule() override = default;
 
 protected:
     bool isFullfiled(JackTokenizer* pTokenizer) override;
     std::string toString() override;
 
 private:
-    std::string encodeXmlSymbol(char symbol);
+    std::string encodeXmlSymbol(char symbol) const;
     char mSymbol;
 };
 
 class IntegerConstantRule : public LexicalRule
 {
 public:
-    IntegerConstantRule() {};
-    virtual ~IntegerConstantRule() {};
+    IntegerConstantRule() = default;
+    ~IntegerConstantRule() override = default;
 
 protected:
     bool isFullfiled(JackTokenizer* pTokenizer) override;
     std::string toString() override;
 
 private:
-    int mIntVal;
+    int mIntVal = 0;
 };
 
 class StringConstantRule : public LexicalRule
 {
 public:
-    StringConstantRule() {};
-    virtual ~StringConstantRule() {};
+    StringConstantRule() = default;
+    ~StringConstantRule() override = default;
 
 protected:
     bool isFullfiled(JackTokenizer* pTokenizer) override;
@@ -98,8 +95,8 @@ private:
 class IdentifierRule : public LexicalRule
 {
 public:
-    IdentifierRule() {};
-    virtual ~IdentifierRule() {};
+    IdentifierRule() = default;
+    ~IdentifierRule() override = default;
 
 protected:
     bool isFullfiled(JackTokenizer* pTokenizer) override;

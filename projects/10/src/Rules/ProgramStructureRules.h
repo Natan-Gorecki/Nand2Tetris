@@ -20,9 +20,8 @@ class ClassRule : public SequenceRule
 {
 public:
     ClassRule();
-    virtual ~ClassRule() {};
+    ~ClassRule() override = default;
 
-public:
     void compile() override;
 };
 
@@ -30,9 +29,8 @@ class ClassVarDecRule : public SequenceRule
 {
 public:
     ClassVarDecRule();
-    virtual ~ClassVarDecRule() {};
+    ~ClassVarDecRule() override = default;
 
-public:
     void compile() override;
 };
 
@@ -40,16 +38,15 @@ class TypeRule : public AlternationRule
 {
 public:
     TypeRule();
-    virtual ~TypeRule() {};
+    ~TypeRule() override = default;
 };
 
 class SubroutineDecRule : public SequenceRule
 {
 public:
     SubroutineDecRule();
-    virtual ~SubroutineDecRule() {};
+    ~SubroutineDecRule() override = default;
 
-public:
     void compile() override;
 };
 
@@ -57,9 +54,8 @@ class ParameterListRule : public ZeroOrOneRule
 {
 public:
     ParameterListRule();
-    virtual ~ParameterListRule() {};
+    ~ParameterListRule() override = default;
 
-public:
     void compile() override;
 };
 
@@ -67,9 +63,8 @@ class SubroutineBodyRule : public SequenceRule
 {
 public:
     SubroutineBodyRule();
-    virtual ~SubroutineBodyRule() {};
+    ~SubroutineBodyRule() override = default;
 
-public:
     void compile() override;
 };
 
@@ -77,29 +72,28 @@ class VarDecRule : public SequenceRule
 {
 public:
     VarDecRule();
-    virtual ~VarDecRule() {};
+    ~VarDecRule() override = default;
 
-public:
     void compile() override;
 };
 
 class ClassNameRule : public IdentifierRule
 {
 public:
-    ClassNameRule() {};
-    virtual ~ClassNameRule() {};
+    ClassNameRule() = default;
+    ~ClassNameRule() override = default;
 };
 
 class SubroutineNameRule : public IdentifierRule
 {
 public:
-    SubroutineNameRule() {};
-    virtual ~SubroutineNameRule() {};
+    SubroutineNameRule() = default;
+    ~SubroutineNameRule() override = default;
 };
 
 class VarNameRule : public IdentifierRule
 {
 public:
-    VarNameRule() {};
-    virtual ~VarNameRule() {};
+    VarNameRule() = default;
+    ~VarNameRule() override = default;
 };

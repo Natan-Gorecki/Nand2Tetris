@@ -27,17 +27,14 @@ public:
     /// Opens the input file and gets ready to tokenize it.
     /// </summary>
     /// <param name="filename">Name of the input file</param>
-    JackTokenizer(std::string filename);
-    /// <summary>
-    /// Closes input file and cleans up.
-    /// </summary>
-    ~JackTokenizer();
+    explicit JackTokenizer(std::string& filename);
 
 private:
     /// <summary>
     /// Are there more tokens in the input?
     /// </summary>
     bool hasMoreTokens();
+
 public:
     /// <summary>
     /// Gets the next token from the input and makes it the current token.
@@ -53,7 +50,7 @@ public:
     /// Gets the current position of the token in the input.
     /// </summary>
     /// <returns>The current token position in the input.</returns>
-    int getPosition();
+    int getPosition() const;
     /// <summary>
     /// Restores the current position to the specified token position.
     /// </summary>
@@ -63,32 +60,32 @@ public:
     /// <summary>
     /// Returns the type of the current token as a constant.
     /// </summary>
-    ETokenType tokenType();
+    ETokenType tokenType() const;
     /// <summary>
     /// Returns the keyword which is the current token as a constant.
     /// <para/> This method should be called only if tokenType is KEYWORD.
     /// </summary>
-    std::string keyword();
+    std::string keyword() const;
     /// <summary>
     /// Returns the character which is the current token.
     /// <para/> Should be called only if tokenType is SYMBOL.
     /// </summary>
-    char symbol();
+    char symbol() const;
     /// <summary>
     /// Returns the string which is the current token.
     /// <para/> Should be called only if tokenType is IDENTIFIER.
     /// </summary>
-    std::string identifier();
+    std::string identifier() const;
     /// <summary>
     /// Returns the integer value of the current token.
     /// <para/> Should be called only if tokenType is INT_CONST.
     /// </summary>
-    int intVal();
+    int intVal() const;
     /// <summary>
     /// Returns the string value of the current token, without opening and closing double quotes.
     /// <para/> Should be called only if tokenType is STRING_CONST.
     /// </summary>
-    std::string stringVal();
+    std::string stringVal() const;
 
 private:
     void advanceNew();
@@ -96,12 +93,10 @@ private:
     void parseStringValue();
     void parseIntValue(std::string str);
 
-private:
     bool skipLineComment();
     bool skipMultilineComment();
 
-private:
-    std::ifstream* mInputStream = NULL;
+    std::unique_ptr<std::ifstream> mInputStream = nullptr;
     char mFirstChar = 0;
     
     std::vector<Token> mTokens;
