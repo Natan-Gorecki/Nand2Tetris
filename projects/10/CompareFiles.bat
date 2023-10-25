@@ -15,17 +15,14 @@ set TokenSuffix=_VST
 %JackAnalyzer% %ArrayTestDir% &&^
 %JackAnalyzer% %ExpressionLessSquareDir% &&^
 %JackAnalyzer% %SquareDir% &&^
-
 %TextComparer% %ArrayTestDir%\MainT.xml %ArrayTestDir%\Main%TokenSuffix%.xml &&^
 %TextComparer% %ArrayTestDir%\Main.xml %ArrayTestDir%\Main%Suffix%.xml &&^
-
 %TextComparer% %ExpressionLessSquareDir%\MainT.xml %ExpressionLessSquareDir%\Main%TokenSuffix%.xml &&^
 %TextComparer% %ExpressionLessSquareDir%\SquareGameT.xml %ExpressionLessSquareDir%\SquareGame%TokenSuffix%.xml &&^
 %TextComparer% %ExpressionLessSquareDir%\SquareT.xml %ExpressionLessSquareDir%\Square%TokenSuffix%.xml &&^
 %TextComparer% %ExpressionLessSquareDir%\Main.xml %ExpressionLessSquareDir%\Main%Suffix%.xml &&^
 %TextComparer% %ExpressionLessSquareDir%\SquareGame.xml %ExpressionLessSquareDir%\SquareGame%Suffix%.xml &&^
 %TextComparer% %ExpressionLessSquareDir%\Square.xml %ExpressionLessSquareDir%\Square%Suffix%.xml &&^
-
 %TextComparer% %SquareDir%\MainT.xml %SquareDir%\Main%TokenSuffix%.xml &&^
 %TextComparer% %SquareDir%\SquareGameT.xml %SquareDir%\SquareGame%TokenSuffix%.xml &&^
 %TextComparer% %SquareDir%\SquareT.xml %SquareDir%\Square%TokenSuffix%.xml &&^

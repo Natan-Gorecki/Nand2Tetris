@@ -17,7 +17,8 @@ std::function<void(std::string)> CompilationEngine::onWriteToken;
 /// <param name="filename">Name of the output file</param>
 CompilationEngine::CompilationEngine(std::string filename, JackTokenizer* jackTokenizer)
 {
-    mOutputFile = new std::ofstream(filename);
+    mOutputFileName = filename;
+    mOutputFile = new std::ofstream(mOutputFileName);
     if (!mOutputFile->is_open())
     {
         throw std::runtime_error("Cannot find or open " + filename + " file.");
@@ -58,6 +59,8 @@ CompilationEngine::~CompilationEngine()
         mOutputFile->close();
         delete mOutputFile;
         mOutputFile = NULL;
+
+        std::cout << "Created " << mOutputFileName << " file." << std::endl;
     }
     if (mTokensFile)
     {

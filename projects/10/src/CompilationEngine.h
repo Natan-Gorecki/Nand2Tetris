@@ -44,5 +44,6 @@ private:
     JackTokenizer* mJackTokenizer = NULL;
 
     bool mWriteTokens = true;
+    std::string mOutputFileName = "";
     std::string mTokensFileName = "";
 };

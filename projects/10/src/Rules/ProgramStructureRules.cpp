@@ -57,9 +57,9 @@ ClassVarDecRule::ClassVarDecRule() : SequenceRule(
 
 void ClassVarDecRule::compile()
 {
-    writeOutput("<classVarDecRule>");
+    writeOutput("<classVarDec>");
     SequenceRule::compile();
-    writeOutput("</classVarDecRule>");
+    writeOutput("</classVarDec>");
 }
 #pragma endregion
 
