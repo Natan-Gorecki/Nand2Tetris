@@ -101,11 +101,11 @@ void JackAnalyzer::parseSingleFile(std::string path)
     CompilationEngine* compilationEngine = new CompilationEngine(outputFile, jackTokenizer);
 
     compilationEngine->compileClass();
-    
-    /*if (jackTokenizer->hasMoreTokens())
+
+    if (jackTokenizer->advance())
     {
         throw std::runtime_error("JackTokenizer has more tokens. Only one class per file is allowed.");
-    }*/
+    }
 
     delete compilationEngine;
     delete jackTokenizer;

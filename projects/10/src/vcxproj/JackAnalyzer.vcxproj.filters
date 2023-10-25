@@ -71,9 +71,6 @@
     <ClInclude Include="..\CompilationEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\EKeyWord.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\ETokenType.h">
       <Filter>Header Files</Filter>
     </ClInclude>

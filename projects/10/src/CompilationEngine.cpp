@@ -41,7 +41,10 @@ CompilationEngine::CompilationEngine(std::string filename, JackTokenizer* jackTo
     };
     onWriteToken = [this](std::string text)
     {
-        *mTokensFile << text;
+        if (mWriteTokens)
+        {
+            *mTokensFile << text;
+        }
     };
 }
 
