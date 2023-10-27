@@ -17,7 +17,7 @@ std::function<void(std::string&)> CompilationEngine::onWriteToken;
 /// </summary>
 /// <param name="filename">Name of the output file</param>
 CompilationEngine::CompilationEngine(const string& filename, shared_ptr<JackTokenizer> jackTokenizer)
-    : mOutputFileName(filename), mJackTokenizer(jackTokenizer)
+    : mJackTokenizer(jackTokenizer), mOutputFileName(filename)
 {
     onWriteOutput = [this](string const& text)
     {
