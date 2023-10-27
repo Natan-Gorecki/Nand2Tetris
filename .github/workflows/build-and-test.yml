@@ -25,4 +25,4 @@ jobs:
       - name: Tests
         working-directory: ${{env.GITHUB_WORKSPACE}}
         run: |
-          ${{env.GITHUB_WORKSPACE}}\projects\10\CompareFiles.bat
+          %GITHUB_WORKSPACE%\projects\10\CompareFiles.bat
