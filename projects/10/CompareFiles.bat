@@ -1,7 +1,9 @@
 @echo off
-set RepositoryDir=C:\Projects\Nand2Tetris
+if not defined RepositoryDir (
+	set RepositoryDir=C:\Projects\Nand2Tetris
+)
 
-set JackAnalyzer=%RepositoryDir%\x64\Debug\JackAnalyzer.exe
+set JackAnalyzer=%RepositoryDir%\x64\Release\JackAnalyzer.exe
 set TextComparer=%RepositoryDir%\tools\TextComparer.bat
 
 set ArrayTestDir=%RepositoryDir%\projects\10\ArrayTest
