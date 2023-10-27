@@ -20,8 +20,7 @@ jobs:
 
       - name: Set RepositoryDir variable
         run: |
-          echo "Setting RepositoryDir to $GITHUB_WORKSPACE"
-          echo "::set-env name=RepositoryDir::$GITHUB_WORKSPACE"
+          echo "RepositoryDir=$GITHUB_WORKSPACE" >> $GITHUB_ENV
 
       - name: Tests
         working-directory: ${{env.GITHUB_WORKSPACE}}
