@@ -24,7 +24,7 @@ echo. && echo Compiling %ExpressionLessSquareDir% || goto :error
 echo. && echo Compiling %SquareDir% || goto :error
 %JackAnalyzer% %SquareDir%
 
-echo Comparing %ArrayTestDir%\MainT.xml
+echo. && Comparing %ArrayTestDir%\MainT.xml
 call %TextComparer% %ArrayTestDir%\MainT.xml %ArrayTestDir%\Main%TokenSuffix%.xml || goto :error
 
 echo. && echo Comparing %ArrayTestDir%\Main.xml
