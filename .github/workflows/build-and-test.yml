@@ -4,7 +4,7 @@ on:
 
 jobs:
   build-and-test:
-    name: Build
+    name: Build and test
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
@@ -25,5 +25,4 @@ jobs:
       - name: Tests
         working-directory: ${{env.GITHUB_WORKSPACE}}
         run: |
-          pwd
-          RunTests.bat
+          .\RunTests.bat
