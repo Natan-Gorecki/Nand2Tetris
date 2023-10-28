@@ -27,4 +27,9 @@ jobs:
         working-directory: ${{ github.workspace }}
         shell: cmd
         run: |
+          dir
+          cd ..
+          dir
+          cd Nand2Tetris 
+          dir
           cmd /c "${{ github.workspace }}\RunTests.bat"
