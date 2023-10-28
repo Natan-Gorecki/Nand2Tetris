@@ -1,4 +1,5 @@
 @echo off
+
 if "%~1" neq "" (
 	set RepositoryDir=%~1
 ) else (
