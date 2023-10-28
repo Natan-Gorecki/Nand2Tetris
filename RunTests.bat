@@ -1,7 +1,11 @@
-echo %RepositoryDir%
+echo "One:" %RepositoryDir%
 
-if not defined RepositoryDir (
-	set RepositoryDir=C:\Projects\Nand2Tetris
+if "%~1" neq "" (
+	set RepositoryDir=%~1
+) else (
+    set RepositoryDir=C:\Projects\Nand2Tetris
 )
 
-::%RepositoryDir%\projects\10\RunTests.bat
+echo "Two:" %RepositoryDir%
+
+%RepositoryDir%\projects\10\RunTests.bat
