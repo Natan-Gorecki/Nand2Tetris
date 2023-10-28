@@ -27,4 +27,5 @@ jobs:
         working-directory: ${{ github.workspace }}
         shell: cmd
         run: |
+          echo %RepositoryDir%
           cmd /c "RunTests.bat"
