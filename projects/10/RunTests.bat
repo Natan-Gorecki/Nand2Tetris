@@ -15,13 +15,13 @@ set Suffix=_New
 set TokenSuffix=_NewT
 
 
-echo. && echo Compiling %ArrayTestDir%
+echo. && echo Compiling %ArrayTestDir% || goto :error
 %JackAnalyzer% %ArrayTestDir%
 
-echo. && echo Compiling %ExpressionLessSquareDir%
+echo. && echo Compiling %ExpressionLessSquareDir% || goto :error
 %JackAnalyzer% %ExpressionLessSquareDir%
 
-echo. && echo Compiling %SquareDir%
+echo. && echo Compiling %SquareDir% || goto :error
 %JackAnalyzer% %SquareDir%
 
 echo Comparing %ArrayTestDir%\MainT.xml
