@@ -19,7 +19,7 @@
 <keyword> let </keyword>
 <identifier> game </identifier>
 <symbol> = </symbol>
-<should_fail> game </identifier>
+<identifier> game </identifier>
 <symbol> ; </symbol>
 <keyword> do </keyword>
 <identifier> game </identifier>
