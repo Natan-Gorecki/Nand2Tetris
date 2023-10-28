@@ -28,4 +28,4 @@ jobs:
         shell: cmd
         run: |
           echo %RepositoryDir%
-          cmd /c "RunTests.bat"
+          cmd /c "RunTests.bat ${{ github.workspace }}"
