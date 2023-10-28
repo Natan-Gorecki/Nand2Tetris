@@ -15,7 +15,6 @@ jobs:
         uses: microsoft/setup-msbuild@v1.1
 
       - name: Build
-        if: false
         working-directory: ${{ github.workspace }}
         run: msbuild -m -p:Configuration=Release -p:Platform=x64 Nand2Tetris.sln
 
