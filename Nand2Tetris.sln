@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VMTranslator", "projects\08
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VMTranslator_Partial", "projects\07\src\vcxproj\VMTranslator_Partial.vcxproj", "{C0F360DF-EFFD-4CCB-B27F-E3C8DCBF1A64}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JackAnalyzer", "projects\10\src\vcxproj\JackAnalyzer.vcxproj", "{8382012B-37CE-4B4B-B9EA-466A59730171}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{C0F360DF-EFFD-4CCB-B27F-E3C8DCBF1A64}.Release|x64.Build.0 = Release|x64
 		{C0F360DF-EFFD-4CCB-B27F-E3C8DCBF1A64}.Release|x86.ActiveCfg = Release|Win32
 		{C0F360DF-EFFD-4CCB-B27F-E3C8DCBF1A64}.Release|x86.Build.0 = Release|Win32
+		{8382012B-37CE-4B4B-B9EA-466A59730171}.Debug|x64.ActiveCfg = Debug|x64
+		{8382012B-37CE-4B4B-B9EA-466A59730171}.Debug|x64.Build.0 = Debug|x64
+		{8382012B-37CE-4B4B-B9EA-466A59730171}.Debug|x86.ActiveCfg = Debug|Win32
+		{8382012B-37CE-4B4B-B9EA-466A59730171}.Debug|x86.Build.0 = Debug|Win32
+		{8382012B-37CE-4B4B-B9EA-466A59730171}.Release|x64.ActiveCfg = Release|x64
+		{8382012B-37CE-4B4B-B9EA-466A59730171}.Release|x64.Build.0 = Release|x64
+		{8382012B-37CE-4B4B-B9EA-466A59730171}.Release|x86.ActiveCfg = Release|Win32
+		{8382012B-37CE-4B4B-B9EA-466A59730171}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
