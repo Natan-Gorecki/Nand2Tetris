@@ -1,6 +1,7 @@
 @echo off
+
 if not defined RepositoryDir (
-	set RepositoryDir=C:\Projects\Nand2Tetris
+    set RepositoryDir=C:\Projects\Nand2Tetris
 )
 
 set JackAnalyzer=%RepositoryDir%\x64\Release\JackAnalyzer.exe
@@ -10,24 +11,61 @@ set ArrayTestDir=%RepositoryDir%\projects\10\ArrayTest
 set ExpressionLessSquareDir=%RepositoryDir%\projects\10\ExpressionLessSquare
 set SquareDir=%RepositoryDir%\projects\10\Square
 
-set Suffix=_VS
-set TokenSuffix=_VST
+set Suffix=_New
+set TokenSuffix=_NewT
 
-@echo on
-%JackAnalyzer% %ArrayTestDir% &&^
-%JackAnalyzer% %ExpressionLessSquareDir% &&^
-%JackAnalyzer% %SquareDir% &&^
-%TextComparer% %ArrayTestDir%\MainT.xml %ArrayTestDir%\Main%TokenSuffix%.xml &&^
-%TextComparer% %ArrayTestDir%\Main.xml %ArrayTestDir%\Main%Suffix%.xml &&^
-%TextComparer% %ExpressionLessSquareDir%\MainT.xml %ExpressionLessSquareDir%\Main%TokenSuffix%.xml &&^
-%TextComparer% %ExpressionLessSquareDir%\SquareGameT.xml %ExpressionLessSquareDir%\SquareGame%TokenSuffix%.xml &&^
-%TextComparer% %ExpressionLessSquareDir%\SquareT.xml %ExpressionLessSquareDir%\Square%TokenSuffix%.xml &&^
-%TextComparer% %ExpressionLessSquareDir%\Main.xml %ExpressionLessSquareDir%\Main%Suffix%.xml &&^
-%TextComparer% %ExpressionLessSquareDir%\SquareGame.xml %ExpressionLessSquareDir%\SquareGame%Suffix%.xml &&^
-%TextComparer% %ExpressionLessSquareDir%\Square.xml %ExpressionLessSquareDir%\Square%Suffix%.xml &&^
-%TextComparer% %SquareDir%\MainT.xml %SquareDir%\Main%TokenSuffix%.xml &&^
-%TextComparer% %SquareDir%\SquareGameT.xml %SquareDir%\SquareGame%TokenSuffix%.xml &&^
-%TextComparer% %SquareDir%\SquareT.xml %SquareDir%\Square%TokenSuffix%.xml &&^
-%TextComparer% %SquareDir%\Main.xml %SquareDir%\Main%Suffix%.xml &&^
-%TextComparer% %SquareDir%\SquareGame.xml %SquareDir%\SquareGame%Suffix%.xml &&^
-%TextComparer% %SquareDir%\Square.xml %SquareDir%\Square%Suffix%.xml
+
+echo. && echo Compiling %ArrayTestDir%
+%JackAnalyzer% %ArrayTestDir%
+
+echo. && echo Compiling %ExpressionLessSquareDir%
+%JackAnalyzer% %ExpressionLessSquareDir%
+
+echo. && echo Compiling %SquareDir%
+%JackAnalyzer% %SquareDir%
+
+echo Comparing %ArrayTestDir%\MainT.xml
+call %TextComparer% %ArrayTestDir%\MainT.xml %ArrayTestDir%\Main%TokenSuffix%.xml || goto :error
+
+echo. && echo Comparing %ArrayTestDir%\Main.xml
+call %TextComparer% %ArrayTestDir%\Main.xml %ArrayTestDir%\Main%Suffix%.xml || goto :error
+
+echo. && echo Comparing %ExpressionLessSquareDir%\MainT.xml
+call %TextComparer% %ExpressionLessSquareDir%\MainT.xml %ExpressionLessSquareDir%\Main%TokenSuffix%.xml || goto :error
+
+echo. && echo Comparing %ExpressionLessSquareDir%\SquareGameT.xml
+call %TextComparer% %ExpressionLessSquareDir%\SquareGameT.xml %ExpressionLessSquareDir%\SquareGame%TokenSuffix%.xml || goto :error
+
+echo. && echo Comparing %ExpressionLessSquareDir%\SquareT.xml
+call %TextComparer% %ExpressionLessSquareDir%\SquareT.xml %ExpressionLessSquareDir%\Square%TokenSuffix%.xml || goto :error
+
+echo. && echo Comparing %ExpressionLessSquareDir%\Main.xml
+call %TextComparer% %ExpressionLessSquareDir%\Main.xml %ExpressionLessSquareDir%\Main%Suffix%.xml || goto :error
+
+echo. && echo Comparing %ExpressionLessSquareDir%\SquareGame.xml
+call %TextComparer% %ExpressionLessSquareDir%\SquareGame.xml %ExpressionLessSquareDir%\SquareGame%Suffix%.xml || goto :error
+
+echo. && echo Comparing %ExpressionLessSquareDir%\Square.xml
+call %TextComparer% %ExpressionLessSquareDir%\Square.xml %ExpressionLessSquareDir%\Square%Suffix%.xml || goto :error
+
+echo. && echo Comparing %SquareDir%\MainT.xml
+call %TextComparer% %SquareDir%\MainT.xml %SquareDir%\Main%TokenSuffix%.xml || goto :error
+
+echo. && echo Comparing %SquareDir%\SquareGameT.xml
+call %TextComparer% %SquareDir%\SquareGameT.xml %SquareDir%\SquareGame%TokenSuffix%.xml || goto :error
+
+echo. && echo Comparing %SquareDir%\SquareT.xml
+call %TextComparer% %SquareDir%\SquareT.xml %SquareDir%\Square%TokenSuffix%.xml || goto :error
+
+echo. && echo Comparing %SquareDir%\Main.xml
+call %TextComparer% %SquareDir%\Main.xml %SquareDir%\Main%Suffix%.xml || goto :error
+
+echo. && echo Comparing %SquareDir%\SquareGame.xml
+call %TextComparer% %SquareDir%\SquareGame.xml %SquareDir%\SquareGame%Suffix%.xml || goto :error
+
+echo. && echo Comparing %SquareDir%\Square.xml
+call %TextComparer% %SquareDir%\Square.xml %SquareDir%\Square%Suffix%.xml || goto :error
+
+
+:error
+exit /b %errorlevel%

@@ -87,7 +87,7 @@ void JackAnalyzer::parseSingleFile(std::string path) const
 {
     fs::path outputPath = path;
     std::string filename = outputPath.filename().stem().string();
-    std::string outputFile = outputPath.replace_filename(filename + "_VS.xml").string();
+    std::string outputFile = outputPath.replace_filename(filename + "_New.xml").string();
 
     auto jackTokenizer = make_shared<JackTokenizer>(path);
     auto compilationEngine = make_unique<CompilationEngine>(outputFile, jackTokenizer);

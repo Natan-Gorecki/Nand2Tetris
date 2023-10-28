@@ -19,13 +19,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: msbuild -m -p:Configuration=Release -p:Platform=x64 Nand2Tetris.sln
 
-      - name: Set RepositoryDir variable
-        run: |
-          echo "RepositoryDir=$GITHUB_WORKSPACE" >> $GITHUB_ENV
-
       - name: Tests
-        working-directory: ${{ github.workspace }}
         shell: cmd
         run: |
-          echo %RepositoryDir%
           cmd /c "RunTests.bat ${{ github.workspace }}"
