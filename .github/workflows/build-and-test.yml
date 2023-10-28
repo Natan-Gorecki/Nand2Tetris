@@ -23,6 +23,6 @@ jobs:
           echo "RepositoryDir=$GITHUB_WORKSPACE" >> $GITHUB_ENV
 
       - name: Tests
-        working-directory: ${{env.GITHUB_WORKSPACE}}
         run: |
-           cmd /c ".\RunTests.bat"
+          cd ${{ env.GITHUB_WORKSPACE }}
+          cmd /c ".\RunTests.bat"
