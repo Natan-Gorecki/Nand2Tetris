@@ -16,7 +16,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Add msbuild to PATH
+      - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v1.1
 
       - name: Install sonar-scanner and build-wrapper

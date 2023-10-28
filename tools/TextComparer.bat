@@ -1,4 +1,4 @@
-@echo on
+@echo off
 
 rem  $Id: TextComparer.bat,v 1.2 2014/05/10 00:52:43 marka Exp $
 rem  mark.armbrust@pobox.com
