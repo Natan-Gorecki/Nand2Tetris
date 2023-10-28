@@ -25,4 +25,5 @@ jobs:
       - name: Tests
         working-directory: ${{env.GITHUB_WORKSPACE}}
         run: |
+          pwd
           RunTests.bat
