@@ -25,5 +25,6 @@ jobs:
 
       - name: Tests
         working-directory: ${{ github.workspace }}
+        shell: cmd
         run: |
-          cmd /c "./RunTests.bat"
+          RunTests.bat
