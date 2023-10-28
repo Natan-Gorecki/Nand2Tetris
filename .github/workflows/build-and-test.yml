@@ -3,7 +3,7 @@ on:
   push:
 
 jobs:
-  build:
+  build-and-test:
     name: Build
     runs-on: windows-latest
     steps:
@@ -25,4 +25,4 @@ jobs:
       - name: Tests
         working-directory: ${{env.GITHUB_WORKSPACE}}
         run: |
-          projects\10\CompareFiles.bat
+          RunTests.bat
