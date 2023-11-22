@@ -140,9 +140,12 @@
     <ClCompile Include="..\Rules\LexicalRules.cpp" />
     <ClCompile Include="..\Rules\ProgramStructureRules.cpp" />
     <ClCompile Include="..\Rules\StatementRules.cpp" />
+    <ClCompile Include="..\VMWriter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\CompilationEngine.h" />
+    <ClInclude Include="..\EArithmetic.h" />
+    <ClInclude Include="..\ESegment.h" />
     <ClInclude Include="..\ETokenType.h" />
     <ClInclude Include="..\JackCompiler.h" />
     <ClInclude Include="..\JackCompilerError.h" />
@@ -152,6 +155,7 @@
     <ClInclude Include="..\Rules\LexicalRules.h" />
     <ClInclude Include="..\Rules\ProgramStructureRules.h" />
     <ClInclude Include="..\Rules\StatementRules.h" />
+    <ClInclude Include="..\VMWriter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

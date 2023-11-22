@@ -42,6 +42,9 @@
     <ClCompile Include="..\Rules\StatementRules.cpp">
       <Filter>Source Files\Rules</Filter>
     </ClCompile>
+    <ClCompile Include="..\VMWriter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\CompilationEngine.h">
@@ -73,6 +76,15 @@
     </ClInclude>
     <ClInclude Include="..\Rules\StatementRules.h">
       <Filter>Header Files\Rules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VMWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ESegment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EArithmetic.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
