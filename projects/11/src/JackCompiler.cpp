@@ -66,7 +66,8 @@ void JackCompiler::parseDirectory() const
 
     for (std::string jackFile : jackFiles)
     {
-        parseSingleFile(jackFile);
+        auto compilationEngine = make_unique<CompilationEngine>(jackFile);
+        compilationEngine->compileFile();
     }
 }
 
@@ -80,22 +81,6 @@ void JackCompiler::parseSingleFile() const
         throw JackCompilerError("File " + mInputPath + " doesn't exist.");
     }
 
-    parseSingleFile(mInputPath);
-}
-
-void JackCompiler::parseSingleFile(std::string path) const
-{
-    fs::path outputPath = path;
-    std::string filename = outputPath.filename().stem().string();
-    std::string outputFile = outputPath.replace_filename(filename + "_New.xml").string();
-
-    auto jackTokenizer = make_shared<JackTokenizer>(path);
-    auto compilationEngine = make_unique<CompilationEngine>(outputFile, jackTokenizer);
-
-    compilationEngine->compileClass();
-
-    if (jackTokenizer->advance())
-    {
-        throw JackCompilerError("JackTokenizer has more tokens. Only one class per file is allowed.");
-    }
+    auto compilationEngine = make_unique<CompilationEngine>(mInputPath);
+    compilationEngine->compileFile();
 }

@@ -45,13 +45,13 @@ int SymbolTable::varCount(ESymbolKind kind)
     switch (kind)
     {
     case ESymbolKind::STATIC:
-        return staticSymbols.size();
+        return (int)staticSymbols.size();
     case ESymbolKind::FIELD:
-        return fieldSymbols.size();
+        return (int)fieldSymbols.size();
     case ESymbolKind::ARG:
-        return argSymbols.size();
+        return (int)argSymbols.size();
     case ESymbolKind::VAR:
-        return varSymbols.size();
+        return (int)varSymbols.size();
     case ESymbolKind::UNDEFINED:
     default:
         return -1;

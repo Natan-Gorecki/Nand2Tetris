@@ -15,27 +15,36 @@ std::function<void(std::string&)> CompilationEngine::onWriteToken;
 /// Opens the output file and gets ready to write into it.
 /// <para/> The next routine called must be compileClass.
 /// </summary>
-/// <param name="filename">Name of the output file</param>
-CompilationEngine::CompilationEngine(const string& filename, shared_ptr<JackTokenizer> jackTokenizer)
-    : mJackTokenizer(jackTokenizer), mOutputFileName(filename)
+/// <param name="filename">Name of the input file</param>
+CompilationEngine::CompilationEngine(const string& filename)
+    : mInputFileName(filename)
 {
+    path path = filename;
+    string name = path.filename().stem().string();
+    mXmlSyntaxFileName = path.replace_filename(filename + ".xml").string();
+    mXmlTokensFileName = path.replace_filename(filename + "_Tokens.xml").string();
+    mVMCodeFileName = path.replace_filename(filename + ".vm").string();
+
     onWriteOutput = [this](string const& text)
     {
-        *mOutputFile << text;
+        if (mWriteXmlSyntax)
+        {
+            *mXmlSyntaxFile << text;
+        }
     };
     onWriteToken = [this](string const& text)
     {
-        if (mWriteTokens)
+        if (mWriteXmlTokens)
         {
-            *mTokensFile << text;
+            *mXmlTokensFile << text;
         }
     };
 }
 
 /// <summary>
-/// Compiles a complete class.
+/// Compiles a single file.
 /// </summary>
-void CompilationEngine::compileClass()
+void CompilationEngine::compileFile()
 {
     beforeCompile();
 
@@ -51,39 +60,59 @@ void CompilationEngine::compileClass()
 
 void CompilationEngine::beforeCompile()
 {
-    mOutputFile = make_unique<ofstream>(mOutputFileName);
-    if (!mOutputFile->is_open())
+    if (mWriteXmlSyntax)
     {
-        throw JackCompilerError("Cannot find or open " + mOutputFileName + " file.");
+        mXmlSyntaxFile = make_unique<ofstream>(mXmlSyntaxFileName);
+        if (!mXmlSyntaxFile->is_open())
+        {
+            throw JackCompilerError("Cannot create or open " + mXmlSyntaxFileName + " file.");
+        }
+    }
+    
+    if (mWriteXmlTokens)
+    {
+        mXmlTokensFile = make_unique<ofstream>(mXmlTokensFileName);
+        if (!mXmlSyntaxFile->is_open())
+        {
+            throw JackCompilerError("Cannot create or open " + mXmlTokensFileName + " file.");
+        }
+        *mXmlTokensFile << "<tokens>\n";
     }
 
-    if (mWriteTokens)
+    if (mWriteVMCode)
     {
-        path outputPath = mOutputFileName;
-        string outputName = outputPath.filename().stem().string();
-        outputPath.replace_filename(outputName + "T.xml");
-
-        mTokensFileName = outputPath.string();
-        mTokensFile = make_unique<ofstream>(mTokensFileName);
-        *mTokensFile << "<tokens>\n";
+        mVMCodeFile = make_shared<ofstream>(mVMCodeFileName);
+        if (!mVMCodeFile->is_open())
+        {
+            throw JackCompilerError("Cannot create or open " + mVMCodeFileName + " file.");
+        }
+        mVMWriter = make_unique<VMWriter>(mVMCodeFile);
     }
-
 }
 
 void CompilationEngine::afterCompile()
 {
-    if (mOutputFile)
+    if (mWriteXmlSyntax)
     {
-        mOutputFile->close();
-        mOutputFile = nullptr;
-        std::cout << "Created " << mOutputFileName << " file." << std::endl;
+        mXmlSyntaxFile->close();
+        mXmlSyntaxFile = nullptr;
+        std::cout << "Created " << mXmlSyntaxFileName << " file." << std::endl;
     }
-    if (mTokensFile)
+
+    if (mWriteXmlTokens)
     {
-        *mTokensFile << "</tokens>\n";
-        mTokensFile->close();
-        mTokensFile = nullptr;
-        std::cout << "Created " << mTokensFileName << " file." << std::endl;
+        *mXmlTokensFile << "</tokens>\n";
+        mXmlTokensFile->close();
+        mXmlTokensFile = nullptr;
+        std::cout << "Created " << mXmlTokensFileName << " file." << std::endl;
+    }
+
+    if (mWriteVMCode)
+    {
+        mVMCodeFile->close();
+        mVMCodeFile = nullptr;
+        mVMWriter = nullptr;
+        std::cout << "Created " << mVMCodeFileName << " file." << std::endl;
     }
 }
 

@@ -13,7 +13,7 @@ public:
     /// <summary>
     /// Creates VMWriter.
     /// </summary>
-    VMWriter(std::shared_ptr<ofstream> outputFile);
+    VMWriter(std::shared_ptr<std::ofstream> outputFile);
 
     /// <summary>
     /// Writes a VM push command.
@@ -56,5 +56,5 @@ private:
     std::string segmentToString(ESegment segment);
     std::string arithmeticToString(EArithmetic segment);
     
-    std::shared_ptr<ofstream> mOutputFile;
+    std::shared_ptr<std::ofstream> mOutputFile;
 };

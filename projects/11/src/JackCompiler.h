@@ -32,8 +32,6 @@ public:
     void parseSingleFile() const;
 
 private:
-    void parseSingleFile(std::string path) const;
-
     std::string mInputPath;
     bool mIsDirectoryPath;
 };
