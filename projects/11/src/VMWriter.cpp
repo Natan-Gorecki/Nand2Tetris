@@ -4,16 +4,11 @@
 using namespace std;
 
 /// <summary>
-/// Creates a new output .vm file/stream and prepares it for writing.
-/// May throw a runtime exception.
+/// Creates VMWriter.
 /// </summary>
-VMWriter::VMWriter(const std::string& filename)
+VMWriter::VMWriter(shared_ptr<ofstream> outputFile)
+    : mOutputFile(outputFile)
 {
-    mOutputFile = make_unique<ofstream>(filename);
-    if (!mOutputFile->is_open())
-    {
-        throw JackCompilerError("Failed to create or open " + filename + " file.");
-    }
 }
 
 /// <summary>
@@ -114,7 +109,7 @@ string VMWriter::segmentToString(ESegment segment)
     }
 }
 
-string arithmeticToString(EArithmetic arithmetic)
+string VMWriter::arithmeticToString(EArithmetic arithmetic)
 {
     switch (arithmetic)
     {

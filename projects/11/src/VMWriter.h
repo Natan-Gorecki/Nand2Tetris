@@ -10,12 +10,10 @@
 class VMWriter
 {
 public:
-
     /// <summary>
-    /// Creates a new output .vm file/stream and prepares it for writing.
-    /// May throw a runtime exception.
+    /// Creates VMWriter.
     /// </summary>
-    VMWriter(const std::string& filename);
+    VMWriter(std::shared_ptr<ofstream> outputFile);
 
     /// <summary>
     /// Writes a VM push command.
@@ -58,5 +56,5 @@ private:
     std::string segmentToString(ESegment segment);
     std::string arithmeticToString(EArithmetic segment);
     
-    std::unique_ptr<std::ofstream> mOutputFile;
+    std::shared_ptr<ofstream> mOutputFile;
 };
