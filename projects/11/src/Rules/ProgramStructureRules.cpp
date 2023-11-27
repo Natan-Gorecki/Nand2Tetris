@@ -216,6 +216,33 @@ SubroutineBodyRule::SubroutineBodyRule() : SequenceRule(
 {
 }
 
+bool SubroutineBodyRule::initialize(JackTokenizer* pTokenizer)
+{
+    if (!SequenceRule::initialize(pTokenizer))
+    {
+        return false;
+    }
+
+    auto& symbolTable = RuleUtils::getParentRule<SubroutineDecRule>(this)->getSymbolTable();
+    for (const auto& childRule : getChildRule<ZeroOrMoreRule>(1)->getChildRules())
+    {
+        auto varDecRule = childRule->cast<VarDecRule>();
+
+        auto type = varDecRule->getChildRule<TypeRule>(1)->getPassedRule()->cast<LexicalRule>()->toString();
+        auto name = varDecRule->getChildRule<LexicalRule>(2)->toString();
+
+        symbolTable.define(name, type, ESymbolKind::VAR);
+
+        for (const auto& varDecChildRule : varDecRule->getChildRule<ZeroOrMoreRule>(3)->getChildRules())
+        {
+            name = varDecChildRule.get()->cast<SequenceRule>()->getChildRule<VarNameRule>(1)->toString();
+            symbolTable.define(name, type, ESymbolKind::VAR);
+        }
+    }
+
+    return true;
+}
+
 void SubroutineBodyRule::compile()
 {
     writeOutput("<subroutineBody>");
