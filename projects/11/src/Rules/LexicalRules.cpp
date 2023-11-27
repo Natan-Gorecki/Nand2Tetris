@@ -52,17 +52,7 @@ bool LexicalRule::initialize(JackTokenizer* pTokenizer)
 
 void LexicalRule::compile()
 {
-    string ruleName = typeid(this).name();
-    string suffix = "Rule";
-
-    // remove Rule suffix
-    ruleName = ruleName.substr(0, ruleName.length() - suffix.length());
-
-    // to lowercase
-    std::transform(ruleName.begin(), ruleName.end(), ruleName.begin(), [](unsigned char c) { return std::tolower(c); });
-
-    string toWrite = "<" + ruleName + ">" + encodeXml(toString()) + "</" + ruleName + ">";
-
+    string toWrite = "<" + getClassName() + ">" + encodeXml(toString()) + "</" + getClassName() + ">";
     writeOutput(toWrite);
     writeToken(toWrite);
 }

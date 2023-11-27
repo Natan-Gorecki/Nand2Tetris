@@ -3,6 +3,10 @@
 #include <string>
 #include "BaseRules.h"
 
+#define CLASS_NAME_OVERRIDE(className) std::string getClassName() override {\
+    return className;\
+}
+
 class LexicalRule;
 class KeywordRule;
 class SymbolRule;
@@ -24,6 +28,7 @@ public:
 
 protected:
     virtual bool isFullfiled(JackTokenizer* pTokenizer) = 0;
+    virtual std::string getClassName() = 0;
 
 private:
     std::string encodeXml(std::string text) const;
@@ -44,6 +49,7 @@ public:
 
 protected:
     bool isFullfiled(JackTokenizer* pTokenizer) override;
+    CLASS_NAME_OVERRIDE("keyword");
 
 private:
     std::string mKeyword;
@@ -64,6 +70,7 @@ public:
 
 protected:
     bool isFullfiled(JackTokenizer* pTokenizer) override;
+    CLASS_NAME_OVERRIDE("symbol");
 
 private:
     char mSymbol;
@@ -79,6 +86,7 @@ public:
 
 protected:
     bool isFullfiled(JackTokenizer* pTokenizer) override;
+    CLASS_NAME_OVERRIDE("integerConstant");
 
 private:
     int mIntVal = 0;
@@ -94,6 +102,7 @@ public:
 
 protected:
     bool isFullfiled(JackTokenizer* pTokenizer) override;
+    CLASS_NAME_OVERRIDE("stringConstant");
 
 private:
     std::string mStringVal;
@@ -109,6 +118,7 @@ public:
 
 protected:
     bool isFullfiled(JackTokenizer* pTokenizer) override;
+    CLASS_NAME_OVERRIDE("identifier");
 
 private:
     std::string mIdentifier;

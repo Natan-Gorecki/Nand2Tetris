@@ -73,7 +73,7 @@ bool ClassVarDecRule::initialize(JackTokenizer* pTokenizer)
     auto classRule = RuleUtils::getParentRule<ClassRule>(this);
     auto& symbolTable = classRule->getSymbolTable();
 
-    auto keywordRule = dynamic_cast<KeywordRule*>(getChildRule<AlternationRule>(0)->getParentRule());
+    auto keywordRule = dynamic_cast<KeywordRule*>(getChildRule<AlternationRule>(0)->getPassedRule());
     auto symbolKind = keywordRule->toString() == "static" ? ESymbolKind::STATIC : ESymbolKind::FIELD;
 
     auto typeNameRule = dynamic_cast<LexicalRule*>(getChildRule<TypeRule>(1)->getPassedRule());
@@ -99,9 +99,6 @@ void ClassVarDecRule::compile()
     writeOutput("<classVarDec>");
     SequenceRule::compile();
     writeOutput("</classVarDec>");
-
-    auto classRule = RuleUtils::getParentRule<ClassRule>(this);
-    auto& symbolTable = classRule->getSymbolTable();
 }
 #pragma endregion
 

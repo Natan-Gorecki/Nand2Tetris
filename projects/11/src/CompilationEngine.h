@@ -43,7 +43,6 @@ private:
     static std::function<void(std::string&)> onWriteOutput;
     static std::function<void(std::string&)> onWriteToken;
 
-    std::shared_ptr<JackTokenizer> mJackTokenizer;
     std::unique_ptr<std::ofstream> mXmlSyntaxFile;
     std::unique_ptr<std::ofstream> mXmlTokensFile;
     std::shared_ptr<std::ofstream> mVMCodeFile;

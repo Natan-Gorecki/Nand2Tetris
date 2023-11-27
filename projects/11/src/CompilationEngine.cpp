@@ -21,9 +21,9 @@ CompilationEngine::CompilationEngine(const string& filename)
 {
     path path = filename;
     string name = path.filename().stem().string();
-    mXmlSyntaxFileName = path.replace_filename(filename + ".xml").string();
-    mXmlTokensFileName = path.replace_filename(filename + "_Tokens.xml").string();
-    mVMCodeFileName = path.replace_filename(filename + ".vm").string();
+    mXmlSyntaxFileName = path.replace_filename(name + ".xml").string();
+    mXmlTokensFileName = path.replace_filename(name + "_Tokens.xml").string();
+    mVMCodeFileName = path.replace_filename(name + ".vm").string();
 
     onWriteOutput = [this](string const& text)
     {
@@ -49,7 +49,8 @@ void CompilationEngine::compileFile()
     beforeCompile();
 
     auto classRule = std::make_unique<ClassRule>();
-    if (!classRule->initialize(mJackTokenizer.get()))
+    auto jackTokenizer = std::make_unique<JackTokenizer>(mInputFileName);
+    if (!classRule->initialize(jackTokenizer.get()))
     {
         throw JackCompilerError("Failed to initialize class.");
     }
