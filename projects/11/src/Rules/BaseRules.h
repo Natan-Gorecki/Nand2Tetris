@@ -32,6 +32,11 @@ public:
     int getRuleLevel() const;
     virtual void setRuleLevel(int ruleLevel);
 
+    template <typename TRule> TRule* cast()
+    {
+        return dynamic_cast<TRule*>(this);
+    }
+
 protected:
     void writeOutput(std::string const& text) const;
     void writeToken(std::string const& text) const;

@@ -73,21 +73,16 @@ bool ClassVarDecRule::initialize(JackTokenizer* pTokenizer)
     auto classRule = RuleUtils::getParentRule<ClassRule>(this);
     auto& symbolTable = classRule->getSymbolTable();
 
-    auto keywordRule = dynamic_cast<KeywordRule*>(getChildRule<AlternationRule>(0)->getPassedRule());
+    auto keywordRule = getChildRule<AlternationRule>(0)->getPassedRule()->cast<KeywordRule>();
     auto symbolKind = keywordRule->toString() == "static" ? ESymbolKind::STATIC : ESymbolKind::FIELD;
-
-    auto typeNameRule = dynamic_cast<LexicalRule*>(getChildRule<TypeRule>(1)->getPassedRule());
-    auto type = typeNameRule->toString();
-
+    auto type = getChildRule<TypeRule>(1)->getPassedRule()->cast<LexicalRule>()->toString();
     auto name = getChildRule<LexicalRule>(2)->toString();
 
     symbolTable.define(name, type, symbolKind);
 
     for (const auto& childRule : getChildRule<ZeroOrMoreRule>(3)->getChildRules())
     {
-        auto sequenceRule = dynamic_cast<SequenceRule*>(childRule.get());
-        name = sequenceRule->getChildRule<VarNameRule>(1)->toString();
-
+        name = childRule.get()->cast<SequenceRule>()->getChildRule<VarNameRule>(1)->toString();
         symbolTable.define(name, type, symbolKind);
     }
 
@@ -169,6 +164,34 @@ ParameterListRule::ParameterListRule() : ZeroOrOneRule([]
         });
     })
 {
+}
+
+bool ParameterListRule::initialize(JackTokenizer* pTokenizer)
+{
+    ZeroOrOneRule::initialize(pTokenizer);
+
+    if (getChildRules().size() == 0)
+    {
+        return true;
+    }
+
+    auto sequenceRule = getChildRule<SequenceRule>(0);
+    auto& symbolTable = RuleUtils::getParentRule<SubroutineDecRule>(this)->getSymbolTable();
+    auto type = sequenceRule->getChildRule<TypeRule>(0)->getPassedRule()->cast<LexicalRule>()->toString();
+    auto name = sequenceRule->getChildRule<LexicalRule>(1)->toString();
+
+    symbolTable.define(name, type, ESymbolKind::ARG);
+
+    for (const auto& childRule : sequenceRule->getChildRule<ZeroOrMoreRule>(2)->getChildRules())
+    {
+        auto sequenceRule = childRule.get()->cast<SequenceRule>();
+        type = sequenceRule->getChildRule<TypeRule>(1)->getPassedRule()->cast<LexicalRule>()->toString();
+        name = sequenceRule->getChildRule<VarNameRule>(2)->toString();
+
+        symbolTable.define(name, type, ESymbolKind::ARG);
+    }
+
+    return true;
 }
 
 void ParameterListRule::compile()

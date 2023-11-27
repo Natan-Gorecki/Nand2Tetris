@@ -67,6 +67,7 @@ public:
     ParameterListRule();
     ~ParameterListRule() override = default;
 
+    bool initialize(JackTokenizer* pTokenizer) override;
     void compile() override;
 };
 
