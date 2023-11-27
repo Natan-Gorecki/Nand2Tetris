@@ -2,7 +2,7 @@
 
 #include "BaseRules.h"
 #include "LexicalRules.h"
-
+#include "..\SymbolTable.h"
 
 class ClassRule;
 class ClassVarDecRule;
@@ -23,6 +23,11 @@ public:
     ~ClassRule() override = default;
 
     void compile() override;
+
+    SymbolTable& getSymbolTable();
+
+private:
+    SymbolTable mSymbolTable;
 };
 
 class ClassVarDecRule : public SequenceRule
@@ -31,6 +36,7 @@ public:
     ClassVarDecRule();
     ~ClassVarDecRule() override = default;
 
+    bool initialize(JackTokenizer* pTokenizer) override;
     void compile() override;
 };
 
@@ -48,6 +54,11 @@ public:
     ~SubroutineDecRule() override = default;
 
     void compile() override;
+
+    SymbolTable& getSymbolTable();
+
+private:
+    SymbolTable mSymbolTable;
 };
 
 class ParameterListRule : public ZeroOrOneRule

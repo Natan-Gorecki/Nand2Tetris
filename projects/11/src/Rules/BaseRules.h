@@ -26,6 +26,9 @@ public:
     virtual bool initialize(JackTokenizer* pTokenizer);
     virtual void compile();
 
+    Rule* getParentRule();
+    void setParentRule(Rule* pRule);
+
     int getRuleLevel() const;
     virtual void setRuleLevel(int ruleLevel);
 
@@ -34,6 +37,7 @@ protected:
     void writeToken(std::string const& text) const;
 
 private:
+    Rule* mParentRule = nullptr;
     int mRuleLevel = 0;
 };
 
@@ -43,10 +47,14 @@ public:
     explicit ParentRule(RuleVector const& rules);
     ~ParentRule() override = default;
 
+    bool initialize(JackTokenizer* pTokenizer) override;
     void compile() override;
 
-protected:
     RuleVector& getChildRules();
+    template <typename TRule> TRule* getChildRule(int index)
+    {
+        return dynamic_cast<TRule*>(mChildRules[index].get());
+    }
 
 private:
     RuleVector mChildRules;
@@ -71,9 +79,10 @@ public:
     void compile() override;
 
     void setRuleLevel(int ruleLevel) override;
+    Rule* getPassedRule();
 
 private:
-    std::shared_ptr<Rule> mCompileRule = nullptr;
+    std::shared_ptr<Rule> mPassedRule = nullptr;
 };
 
 class ZeroOrMoreRule : public ParentRule

@@ -17,6 +17,16 @@ void Rule::compile()
     // default virtual empty method
 }
 
+Rule* Rule::getParentRule()
+{
+    return mParentRule;
+}
+
+void Rule::setParentRule(Rule* pRule)
+{
+    mParentRule = pRule;
+}
+
 int Rule::getRuleLevel() const
 {
     return mRuleLevel;
@@ -50,6 +60,15 @@ ParentRule::ParentRule(RuleVector const& rules)
     }
 }
 
+bool ParentRule::initialize(JackTokenizer* pTokenizer)
+{
+    for (const auto& pRule : mChildRules)
+    {
+        pRule->setParentRule(this);
+    }
+    return true;
+}
+
 void ParentRule::compile()
 {
     for (const auto& pRule : mChildRules)
@@ -72,6 +91,8 @@ SequenceRule::SequenceRule(RuleVector const& rules)
 
 bool SequenceRule::initialize(JackTokenizer* pTokenizer)
 {
+    ParentRule::initialize(pTokenizer);
+
     auto initialPosition = pTokenizer->getPosition();
     for (const auto& pRule : getChildRules())
     {
@@ -97,13 +118,15 @@ AlternationRule::AlternationRule(RuleVector const& rules)
 
 bool AlternationRule::initialize(JackTokenizer* pTokenizer)
 {
+    ParentRule::initialize(pTokenizer);
+
     for (const auto& pRule : getChildRules())
     {
         auto result = pRule->initialize(pTokenizer);
 
         if (result)
         {
-            mCompileRule = pRule;
+            mPassedRule = pRule;
             return true;
         }
     }
@@ -113,12 +136,12 @@ bool AlternationRule::initialize(JackTokenizer* pTokenizer)
 
 void AlternationRule::compile()
 {
-    if (!mCompileRule)
+    if (!mPassedRule)
     {
         throw JackCompilerError("Failed to compile AlternationRule.");
     }
 
-    mCompileRule->compile();
+    mPassedRule->compile();
 }
 
 void AlternationRule::setRuleLevel(int ruleLevel)
@@ -128,6 +151,11 @@ void AlternationRule::setRuleLevel(int ruleLevel)
     {
         pRule->setRuleLevel(ruleLevel);
     }
+}
+
+Rule* AlternationRule::getPassedRule()
+{
+    return mPassedRule.get();
 }
 #pragma endregion
 
@@ -141,10 +169,10 @@ ZeroOrMoreRule::ZeroOrMoreRule(CreateRuleFunc const& createRuleFunc)
 bool ZeroOrMoreRule::initialize(JackTokenizer* pTokenizer)
 {
     bool result = true;
-
     while (result)
     {
         auto pRule = onCreateRule();
+        pRule->setParentRule(this);
 
         const Rule& rule = *pRule;
         int ruleLevel = typeid(rule) != typeid(SequenceRule) ? getRuleLevel() : getRuleLevel() - 1;
@@ -172,6 +200,7 @@ ZeroOrOneRule::ZeroOrOneRule(CreateRuleFunc const& createRuleFunc)
 bool ZeroOrOneRule::initialize(JackTokenizer* pTokenizer)
 {
     auto pRule = onCreateRule();
+    pRule->setParentRule(this);
 
     const Rule& rule = *pRule;
     int ruleLevel = typeid(rule) != typeid(SequenceRule) ? getRuleLevel() : getRuleLevel() - 1;

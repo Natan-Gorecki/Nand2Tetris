@@ -2,16 +2,6 @@
 #include "SymbolTable.h"
 
 /// <summary>
-/// Empties the symbol table from ARG and VAR symbols.
-/// Used to clear memory when subroutine ends.
-/// </summary>
-void SymbolTable::resetLocal()
-{
-    argSymbols.clear();
-    varSymbols.clear();
-}
-
-/// <summary>
 /// Defines (adds to the table) a new variable of the given name, type, and kind.
 /// Assings to it the index value of that kind, and adds 1 to the index.
 /// </summary>

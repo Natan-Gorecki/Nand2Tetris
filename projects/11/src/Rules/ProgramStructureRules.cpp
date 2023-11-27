@@ -1,6 +1,7 @@
 #include <functional>
 #include "ExpressionRules.h"
 #include "ProgramStructureRules.h"
+#include "RuleUtils.h"
 #include "StatementRules.h"
 #include "../CompilationEngine.h"
 
@@ -32,6 +33,11 @@ void ClassRule::compile()
     writeOutput("</class>");
 }
 
+SymbolTable& ClassRule::getSymbolTable()
+{
+    return mSymbolTable;
+}
+
 #pragma endregion
 
 #pragma region ClassVarDecRule
@@ -57,11 +63,45 @@ ClassVarDecRule::ClassVarDecRule() : SequenceRule(
 {
 }
 
+bool ClassVarDecRule::initialize(JackTokenizer* pTokenizer)
+{
+    if (!SequenceRule::initialize(pTokenizer))
+    {
+        return false;
+    }
+
+    auto classRule = RuleUtils::getParentRule<ClassRule>(this);
+    auto& symbolTable = classRule->getSymbolTable();
+
+    auto keywordRule = dynamic_cast<KeywordRule*>(getChildRule<AlternationRule>(0)->getParentRule());
+    auto symbolKind = keywordRule->toString() == "static" ? ESymbolKind::STATIC : ESymbolKind::FIELD;
+
+    auto typeNameRule = dynamic_cast<LexicalRule*>(getChildRule<TypeRule>(1)->getPassedRule());
+    auto type = typeNameRule->toString();
+
+    auto name = getChildRule<LexicalRule>(2)->toString();
+
+    symbolTable.define(name, type, symbolKind);
+
+    for (const auto& childRule : getChildRule<ZeroOrMoreRule>(3)->getChildRules())
+    {
+        auto sequenceRule = dynamic_cast<SequenceRule*>(childRule.get());
+        name = sequenceRule->getChildRule<VarNameRule>(1)->toString();
+
+        symbolTable.define(name, type, symbolKind);
+    }
+
+    return true;
+}
+
 void ClassVarDecRule::compile()
 {
     writeOutput("<classVarDec>");
     SequenceRule::compile();
     writeOutput("</classVarDec>");
+
+    auto classRule = RuleUtils::getParentRule<ClassRule>(this);
+    auto& symbolTable = classRule->getSymbolTable();
 }
 #pragma endregion
 
@@ -105,6 +145,11 @@ void SubroutineDecRule::compile()
     writeOutput("<subroutineDec>");
     SequenceRule::compile();
     writeOutput("</subroutineDec>");
+}
+
+SymbolTable& SubroutineDecRule::getSymbolTable()
+{
+    return mSymbolTable;
 }
 #pragma endregion
 

@@ -20,9 +20,13 @@ public:
     bool initialize(JackTokenizer* pTokenizer) final;
     void compile() final;
 
+    virtual std::string toString() = 0;
+
 protected:
     virtual bool isFullfiled(JackTokenizer* pTokenizer) = 0;
-    virtual std::string toString() = 0;
+
+private:
+    std::string encodeXml(std::string text) const;
 };
 
 class KeywordRule : public LexicalRule
@@ -36,9 +40,10 @@ public:
     explicit KeywordRule(std::string const& keyword);
     ~KeywordRule() override = default;
 
+    std::string toString() override;
+
 protected:
     bool isFullfiled(JackTokenizer* pTokenizer) override;
-    std::string toString() override;
 
 private:
     std::string mKeyword;
@@ -55,12 +60,12 @@ public:
     explicit SymbolRule(char symbol);
     ~SymbolRule() override = default;
 
-protected:
-    bool isFullfiled(JackTokenizer* pTokenizer) override;
     std::string toString() override;
 
+protected:
+    bool isFullfiled(JackTokenizer* pTokenizer) override;
+
 private:
-    std::string encodeXmlSymbol(char symbol) const;
     char mSymbol;
 };
 
@@ -70,9 +75,10 @@ public:
     IntegerConstantRule() = default;
     ~IntegerConstantRule() override = default;
 
+    std::string toString() override;
+
 protected:
     bool isFullfiled(JackTokenizer* pTokenizer) override;
-    std::string toString() override;
 
 private:
     int mIntVal = 0;
@@ -84,9 +90,10 @@ public:
     StringConstantRule() = default;
     ~StringConstantRule() override = default;
 
+    std::string toString() override;
+
 protected:
     bool isFullfiled(JackTokenizer* pTokenizer) override;
-    std::string toString() override;
 
 private:
     std::string mStringVal;
@@ -98,9 +105,10 @@ public:
     IdentifierRule() = default;
     ~IdentifierRule() override = default;
 
+    std::string toString() override;
+
 protected:
     bool isFullfiled(JackTokenizer* pTokenizer) override;
-    std::string toString() override;
 
 private:
     std::string mIdentifier;

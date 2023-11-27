@@ -66,6 +66,7 @@ bool TermRule::initialize(JackTokenizer* pTokenizer)
     for (const auto& onCreateRule : mCreateRuleFuncs)
     {
         auto pRule = onCreateRule();
+        pRule->setParentRule(this);
 
         const Rule& rule = *pRule;
         int ruleLevel = typeid(rule) != typeid(SequenceRule) ? getRuleLevel() + 1 : getRuleLevel();

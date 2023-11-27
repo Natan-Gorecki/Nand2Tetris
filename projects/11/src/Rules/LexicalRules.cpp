@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <set>
 #include <stdexcept>
 #include "LexicalRules.h"
@@ -51,8 +52,48 @@ bool LexicalRule::initialize(JackTokenizer* pTokenizer)
 
 void LexicalRule::compile()
 {
-    writeOutput(toString());
-    writeToken(toString());
+    string ruleName = typeid(this).name();
+    string suffix = "Rule";
+
+    // remove Rule suffix
+    ruleName = ruleName.substr(0, ruleName.length() - suffix.length());
+
+    // to lowercase
+    std::transform(ruleName.begin(), ruleName.end(), ruleName.begin(), [](unsigned char c) { return std::tolower(c); });
+
+    string toWrite = "<" + ruleName + ">" + encodeXml(toString()) + "</" + ruleName + ">";
+
+    writeOutput(toWrite);
+    writeToken(toWrite);
+}
+
+string LexicalRule::encodeXml(string text) const
+{
+    string result;
+
+    for (char symbol : text)
+    {
+        switch (symbol)
+        {
+        case '<':
+            result += "&lt;";
+            continue;
+        case '>':
+            result += "&gt;";
+            continue;
+        case '"':
+            result += "&quot;";
+            continue;
+        case '&':
+            result += "&amp;";
+            continue;
+        default:
+            result += symbol;
+            continue;
+        }
+    }
+
+    return result;
 }
 #pragma endregion
 
@@ -75,6 +116,11 @@ KeywordRule::KeywordRule(string const& keyword)
     mKeyword = keyword;
 }
 
+string KeywordRule::toString()
+{
+    return mKeyword;
+}
+
 bool KeywordRule::isFullfiled(JackTokenizer* pTokenizer)
 {
     if (pTokenizer->tokenType() == ETokenType::KEYWORD && pTokenizer->keyword() == mKeyword)
@@ -83,11 +129,6 @@ bool KeywordRule::isFullfiled(JackTokenizer* pTokenizer)
     }
 
     return false;
-}
-
-string KeywordRule::toString()
-{
-    return "<keyword> " + mKeyword + " </keyword>";
 }
 #pragma endregion
 
@@ -110,6 +151,11 @@ SymbolRule::SymbolRule(char symbol)
     mSymbol = symbol;
 }
 
+string SymbolRule::toString()
+{
+    return string(1, mSymbol);
+}
+
 bool SymbolRule::isFullfiled(JackTokenizer* pTokenizer)
 {
     if (pTokenizer->tokenType() == ETokenType::SYMBOL && pTokenizer->symbol() == mSymbol)
@@ -119,31 +165,14 @@ bool SymbolRule::isFullfiled(JackTokenizer* pTokenizer)
 
     return false;
 }
-
-string SymbolRule::toString()
-{
-    return "<symbol> " + encodeXmlSymbol(mSymbol) + " </symbol>";
-}
-
-string SymbolRule::encodeXmlSymbol(char symbol) const
-{
-    switch (symbol)
-    {
-    case '<':
-        return "&lt;";
-    case '>':
-        return "&gt;";
-    case '"':
-        return "&quot;";
-    case '&':
-        return "&amp;";
-    default:
-        return string(1, symbol);
-    }
-}
 #pragma endregion
 
 #pragma region IntegerConstantRule
+string IntegerConstantRule::toString()
+{
+    return to_string(mIntVal);
+}
+
 bool IntegerConstantRule::isFullfiled(JackTokenizer* pTokenizer)
 {
     if (pTokenizer->tokenType() == ETokenType::INT_CONST)
@@ -154,14 +183,14 @@ bool IntegerConstantRule::isFullfiled(JackTokenizer* pTokenizer)
 
     return false;
 }
-
-string IntegerConstantRule::toString()
-{
-    return "<integerConstant> " + to_string(mIntVal) + " </integerConstant>";
-}
 #pragma endregion
 
 #pragma region StringConstantRule
+string StringConstantRule::toString()
+{
+    return mStringVal;
+}
+
 bool StringConstantRule::isFullfiled(JackTokenizer* pTokenizer)
 {
     if (pTokenizer->tokenType() == ETokenType::STRING_CONST)
@@ -172,14 +201,14 @@ bool StringConstantRule::isFullfiled(JackTokenizer* pTokenizer)
 
     return false;
 }
-
-string StringConstantRule::toString()
-{
-    return "<stringConstant> " + mStringVal + " </stringConstant>";
-}
 #pragma endregion
 
 #pragma region IdentifierRule
+string IdentifierRule::toString()
+{
+    return mIdentifier;
+}
+
 bool IdentifierRule::isFullfiled(JackTokenizer* pTokenizer)
 {
     if (pTokenizer->tokenType() == ETokenType::IDENTIFIER)
@@ -189,10 +218,5 @@ bool IdentifierRule::isFullfiled(JackTokenizer* pTokenizer)
     }
 
     return false;
-}
-
-string IdentifierRule::toString()
-{
-    return "<identifier> " + mIdentifier + " </identifier>";
 }
 #pragma endregion
