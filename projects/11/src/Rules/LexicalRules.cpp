@@ -50,7 +50,7 @@ bool LexicalRule::initialize(JackTokenizer* pTokenizer)
     return result;
 }
 
-void LexicalRule::compile()
+void LexicalRule::compile(VMWriter* vmWriter)
 {
     string toWrite = "<" + getClassName() + ">" + encodeXml(toString()) + "</" + getClassName() + ">";
     writeOutput(toWrite);

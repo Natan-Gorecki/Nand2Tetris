@@ -22,7 +22,7 @@ public:
     ~LexicalRule() override = default;
 
     bool initialize(JackTokenizer* pTokenizer) final;
-    void compile() final;
+    void compile(VMWriter* vmWriter) final;
 
     virtual std::string toString() = 0;
 

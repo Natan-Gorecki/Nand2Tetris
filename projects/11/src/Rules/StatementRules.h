@@ -18,7 +18,7 @@ public:
     StatementsRule();
     ~StatementsRule() override = default;
 
-    void compile() override;
+    void compile(VMWriter* vmWriter) override;
 };
 
 class StatementRule : public AlternationRule
@@ -34,7 +34,7 @@ public:
     LetStatementRule();
     ~LetStatementRule() override = default;
 
-    void compile() override;
+    void compile(VMWriter* vmWriter) override;
 };
 
 class IfStatementRule : public SequenceRule
@@ -43,7 +43,7 @@ public:
     IfStatementRule();
     ~IfStatementRule() override = default;
 
-    void compile() override;
+    void compile(VMWriter* vmWriter) override;
 };
 
 class WhileStatementRule : public SequenceRule
@@ -52,7 +52,7 @@ public:
     WhileStatementRule();
     ~WhileStatementRule() override = default;
 
-    void compile() override;
+    void compile(VMWriter* vmWriter) override;
 };
 
 class DoStatementRule : public SequenceRule
@@ -61,7 +61,7 @@ public:
     DoStatementRule();
     ~DoStatementRule() override = default;
 
-    void compile() override;
+    void compile(VMWriter* vmWriter) override;
 };
 
 class ReturnStatementRule : public SequenceRule
@@ -70,5 +70,5 @@ public:
     ReturnStatementRule();
     ~ReturnStatementRule() override = default;
 
-    void compile() override;
+    void compile(VMWriter* vmWriter) override;
 };

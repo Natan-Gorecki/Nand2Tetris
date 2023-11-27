@@ -26,10 +26,10 @@ ClassRule::ClassRule() : SequenceRule(
 {
 }
 
-void ClassRule::compile()
+void ClassRule::compile(VMWriter* vmWriter)
 {
     writeOutput("<class>");
-    SequenceRule::compile();
+    SequenceRule::compile(vmWriter);
     writeOutput("</class>");
 }
 
@@ -89,10 +89,10 @@ bool ClassVarDecRule::initialize(JackTokenizer* pTokenizer)
     return true;
 }
 
-void ClassVarDecRule::compile()
+void ClassVarDecRule::compile(VMWriter* vmWriter)
 {
     writeOutput("<classVarDec>");
-    SequenceRule::compile();
+    SequenceRule::compile(vmWriter);
     writeOutput("</classVarDec>");
 }
 #pragma endregion
@@ -132,10 +132,28 @@ SubroutineDecRule::SubroutineDecRule() : SequenceRule(
 {
 }
 
-void SubroutineDecRule::compile()
+bool SubroutineDecRule::initialize(JackTokenizer* pTokenizer)
+{
+    if (!SequenceRule::initialize(pTokenizer))
+    {
+        return false;
+    }
+
+    auto subroutineType = getChildRule<AlternationRule>(0)->getPassedRule()->cast<KeywordRule>()->toString();
+    if (subroutineType == "method")
+    {
+        auto classRule = RuleUtils::getParentRule<ClassRule>(this);
+        auto className = classRule->getChildRule<ClassNameRule>(1)->toString();
+        mSymbolTable.define("this", className, ESymbolKind::ARG, 0);
+    }
+
+    return true;
+}
+
+void SubroutineDecRule::compile(VMWriter* vmWriter)
 {
     writeOutput("<subroutineDec>");
-    SequenceRule::compile();
+    SequenceRule::compile(vmWriter);
     writeOutput("</subroutineDec>");
 }
 
@@ -194,10 +212,10 @@ bool ParameterListRule::initialize(JackTokenizer* pTokenizer)
     return true;
 }
 
-void ParameterListRule::compile()
+void ParameterListRule::compile(VMWriter* vmWriter)
 {
     writeOutput("<parameterList>");
-    ZeroOrOneRule::compile();
+    ZeroOrOneRule::compile(vmWriter);
     writeOutput("</parameterList>");
 }
 #pragma endregion
@@ -243,10 +261,10 @@ bool SubroutineBodyRule::initialize(JackTokenizer* pTokenizer)
     return true;
 }
 
-void SubroutineBodyRule::compile()
+void SubroutineBodyRule::compile(VMWriter* vmWriter)
 {
     writeOutput("<subroutineBody>");
-    SequenceRule::compile();
+    SequenceRule::compile(vmWriter);
     writeOutput("</subroutineBody>");
 }
 #pragma endregion
@@ -270,10 +288,10 @@ VarDecRule::VarDecRule() : SequenceRule(
 {
 }
 
-void VarDecRule::compile()
+void VarDecRule::compile(VMWriter* vmWriter)
 {
     writeOutput("<varDec>");
-    SequenceRule::compile();
+    SequenceRule::compile(vmWriter);
     writeOutput("</varDec>");
 }
 #pragma endregion

@@ -12,7 +12,7 @@ bool Rule::initialize(JackTokenizer* pTokenizer)
     return true;
 }
 
-void Rule::compile()
+void Rule::compile(VMWriter* vmWriter)
 {
     // default virtual empty method
 }
@@ -69,11 +69,11 @@ bool ParentRule::initialize(JackTokenizer* pTokenizer)
     return true;
 }
 
-void ParentRule::compile()
+void ParentRule::compile(VMWriter* vmWriter)
 {
     for (const auto& pRule : mChildRules)
     {
-        pRule->compile();
+        pRule->compile(vmWriter);
     }
 }
 
@@ -134,14 +134,14 @@ bool AlternationRule::initialize(JackTokenizer* pTokenizer)
     return false;
 }
 
-void AlternationRule::compile()
+void AlternationRule::compile(VMWriter* vmWriter)
 {
     if (!mPassedRule)
     {
         throw JackCompilerError("Failed to compile AlternationRule.");
     }
 
-    mPassedRule->compile();
+    mPassedRule->compile(vmWriter);
 }
 
 void AlternationRule::setRuleLevel(int ruleLevel)

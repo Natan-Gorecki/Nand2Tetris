@@ -22,10 +22,10 @@ ExpressionRule::ExpressionRule() : SequenceRule(
 {
 }
 
-void ExpressionRule::compile()
+void ExpressionRule::compile(VMWriter* vmWriter)
 {
     writeOutput("<expression>");
-    SequenceRule::compile();
+    SequenceRule::compile(vmWriter);
     writeOutput("</expression>");
 }
 #pragma endregion
@@ -82,10 +82,10 @@ bool TermRule::initialize(JackTokenizer* pTokenizer)
     return false;
 }
 
-void TermRule::compile()
+void TermRule::compile(VMWriter* vmWriter)
 {
     writeOutput("<term>");
-    ParentRule::compile();
+    ParentRule::compile(vmWriter);
     writeOutput("</term>");
 }
 #pragma endregion
@@ -145,10 +145,10 @@ ExpressionListRule::ExpressionListRule() : SequenceRule(
 {
 }
 
-void ExpressionListRule::compile()
+void ExpressionListRule::compile(VMWriter* vmWriter)
 {
     writeOutput("<expressionList>");
-    SequenceRule::compile();
+    SequenceRule::compile(vmWriter);
     writeOutput("</expressionList>");
 }
 #pragma endregion

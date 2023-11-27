@@ -18,10 +18,10 @@ StatementsRule::StatementsRule() : SequenceRule(
 {
 }
 
-void StatementsRule::compile()
+void StatementsRule::compile(VMWriter* vmWriter)
 {
     writeOutput("<statements>");
-    SequenceRule::compile();
+    SequenceRule::compile(vmWriter);
     writeOutput("</statements>");
 }
 #pragma endregion
@@ -60,10 +60,10 @@ LetStatementRule::LetStatementRule() : SequenceRule(
 {
 }
 
-void LetStatementRule::compile()
+void LetStatementRule::compile(VMWriter* vmWriter)
 {
     writeOutput("<letStatement>");
-    SequenceRule::compile();
+    SequenceRule::compile(vmWriter);
     writeOutput("</letStatement>");
 }
 #pragma endregion
@@ -92,10 +92,10 @@ IfStatementRule::IfStatementRule() : SequenceRule(
 {
 }
 
-void IfStatementRule::compile()
+void IfStatementRule::compile(VMWriter* vmWriter)
 {
     writeOutput("<ifStatement>");
-    SequenceRule::compile();
+    SequenceRule::compile(vmWriter);
     writeOutput("</ifStatement>");
 }
 #pragma endregion
@@ -114,10 +114,10 @@ WhileStatementRule::WhileStatementRule() : SequenceRule(
 {
 }
 
-void WhileStatementRule::compile()
+void WhileStatementRule::compile(VMWriter* vmWriter)
 {
     writeOutput("<whileStatement>");
-    SequenceRule::compile();
+    SequenceRule::compile(vmWriter);
     writeOutput("</whileStatement>");
 }
 #pragma endregion
@@ -132,10 +132,10 @@ DoStatementRule::DoStatementRule() : SequenceRule(
 {
 }
 
-void DoStatementRule::compile()
+void DoStatementRule::compile(VMWriter* vmWriter)
 {
     writeOutput("<doStatement>");
-    SequenceRule::compile();
+    SequenceRule::compile(vmWriter);
     writeOutput("</doStatement>");
 }
 #pragma endregion
@@ -153,10 +153,10 @@ ReturnStatementRule::ReturnStatementRule() : SequenceRule(
 {
 }
 
-void ReturnStatementRule::compile()
+void ReturnStatementRule::compile(VMWriter* vmWriter)
 {
     writeOutput("<returnStatement>");
-    SequenceRule::compile();
+    SequenceRule::compile(vmWriter);
     writeOutput("</returnStatement>");
 }
 #pragma endregion

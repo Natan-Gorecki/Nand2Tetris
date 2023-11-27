@@ -54,7 +54,7 @@ void CompilationEngine::compileFile()
     {
         throw JackCompilerError("Failed to initialize class.");
     }
-    classRule->compile();
+    classRule->compile(mVMWriter.get());
 
     afterCompile();
 }

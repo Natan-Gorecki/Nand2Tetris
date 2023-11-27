@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include "../JackTokenizer.h"
-
+#include "../VMWriter.h"
 
 class Rule;
 class ParentRule;
@@ -24,7 +24,7 @@ public:
     virtual ~Rule() = default;
 
     virtual bool initialize(JackTokenizer* pTokenizer);
-    virtual void compile();
+    virtual void compile(VMWriter* vmWriter);
 
     Rule* getParentRule();
     void setParentRule(Rule* pRule);
@@ -53,7 +53,7 @@ public:
     ~ParentRule() override = default;
 
     bool initialize(JackTokenizer* pTokenizer) override;
-    void compile() override;
+    void compile(VMWriter* vmWriter) override;
 
     RuleVector& getChildRules();
     template <typename TRule> TRule* getChildRule(int index)
@@ -81,7 +81,7 @@ public:
     ~AlternationRule() override = default;
 
     bool initialize(JackTokenizer* pTokenizer) override;
-    void compile() override;
+    void compile(VMWriter* vmWriter) override;
 
     void setRuleLevel(int ruleLevel) override;
     Rule* getPassedRule();

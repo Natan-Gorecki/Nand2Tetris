@@ -17,7 +17,7 @@ public:
     ExpressionRule();
     ~ExpressionRule() override = default;
 
-    void compile() override;
+    void compile(VMWriter* vmWriter) override;
 };
 
 class TermRule : public ParentRule
@@ -27,7 +27,7 @@ public:
     ~TermRule() override = default;
 
     bool initialize(JackTokenizer* pTokenizer) override;
-    void compile() override;
+    void compile(VMWriter* vmWriter) override;
 
 private:
     std::vector<CreateRuleFunc> mCreateRuleFuncs;
@@ -48,7 +48,7 @@ public:
     ExpressionListRule();
     ~ExpressionListRule() override = default;
 
-    void compile() override;
+    void compile(VMWriter* vmWriter) override;
 };
 
 class OpRule : public AlternationRule

@@ -22,7 +22,7 @@ public:
     ClassRule();
     ~ClassRule() override = default;
 
-    void compile() override;
+    void compile(VMWriter* vmWriter) override;
 
     SymbolTable& getSymbolTable();
 
@@ -37,7 +37,7 @@ public:
     ~ClassVarDecRule() override = default;
 
     bool initialize(JackTokenizer* pTokenizer) override;
-    void compile() override;
+    void compile(VMWriter* vmWriter) override;
 };
 
 class TypeRule : public AlternationRule
@@ -53,7 +53,8 @@ public:
     SubroutineDecRule();
     ~SubroutineDecRule() override = default;
 
-    void compile() override;
+    bool initialize(JackTokenizer* pTokenizer) override;
+    void compile(VMWriter* vmWriter) override;
 
     SymbolTable& getSymbolTable();
 
@@ -68,7 +69,7 @@ public:
     ~ParameterListRule() override = default;
 
     bool initialize(JackTokenizer* pTokenizer) override;
-    void compile() override;
+    void compile(VMWriter* vmWriter) override;
 };
 
 class SubroutineBodyRule : public SequenceRule
@@ -78,7 +79,7 @@ public:
     ~SubroutineBodyRule() override = default;
 
     bool initialize(JackTokenizer* pTokenizer) override;
-    void compile() override;
+    void compile(VMWriter* vmWriter) override;
 };
 
 class VarDecRule : public SequenceRule
@@ -87,7 +88,7 @@ public:
     VarDecRule();
     ~VarDecRule() override = default;
 
-    void compile() override;
+    void compile(VMWriter* vmWriter) override;
 };
 
 class ClassNameRule : public IdentifierRule

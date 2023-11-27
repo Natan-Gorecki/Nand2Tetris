@@ -7,24 +7,19 @@
 /// </summary>
 void SymbolTable::define(std::string name, std::string type, ESymbolKind kind)
 {
-    switch (kind)
-    {
-    case ESymbolKind::STATIC:
-        staticSymbols.push_back({ name, type });
-        break;
-    case ESymbolKind::FIELD:
-        fieldSymbols.push_back({ name, type });
-        break;
-    case ESymbolKind::ARG:
-        argSymbols.push_back({ name, type });
-        break;
-    case ESymbolKind::VAR:
-        varSymbols.push_back({ name, type });
-        break;
-    case ESymbolKind::UNDEFINED:
-    default:
-        throw JackCompilerError("Cannot define UNDEFINED symbol.");
-    }
+    auto& vector = getVector(kind);
+    vector.push_back({ name, type });
+}
+
+/// <summary>
+/// Defines (adds to the table) a new variable of the given name, type, and kind.
+/// Assings to it the specified index, and adds 1 to the index.
+/// </summary>
+void SymbolTable::define(std::string name, std::string type, ESymbolKind kind, int index)
+{
+    auto& vector = getVector(kind);
+    auto position = vector.begin() + index;
+    vector.insert(position, { name, type });
 }
 
 /// <summary>
@@ -144,6 +139,24 @@ int SymbolTable::indexOf(std::string name)
 
     index = findSymbol(staticSymbols, name);
     return index;
+}
+
+std::vector<std::pair<std::string, std::string>>& SymbolTable::getVector(ESymbolKind symbolKind)
+{
+    switch (symbolKind)
+    {
+    case ESymbolKind::STATIC:
+        return staticSymbols;
+    case ESymbolKind::FIELD:
+        return fieldSymbols;
+    case ESymbolKind::ARG:
+        return argSymbols;
+    case ESymbolKind::VAR:
+        return varSymbols;
+    case ESymbolKind::UNDEFINED:
+    default:
+        throw JackCompilerError("Cannot define UNDEFINED symbol.");
+    }
 }
 
 int SymbolTable::findSymbol(const std::vector<std::pair<std::string, std::string>>& symbols, const std::string& key)
