@@ -146,6 +146,11 @@ string SymbolRule::toString()
     return string(1, mSymbol);
 }
 
+char SymbolRule::getValue()
+{
+    return mSymbol;
+}
+
 bool SymbolRule::isFullfiled(JackTokenizer* pTokenizer)
 {
     if (pTokenizer->tokenType() == ETokenType::SYMBOL && pTokenizer->symbol() == mSymbol)
@@ -161,6 +166,11 @@ bool SymbolRule::isFullfiled(JackTokenizer* pTokenizer)
 string IntegerConstantRule::toString()
 {
     return to_string(mIntVal);
+}
+
+int IntegerConstantRule::getValue()
+{
+    return mIntVal;
 }
 
 bool IntegerConstantRule::isFullfiled(JackTokenizer* pTokenizer)

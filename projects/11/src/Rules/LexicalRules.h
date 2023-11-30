@@ -67,6 +67,7 @@ public:
     ~SymbolRule() override = default;
 
     std::string toString() override;
+    char getValue();
 
 protected:
     bool isFullfiled(JackTokenizer* pTokenizer) override;
@@ -83,6 +84,7 @@ public:
     ~IntegerConstantRule() override = default;
 
     std::string toString() override;
+    int getValue();
 
 protected:
     bool isFullfiled(JackTokenizer* pTokenizer) override;

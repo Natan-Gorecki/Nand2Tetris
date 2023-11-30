@@ -152,9 +152,31 @@ bool SubroutineDecRule::initialize(JackTokenizer* pTokenizer)
 
 void SubroutineDecRule::compile(VMWriter* vmWriter)
 {
+    auto subroutineName = getChildRule<SubroutineNameRule>(2)->toString();
+    auto classRule = RuleUtils::getParentRule<ClassRule>(this);
+    auto className = classRule->getChildRule<ClassNameRule>(1)->toString();
+    auto variablesCount = mSymbolTable.varCount(ESymbolKind::VAR);
+
+    vmWriter->writeFunction(className + "." + subroutineName, variablesCount);
+
+    auto subroutineType = getChildRule<AlternationRule>(0)->getPassedRule()->cast<KeywordRule>()->toString();
+    if (subroutineType == "method")
+    {
+        vmWriter->writePush(ESegment::ARGUMENT, 0);
+        vmWriter->writePop(ESegment::POINTER, 0);
+    }
+
     writeOutput("<subroutineDec>");
     SequenceRule::compile(vmWriter);
     writeOutput("</subroutineDec>");
+
+    auto returnType = getChildRule<AlternationRule>(1)->getPassedRule()->cast<LexicalRule>()->toString();
+    if (returnType == "void")
+    {
+        vmWriter->writePush(ESegment::CONSTANT, 0);
+    }
+
+    vmWriter->writeReturn();
 }
 
 SymbolTable& SubroutineDecRule::getSymbolTable()

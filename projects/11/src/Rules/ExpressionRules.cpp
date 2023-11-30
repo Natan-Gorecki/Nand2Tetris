@@ -3,6 +3,7 @@
 #include "ExpressionRules.h"
 #include "LexicalRules.h"
 #include "ProgramStructureRules.h"
+#include "RuleUtils.h"
 
 using namespace std;
 
@@ -25,7 +26,16 @@ ExpressionRule::ExpressionRule() : SequenceRule(
 void ExpressionRule::compile(VMWriter* vmWriter)
 {
     writeOutput("<expression>");
-    SequenceRule::compile(vmWriter);
+    auto term1 = getChildRule<TermRule>(0);
+    term1->compile(vmWriter);
+
+    if (getChildRule<ZeroOrMoreRule>(1)->getChildRules().size() > 0)
+    {
+        auto op = getChildRule<ZeroOrMoreRule>(1)->getChildRule<SequenceRule>(0)->getChildRule<OpRule>(0);
+        auto term2 = getChildRule<ZeroOrMoreRule>(1)->getChildRule<SequenceRule>(0)->getChildRule<TermRule>(1);
+        term2->compile(vmWriter);
+        op->compile(vmWriter);
+    }
     writeOutput("</expression>");
 }
 #pragma endregion
@@ -84,6 +94,10 @@ bool TermRule::initialize(JackTokenizer* pTokenizer)
 
 void TermRule::compile(VMWriter* vmWriter)
 {
+    if (auto integerRule = getChildRule<IntegerConstantRule>(0))
+    {
+        vmWriter->writePush(ESegment::CONSTANT, integerRule->getValue());
+    }
     writeOutput("<term>");
     ParentRule::compile(vmWriter);
     writeOutput("</term>");
@@ -115,6 +129,21 @@ SubroutineCallRule::SubroutineCallRule() : AlternationRule(
         })
     })
 {
+}
+
+void SubroutineCallRule::compile(VMWriter* vmWriter)
+{
+    bool isMethod = getPassedRule()->cast<SequenceRule>()->getChildRule<SubroutineNameRule>(0) != nullptr;
+
+    if (!isMethod)
+    {
+        auto className = getPassedRule()->cast<SequenceRule>()->getChildRule<AlternationRule>(0)->getPassedRule()->cast<ClassNameRule>()->toString();
+        auto subroutineName = getPassedRule()->cast<SequenceRule>()->getChildRule<SubroutineNameRule>(2)->toString();
+        auto expressionCount = getPassedRule()->cast<SequenceRule>()->getChildRule<ExpressionListRule>(4)->getExpressionCount();
+        AlternationRule::compile(vmWriter);
+
+        vmWriter->writeCall(className + "." + subroutineName, expressionCount);
+    }
 }
 
 void SubroutineCallRule::setRuleLevel(int ruleLevel)
@@ -151,6 +180,17 @@ void ExpressionListRule::compile(VMWriter* vmWriter)
     SequenceRule::compile(vmWriter);
     writeOutput("</expressionList>");
 }
+
+int ExpressionListRule::getExpressionCount()
+{
+    if (getChildRules().empty())
+    {
+        return 0;
+    }
+
+    auto zeroOrMoreRule = getChildRule<ZeroOrOneRule>(0)->getChildRule<SequenceRule>(0)->getChildRule<ZeroOrMoreRule>(1);
+    return 1 + zeroOrMoreRule->getChildRules().size();
+}
 #pragma endregion
 
 #pragma region OpRule
@@ -167,6 +207,22 @@ OpRule::OpRule() : AlternationRule(
         make_shared<SymbolRule>('=')
     })
 {
+}
+
+void OpRule::compile(VMWriter* vmWriter)
+{
+    AlternationRule::compile(vmWriter);
+
+    auto symbol = getPassedRule()->cast<SymbolRule>()->getValue();
+    switch (symbol)
+    {
+    case '+':
+        vmWriter->writeArithmetic(EArithmetic::ADD);
+        break;
+    case '*':
+        vmWriter->writeCall("Math.multiply", 2);
+        break;
+    }
 }
 #pragma endregion
 

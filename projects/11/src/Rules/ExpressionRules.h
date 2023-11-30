@@ -39,6 +39,8 @@ public:
     SubroutineCallRule();
     ~SubroutineCallRule() override = default;
 
+    void compile(VMWriter* vmWriter) override;
+
     void setRuleLevel(int ruleLevel) override;
 };
 
@@ -49,6 +51,8 @@ public:
     ~ExpressionListRule() override = default;
 
     void compile(VMWriter* vmWriter) override;
+
+    int getExpressionCount();
 };
 
 class OpRule : public AlternationRule
@@ -56,6 +60,8 @@ class OpRule : public AlternationRule
 public:
     OpRule();
     ~OpRule() override = default;
+
+    void compile(VMWriter* vmWriter) override;
 };
 
 class UnaryOpRule : public AlternationRule

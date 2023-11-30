@@ -137,6 +137,8 @@ void DoStatementRule::compile(VMWriter* vmWriter)
     writeOutput("<doStatement>");
     SequenceRule::compile(vmWriter);
     writeOutput("</doStatement>");
+
+    vmWriter->writePop(ESegment::TEMP, 0);
 }
 #pragma endregion
 
