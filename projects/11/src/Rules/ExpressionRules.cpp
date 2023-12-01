@@ -25,13 +25,13 @@ ExpressionRule::ExpressionRule() : SequenceRule(
 
 void ExpressionRule::compile(VMWriter* vmWriter)
 {
-    auto term1 = getChildRule<TermRule>(0);
+    auto term1 = getChild<TermRule>(0);
     term1->compile(vmWriter);
 
-    if (getChildRule<ZeroOrMoreRule>(1)->getChildRules().size() > 0)
+    if (getChild<ZeroOrMoreRule>(1)->getChildRules().size() > 0)
     {
-        auto op = getChildRule<ZeroOrMoreRule>(1)->getChildRule<SequenceRule>(0)->getChildRule<OpRule>(0);
-        auto term2 = getChildRule<ZeroOrMoreRule>(1)->getChildRule<SequenceRule>(0)->getChildRule<TermRule>(1);
+        auto op = getChild<ZeroOrMoreRule>(1)->getChild<SequenceRule>(0)->getChild<OpRule>(0);
+        auto term2 = getChild<ZeroOrMoreRule>(1)->getChild<SequenceRule>(0)->getChild<TermRule>(1);
         term2->compile(vmWriter);
         op->compile(vmWriter);
     }
@@ -100,15 +100,15 @@ bool TermRule::initialize(JackTokenizer* pTokenizer)
 
 void TermRule::compile(VMWriter* vmWriter)
 {
-    if (auto integerRule = getChildRule<IntegerConstantRule>(0))
+    if (auto integerRule = getChild<IntegerConstantRule>(0))
     {
         vmWriter->writePush(ESegment::CONSTANT, integerRule->getValue());
         return;
     }
-    auto sequenceRule = getChildRule<SequenceRule>(0);
-    if (auto symbolRule = sequenceRule->getChildRule<SymbolRule>(0))
+    auto sequenceRule = getChild<SequenceRule>(0);
+    if (auto symbolRule = sequenceRule->getChild<SymbolRule>(0))
     {
-        auto expressionRule = sequenceRule->getChildRule<ExpressionRule>(1);
+        auto expressionRule = sequenceRule->getChild<ExpressionRule>(1);
         expressionRule->compile(vmWriter);
         return;
     }
@@ -151,13 +151,13 @@ SubroutineCallRule::SubroutineCallRule() : AlternationRule(
 
 void SubroutineCallRule::compile(VMWriter* vmWriter)
 {
-    bool isMethod = getPassedRule()->cast<SequenceRule>()->getChildRule<SubroutineNameRule>(0) != nullptr;
+    bool isMethod = getPassedRule()->cast<SequenceRule>()->getChild<SubroutineNameRule>(0) != nullptr;
 
     if (!isMethod)
     {
-        auto className = getPassedRule()->cast<SequenceRule>()->getChildRule<AlternationRule>(0)->getPassedRule()->cast<ClassNameRule>()->toString();
-        auto subroutineName = getPassedRule()->cast<SequenceRule>()->getChildRule<SubroutineNameRule>(2)->toString();
-        auto expressionCount = getPassedRule()->cast<SequenceRule>()->getChildRule<ExpressionListRule>(4)->getExpressionCount();
+        auto className = getPassedRule()->cast<SequenceRule>()->getChild<AlternationRule>(0)->getPassedRule()->cast<ClassNameRule>()->toString();
+        auto subroutineName = getPassedRule()->cast<SequenceRule>()->getChild<SubroutineNameRule>(2)->toString();
+        auto expressionCount = getPassedRule()->cast<SequenceRule>()->getChild<ExpressionListRule>(4)->getExpressionCount();
         AlternationRule::compile(vmWriter);
 
         vmWriter->writeCall(className + "." + subroutineName, expressionCount);
@@ -211,7 +211,7 @@ int ExpressionListRule::getExpressionCount()
         return 0;
     }
 
-    auto zeroOrMoreRule = getChildRule<ZeroOrOneRule>(0)->getChildRule<SequenceRule>(0)->getChildRule<ZeroOrMoreRule>(1);
+    auto zeroOrMoreRule = getChild<ZeroOrOneRule>(0)->getChild<SequenceRule>(0)->getChild<ZeroOrMoreRule>(1);
     return 1 + zeroOrMoreRule->getChildRules().size();
 }
 #pragma endregion

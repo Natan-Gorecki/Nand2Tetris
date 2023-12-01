@@ -59,7 +59,7 @@ public:
     void writeXmlTokens(std::ofstream* stream) override;
 
     RuleVector& getChildRules();
-    template <typename TRule> TRule* getChildRule(int index)
+    template <typename TRule> TRule* getChild(int index)
     {
         return dynamic_cast<TRule*>(mChildRules[index].get());
     }
