@@ -39,7 +39,7 @@ void CompilationEngine::compileFile()
 
     if (mWriteXmlSyntax)
     {
-        classRule->writeXmlSyntax(mXmlSyntaxFile.get());
+        classRule->writeXmlSyntax(mXmlSyntaxFile.get(), 0);
     }
     if (mWriteXmlTokens)
     {

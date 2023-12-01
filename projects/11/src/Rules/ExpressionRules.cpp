@@ -38,11 +38,11 @@ void ExpressionRule::compile(VMWriter* vmWriter)
     
 }
 
-void ExpressionRule::writeXmlSyntax(ofstream* stream)
+void ExpressionRule::writeXmlSyntax(ofstream* stream, int tabs)
 {
-    writeXmlSyntaxImpl(stream, "<expression>");
-    SequenceRule::writeXmlSyntax(stream);
-    writeXmlSyntaxImpl(stream, "</expression>");
+    XML_SYNTAX("<expression>");
+    SequenceRule::writeXmlSyntax(stream, tabs);
+    XML_SYNTAX("</expression>");
 }
 #pragma endregion
 
@@ -84,10 +84,6 @@ bool TermRule::initialize(JackTokenizer* pTokenizer)
         auto pRule = onCreateRule();
         pRule->setParentRule(this);
 
-        const Rule& rule = *pRule;
-        int ruleLevel = typeid(rule) != typeid(SequenceRule) ? getRuleLevel() + 1 : getRuleLevel();
-        pRule->setRuleLevel(ruleLevel);
-
         if (pRule->initialize(pTokenizer))
         {
             getChildRules().push_back(pRule);
@@ -114,11 +110,22 @@ void TermRule::compile(VMWriter* vmWriter)
     }
 }
 
-void TermRule::writeXmlSyntax(ofstream* stream)
+void TermRule::writeXmlSyntax(ofstream* stream, int tabs)
 {
-    writeXmlSyntaxImpl(stream, "<term>");
-    ParentRule::writeXmlSyntax(stream);
-    writeXmlSyntaxImpl(stream, "</term>");
+    XML_SYNTAX("<term>");
+
+    int ruleTabs = tabs + 1;
+    if (getChildRules().size() > 0)
+    {
+        const Rule& rule = *getChild<Rule>(0);
+        if (typeid(rule) == typeid(SequenceRule))
+        {
+            ruleTabs = tabs;
+        }
+    }
+    ParentRule::writeXmlSyntax(stream, ruleTabs);
+
+    XML_SYNTAX("</term>");
 }
 #pragma endregion
 
@@ -164,9 +171,9 @@ void SubroutineCallRule::compile(VMWriter* vmWriter)
     }
 }
 
-void SubroutineCallRule::setRuleLevel(int ruleLevel)
+void SubroutineCallRule::writeXmlSyntax(std::ofstream* stream, int tabs)
 {
-    AlternationRule::setRuleLevel(ruleLevel - 1);
+    AlternationRule::writeXmlSyntax(stream, tabs - 1);
 }
 #pragma endregion
 
@@ -197,11 +204,11 @@ void ExpressionListRule::compile(VMWriter* vmWriter)
     SequenceRule::compile(vmWriter);
 }
 
-void ExpressionListRule::writeXmlSyntax(std::ofstream* stream)
+void ExpressionListRule::writeXmlSyntax(std::ofstream* stream, int tabs)
 {
-    writeXmlSyntaxImpl(stream, "<expressionList>");
-    SequenceRule::writeXmlSyntax(stream);
-    writeXmlSyntaxImpl(stream, "</expressionList>");
+    XML_SYNTAX("<expressionList>");
+    SequenceRule::writeXmlSyntax(stream, tabs);
+    XML_SYNTAX("</expressionList>");
 }
 
 int ExpressionListRule::getExpressionCount()

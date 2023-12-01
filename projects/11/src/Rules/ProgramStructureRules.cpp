@@ -26,11 +26,11 @@ ClassRule::ClassRule() : SequenceRule(
 {
 }
 
-void ClassRule::writeXmlSyntax(std::ofstream* stream)
+void ClassRule::writeXmlSyntax(std::ofstream* stream, int tabs)
 {
-    writeXmlSyntaxImpl(stream, "<class>");
-    SequenceRule::writeXmlSyntax(stream);
-    writeXmlSyntaxImpl(stream, "</class>");
+    XML_SYNTAX("<class>");
+    SequenceRule::writeXmlSyntax(stream, tabs);
+    XML_SYNTAX("</class>");
 }
 
 SymbolTable& ClassRule::getSymbolTable()
@@ -89,11 +89,11 @@ bool ClassVarDecRule::initialize(JackTokenizer* pTokenizer)
     return true;
 }
 
-void ClassVarDecRule::writeXmlSyntax(std::ofstream* stream)
+void ClassVarDecRule::writeXmlSyntax(std::ofstream* stream, int tabs)
 {
-    writeXmlSyntaxImpl(stream, "<classVarDec>");
-    SequenceRule::writeXmlSyntax(stream);
-    writeXmlSyntaxImpl(stream, "</classVarDec>");
+    XML_SYNTAX("<classVarDec>");
+    SequenceRule::writeXmlSyntax(stream, tabs);
+    XML_SYNTAX("</classVarDec>");
 }
 #pragma endregion
 
@@ -177,11 +177,11 @@ void SubroutineDecRule::compile(VMWriter* vmWriter)
     vmWriter->writeReturn();
 }
 
-void SubroutineDecRule::writeXmlSyntax(std::ofstream* stream)
+void SubroutineDecRule::writeXmlSyntax(std::ofstream* stream, int tabs)
 {
-    writeXmlSyntaxImpl(stream, "<subroutineDec>");
-    SequenceRule::writeXmlSyntax(stream);
-    writeXmlSyntaxImpl(stream, "</subroutineDec>");
+    XML_SYNTAX("<subroutineDec>");
+    SequenceRule::writeXmlSyntax(stream, tabs);
+    XML_SYNTAX("</subroutineDec>");
 }
 
 SymbolTable& SubroutineDecRule::getSymbolTable()
@@ -239,11 +239,11 @@ bool ParameterListRule::initialize(JackTokenizer* pTokenizer)
     return true;
 }
 
-void ParameterListRule::writeXmlSyntax(std::ofstream* stream)
+void ParameterListRule::writeXmlSyntax(std::ofstream* stream, int tabs)
 {
-    writeXmlSyntaxImpl(stream, "<parameterList>");
-    ZeroOrOneRule::writeXmlSyntax(stream);
-    writeXmlSyntaxImpl(stream, "</parameterList>");
+    XML_SYNTAX("<parameterList>");
+    ZeroOrOneRule::writeXmlSyntax(stream, tabs);
+    XML_SYNTAX("</parameterList>");
 }
 #pragma endregion
 
@@ -288,11 +288,11 @@ bool SubroutineBodyRule::initialize(JackTokenizer* pTokenizer)
     return true;
 }
 
-void SubroutineBodyRule::writeXmlSyntax(std::ofstream* stream)
+void SubroutineBodyRule::writeXmlSyntax(std::ofstream* stream, int tabs)
 {
-    writeXmlSyntaxImpl(stream, "<subroutineBody>");
-    SequenceRule::writeXmlSyntax(stream);
-    writeXmlSyntaxImpl(stream, "</subroutineBody>");
+    XML_SYNTAX("<subroutineBody>");
+    SequenceRule::writeXmlSyntax(stream, tabs);
+    XML_SYNTAX("</subroutineBody>");
 }
 #pragma endregion
 
@@ -315,10 +315,10 @@ VarDecRule::VarDecRule() : SequenceRule(
 {
 }
 
-void VarDecRule::writeXmlSyntax(std::ofstream* stream)
+void VarDecRule::writeXmlSyntax(std::ofstream* stream, int tabs)
 {
-    writeXmlSyntaxImpl(stream, "<varDec>");
-    SequenceRule::writeXmlSyntax(stream);
-    writeXmlSyntaxImpl(stream, "</varDec>");
+    XML_SYNTAX("<varDec>");
+    SequenceRule::writeXmlSyntax(stream, tabs);
+    XML_SYNTAX("</varDec>");
 }
 #pragma endregion

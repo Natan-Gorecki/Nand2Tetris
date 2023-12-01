@@ -18,7 +18,7 @@ public:
     ~ExpressionRule() override = default;
 
     void compile(VMWriter* vmWriter) override;
-    void writeXmlSyntax(std::ofstream* stream) override;
+    void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 };
 
 class TermRule : public ParentRule
@@ -29,7 +29,7 @@ public:
 
     bool initialize(JackTokenizer* pTokenizer) override;
     void compile(VMWriter* vmWriter) override;
-    void writeXmlSyntax(std::ofstream* stream) override;
+    void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 
 private:
     std::vector<CreateRuleFunc> mCreateRuleFuncs;
@@ -42,8 +42,7 @@ public:
     ~SubroutineCallRule() override = default;
 
     void compile(VMWriter* vmWriter) override;
-
-    void setRuleLevel(int ruleLevel) override;
+    void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 };
 
 class ExpressionListRule : public SequenceRule
@@ -53,7 +52,7 @@ public:
     ~ExpressionListRule() override = default;
 
     void compile(VMWriter* vmWriter) override;
-    void writeXmlSyntax(std::ofstream* stream) override;
+    void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 
     int getExpressionCount();
 };

@@ -17,6 +17,8 @@ class ZeroOrOneRule;
 using RuleVector = std::vector<std::shared_ptr<Rule>>;
 using CreateRuleFunc = std::function<std::shared_ptr<Rule>(void)>;
 
+#define XML_SYNTAX(text) *stream << std::string(tabs * 2, ' ') << text << "\n";
+
 class Rule
 {
 public:
@@ -25,26 +27,19 @@ public:
 
     virtual bool initialize(JackTokenizer* pTokenizer);
     virtual void compile(VMWriter* vmWriter);
-    virtual void writeXmlSyntax(std::ofstream* stream);
+    virtual void writeXmlSyntax(std::ofstream* stream, int tabs);
     virtual void writeXmlTokens(std::ofstream* stream);
 
     Rule* getParentRule();
     void setParentRule(Rule* pRule);
-
-    int getRuleLevel() const;
-    virtual void setRuleLevel(int ruleLevel);
 
     template <typename TRule> TRule* cast()
     {
         return dynamic_cast<TRule*>(this);
     }
 
-protected:
-    void writeXmlSyntaxImpl(std::ofstream* stream, std::string const& text);
-
 private:
     Rule* mParentRule = nullptr;
-    int mRuleLevel = 0;
 };
 
 class ParentRule : public Rule
@@ -55,7 +50,7 @@ public:
 
     bool initialize(JackTokenizer* pTokenizer) override;
     void compile(VMWriter* vmWriter) override;
-    void writeXmlSyntax(std::ofstream* stream) override;
+    void writeXmlSyntax(std::ofstream* stream, int tabs) override;
     void writeXmlTokens(std::ofstream* stream) override;
 
     RuleVector& getChildRules();
@@ -75,6 +70,7 @@ public:
     ~SequenceRule() override = default;
 
     bool initialize(JackTokenizer* pTokenizer) override;
+    void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 };
 
 class AlternationRule : public ParentRule
@@ -85,9 +81,8 @@ public:
 
     bool initialize(JackTokenizer* pTokenizer) override;
     void compile(VMWriter* vmWriter) override;
-    void writeXmlSyntax(std::ofstream* stream) override;
+    void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 
-    void setRuleLevel(int ruleLevel) override;
     Rule* getPassedRule();
 
 private:
@@ -101,6 +96,7 @@ public:
     ~ZeroOrMoreRule() override = default;
 
     bool initialize(JackTokenizer* pTokenizer) override;
+    void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 
 private:
     CreateRuleFunc onCreateRule;
@@ -113,6 +109,7 @@ public:
     ~ZeroOrOneRule() override = default;
 
     bool initialize(JackTokenizer* pTokenizer) override;
+    void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 
 private:
     CreateRuleFunc onCreateRule;

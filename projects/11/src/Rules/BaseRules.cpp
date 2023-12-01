@@ -36,11 +36,6 @@ void Rule::setParentRule(Rule* pRule)
 {
     mParentRule = pRule;
 }
-
-void Rule::writeXmlSyntaxImpl(ofstream* stream, int tabs, string const& text)
-{
-    *stream << string(tabs * 2, ' ') << text << "\n";
-}
 #pragma endregion
 
 #pragma region ParentRule
@@ -195,7 +190,15 @@ bool ZeroOrMoreRule::initialize(JackTokenizer* pTokenizer)
 
 void ZeroOrMoreRule::writeXmlSyntax(std::ofstream* stream, int tabs)
 {
-    auto ruleTabs = getChild<SequenceRule>(0) ? tabs -1 : tabs;
+    int ruleTabs = tabs;
+    if (getChildRules().size() > 0)
+    {
+        const Rule& rule = *getChild<Rule>(0);
+        if (typeid(rule) == typeid(SequenceRule))
+        {
+            ruleTabs = tabs - 1;
+        }
+    }
     ParentRule::writeXmlSyntax(stream, ruleTabs);
 }
 #pragma endregion
@@ -222,7 +225,15 @@ bool ZeroOrOneRule::initialize(JackTokenizer* pTokenizer)
 
 void ZeroOrOneRule::writeXmlSyntax(std::ofstream* stream, int tabs)
 {
-    auto ruleTabs = getChild<SequenceRule>(0) ? tabs - 1 : tabs;
+    int ruleTabs = tabs;
+    if (getChildRules().size() > 0)
+    {
+        const Rule& rule = *getChild<Rule>(0);
+        if (typeid(rule) == typeid(SequenceRule))
+        {
+            ruleTabs = tabs - 1;
+        }
+    }
     ParentRule::writeXmlSyntax(stream, ruleTabs);
 }
 #pragma endregion

@@ -18,7 +18,7 @@ public:
     StatementsRule();
     ~StatementsRule() override = default;
 
-    void writeXmlSyntax(std::ofstream* stream) override;
+    void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 };
 
 class StatementRule : public AlternationRule
@@ -34,7 +34,7 @@ public:
     LetStatementRule();
     ~LetStatementRule() override = default;
 
-    void writeXmlSyntax(std::ofstream* stream) override;
+    void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 };
 
 class IfStatementRule : public SequenceRule
@@ -43,7 +43,7 @@ public:
     IfStatementRule();
     ~IfStatementRule() override = default;
 
-    void writeXmlSyntax(std::ofstream* stream) override;
+    void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 };
 
 class WhileStatementRule : public SequenceRule
@@ -52,7 +52,7 @@ public:
     WhileStatementRule();
     ~WhileStatementRule() override = default;
 
-    void writeXmlSyntax(std::ofstream* stream) override;
+    void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 };
 
 class DoStatementRule : public SequenceRule
@@ -62,7 +62,7 @@ public:
     ~DoStatementRule() override = default;
 
     void compile(VMWriter* vmWriter) override;
-    void writeXmlSyntax(std::ofstream* stream) override;
+    void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 };
 
 class ReturnStatementRule : public SequenceRule
@@ -71,5 +71,5 @@ public:
     ReturnStatementRule();
     ~ReturnStatementRule() override = default;
 
-    void writeXmlSyntax(std::ofstream* stream) override;
+    void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 };

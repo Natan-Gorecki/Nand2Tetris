@@ -50,10 +50,10 @@ bool LexicalRule::initialize(JackTokenizer* pTokenizer)
     return result;
 }
 
-void LexicalRule::writeXmlSyntax(std::ofstream* stream)
+void LexicalRule::writeXmlSyntax(std::ofstream* stream, int tabs)
 {
     string toWrite = "<" + getClassName() + ">" + encodeXml(toString()) + "</" + getClassName() + ">";
-    writeXmlSyntaxImpl(stream, toWrite);
+    XML_SYNTAX(toWrite);
 }
 
 void LexicalRule::writeXmlTokens(std::ofstream* stream)
