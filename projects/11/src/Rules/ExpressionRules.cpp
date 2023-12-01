@@ -3,7 +3,6 @@
 #include "ExpressionRules.h"
 #include "LexicalRules.h"
 #include "ProgramStructureRules.h"
-#include "RuleUtils.h"
 
 using namespace std;
 
@@ -25,13 +24,13 @@ ExpressionRule::ExpressionRule() : SequenceRule(
 
 void ExpressionRule::compile(VMWriter* vmWriter)
 {
-    auto term1 = getChild<TermRule>(0);
+    auto term1 = getChild(0)->cast<TermRule>();
     term1->compile(vmWriter);
 
-    if (getChild<ZeroOrMoreRule>(1)->getChildRules().size() > 0)
+    if (getChild(1)->getChildRules().size() > 0)
     {
-        auto op = getChild<ZeroOrMoreRule>(1)->getChild<SequenceRule>(0)->getChild<OpRule>(0);
-        auto term2 = getChild<ZeroOrMoreRule>(1)->getChild<SequenceRule>(0)->getChild<TermRule>(1);
+        auto op = getChild(1)->getChild(0)->getChild(0)->cast<OpRule>();
+        auto term2 = getChild(1)->getChild(0)->getChild(1)->cast<TermRule>();
         term2->compile(vmWriter);
         op->compile(vmWriter);
     }
@@ -47,7 +46,7 @@ void ExpressionRule::writeXmlSyntax(ofstream* stream, int tabs)
 #pragma endregion
 
 #pragma region TermRule
-TermRule::TermRule() : ParentRule({ })
+TermRule::TermRule() : Rule({ })
 {
     mCreateRuleFuncs =
     {
@@ -82,7 +81,7 @@ bool TermRule::initialize(JackTokenizer* pTokenizer)
     for (const auto& onCreateRule : mCreateRuleFuncs)
     {
         auto pRule = onCreateRule();
-        pRule->setParentRule(this);
+        pRule->setParent(this);
 
         if (pRule->initialize(pTokenizer))
         {
@@ -96,15 +95,15 @@ bool TermRule::initialize(JackTokenizer* pTokenizer)
 
 void TermRule::compile(VMWriter* vmWriter)
 {
-    if (auto integerRule = getChild<IntegerConstantRule>(0))
+    if (auto integerRule = getChild(0)->cast<IntegerConstantRule>())
     {
         vmWriter->writePush(ESegment::CONSTANT, integerRule->getValue());
         return;
     }
-    auto sequenceRule = getChild<SequenceRule>(0);
-    if (auto symbolRule = sequenceRule->getChild<SymbolRule>(0))
+    auto sequenceRule = getChild(0)->cast<SequenceRule>();
+    if (auto symbolRule = sequenceRule->getChild(0)->cast<SymbolRule>())
     {
-        auto expressionRule = sequenceRule->getChild<ExpressionRule>(1);
+        auto expressionRule = sequenceRule->getChild(1)->cast<ExpressionRule>();
         expressionRule->compile(vmWriter);
         return;
     }
@@ -117,13 +116,13 @@ void TermRule::writeXmlSyntax(ofstream* stream, int tabs)
     int ruleTabs = tabs + 1;
     if (getChildRules().size() > 0)
     {
-        const Rule& rule = *getChild<Rule>(0);
+        const Rule& rule = *getChild(0);
         if (typeid(rule) == typeid(SequenceRule))
         {
             ruleTabs = tabs;
         }
     }
-    ParentRule::writeXmlSyntax(stream, ruleTabs);
+    Rule::writeXmlSyntax(stream, ruleTabs);
 
     XML_SYNTAX("</term>");
 }
@@ -158,13 +157,13 @@ SubroutineCallRule::SubroutineCallRule() : AlternationRule(
 
 void SubroutineCallRule::compile(VMWriter* vmWriter)
 {
-    bool isMethod = getPassedRule()->cast<SequenceRule>()->getChild<SubroutineNameRule>(0) != nullptr;
+    bool isMethod = getPassedRule()->getChild(0)->cast<SubroutineNameRule>() != nullptr;
 
     if (!isMethod)
     {
-        auto className = getPassedRule()->cast<SequenceRule>()->getChild<AlternationRule>(0)->getPassedRule()->cast<ClassNameRule>()->toString();
-        auto subroutineName = getPassedRule()->cast<SequenceRule>()->getChild<SubroutineNameRule>(2)->toString();
-        auto expressionCount = getPassedRule()->cast<SequenceRule>()->getChild<ExpressionListRule>(4)->getExpressionCount();
+        auto className = getPassedRule()->getChild(0)->cast<AlternationRule>()->getPassedRule()->cast<ClassNameRule>()->toString();
+        auto subroutineName = getPassedRule()->getChild(2)->cast<SubroutineNameRule>()->toString();
+        auto expressionCount = getPassedRule()->getChild(4)->cast<ExpressionListRule>()->getExpressionCount();
         AlternationRule::compile(vmWriter);
 
         vmWriter->writeCall(className + "." + subroutineName, expressionCount);
@@ -218,7 +217,7 @@ int ExpressionListRule::getExpressionCount()
         return 0;
     }
 
-    auto zeroOrMoreRule = getChild<ZeroOrOneRule>(0)->getChild<SequenceRule>(0)->getChild<ZeroOrMoreRule>(1);
+    auto zeroOrMoreRule = getChild(0)->getChild(0)->getChild(1)->cast<ZeroOrMoreRule>();
     return 1 + zeroOrMoreRule->getChildRules().size();
 }
 #pragma endregion

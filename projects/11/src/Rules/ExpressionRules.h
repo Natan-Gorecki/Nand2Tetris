@@ -21,7 +21,7 @@ public:
     void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 };
 
-class TermRule : public ParentRule
+class TermRule : public Rule
 {
 public:
     TermRule();

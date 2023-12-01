@@ -6,40 +6,7 @@
 using namespace std;
 
 #pragma region Rule
-bool Rule::initialize(JackTokenizer* pTokenizer)
-{
-    // default virtual empty method
-    return true;
-}
-
-void Rule::compile(VMWriter* vmWriter)
-{
-    // default virtual empty method
-}
-
-void Rule::writeXmlSyntax(ofstream* stream, int tabs)
-{
-    // default virtual empty method
-}
-
-void Rule::writeXmlTokens(ofstream* stream)
-{
-    // default virtual empty method
-}
-
-Rule* Rule::getParentRule()
-{
-    return mParentRule;
-}
-
-void Rule::setParentRule(Rule* pRule)
-{
-    mParentRule = pRule;
-}
-#pragma endregion
-
-#pragma region ParentRule
-ParentRule::ParentRule(RuleVector const& rules)
+Rule::Rule(RuleVector const& rules)
 {
     for (const auto& pRule : rules)
     {
@@ -47,16 +14,16 @@ ParentRule::ParentRule(RuleVector const& rules)
     }
 }
 
-bool ParentRule::initialize(JackTokenizer* pTokenizer)
+bool Rule::initialize(JackTokenizer* pTokenizer)
 {
     for (const auto& pRule : mChildRules)
     {
-        pRule->setParentRule(this);
+        pRule->setParent(this);
     }
     return true;
 }
 
-void ParentRule::compile(VMWriter* vmWriter)
+void Rule::compile(VMWriter* vmWriter)
 {
     for (const auto& pRule : mChildRules)
     {
@@ -64,7 +31,7 @@ void ParentRule::compile(VMWriter* vmWriter)
     }
 }
 
-void ParentRule::writeXmlSyntax(std::ofstream* stream, int tabs)
+void Rule::writeXmlSyntax(ofstream* stream, int tabs)
 {
     for (const auto& pRule : mChildRules)
     {
@@ -72,7 +39,7 @@ void ParentRule::writeXmlSyntax(std::ofstream* stream, int tabs)
     }
 }
 
-void ParentRule::writeXmlTokens(std::ofstream* stream)
+void Rule::writeXmlTokens(ofstream* stream)
 {
     for (const auto& pRule : mChildRules)
     {
@@ -80,7 +47,22 @@ void ParentRule::writeXmlTokens(std::ofstream* stream)
     }
 }
 
-RuleVector& ParentRule::getChildRules()
+Rule* Rule::getParent()
+{
+    return mParentRule;
+}
+
+void Rule::setParent(Rule* pRule)
+{
+    mParentRule = pRule;
+}
+
+Rule* Rule::getChild(int index)
+{
+    return mChildRules[index].get();
+}
+
+RuleVector& Rule::getChildRules()
 {
     return mChildRules;
 }
@@ -88,13 +70,13 @@ RuleVector& ParentRule::getChildRules()
 
 #pragma region SequenceRule
 SequenceRule::SequenceRule(RuleVector const& rules)
-    : ParentRule(rules)
+    : Rule(rules)
 {
 }
 
 bool SequenceRule::initialize(JackTokenizer* pTokenizer)
 {
-    ParentRule::initialize(pTokenizer);
+    Rule::initialize(pTokenizer);
 
     auto initialPosition = pTokenizer->getPosition();
     for (const auto& pRule : getChildRules())
@@ -113,19 +95,19 @@ bool SequenceRule::initialize(JackTokenizer* pTokenizer)
 
 void SequenceRule::writeXmlSyntax(std::ofstream* stream, int tabs)
 {
-    ParentRule::writeXmlSyntax(stream, tabs + 1);
+    Rule::writeXmlSyntax(stream, tabs + 1);
 }
 #pragma endregion
 
 #pragma region AlternationRule
 AlternationRule::AlternationRule(RuleVector const& rules)
-    : ParentRule(rules)
+    : Rule(rules)
 {
 }
 
 bool AlternationRule::initialize(JackTokenizer* pTokenizer)
 {
-    ParentRule::initialize(pTokenizer);
+    Rule::initialize(pTokenizer);
 
     for (const auto& pRule : getChildRules())
     {
@@ -164,7 +146,7 @@ Rule* AlternationRule::getPassedRule()
 
 #pragma region ZeroOrMoreRule
 ZeroOrMoreRule::ZeroOrMoreRule(CreateRuleFunc const& createRuleFunc)
-    : ParentRule({ }),
+    : Rule({ }),
     onCreateRule(createRuleFunc)
 {
 }
@@ -175,7 +157,7 @@ bool ZeroOrMoreRule::initialize(JackTokenizer* pTokenizer)
     while (result)
     {
         auto pRule = onCreateRule();
-        pRule->setParentRule(this);
+        pRule->setParent(this);
 
         if (!pRule->initialize(pTokenizer))
         {
@@ -193,19 +175,19 @@ void ZeroOrMoreRule::writeXmlSyntax(std::ofstream* stream, int tabs)
     int ruleTabs = tabs;
     if (getChildRules().size() > 0)
     {
-        const Rule& rule = *getChild<Rule>(0);
+        const Rule& rule = *getChild(0);
         if (typeid(rule) == typeid(SequenceRule))
         {
             ruleTabs = tabs - 1;
         }
     }
-    ParentRule::writeXmlSyntax(stream, ruleTabs);
+    Rule::writeXmlSyntax(stream, ruleTabs);
 }
 #pragma endregion
 
 #pragma region ZeroOrOneRule
 ZeroOrOneRule::ZeroOrOneRule(CreateRuleFunc const& createRuleFunc)
-    : ParentRule({ }),
+    : Rule({ }),
     onCreateRule(createRuleFunc)
 {
 }
@@ -213,7 +195,7 @@ ZeroOrOneRule::ZeroOrOneRule(CreateRuleFunc const& createRuleFunc)
 bool ZeroOrOneRule::initialize(JackTokenizer* pTokenizer)
 {
     auto pRule = onCreateRule();
-    pRule->setParentRule(this);
+    pRule->setParent(this);
 
     if (pRule->initialize(pTokenizer))
     {
@@ -228,12 +210,12 @@ void ZeroOrOneRule::writeXmlSyntax(std::ofstream* stream, int tabs)
     int ruleTabs = tabs;
     if (getChildRules().size() > 0)
     {
-        const Rule& rule = *getChild<Rule>(0);
+        const Rule& rule = *getChild(0);
         if (typeid(rule) == typeid(SequenceRule))
         {
             ruleTabs = tabs - 1;
         }
     }
-    ParentRule::writeXmlSyntax(stream, ruleTabs);
+    Rule::writeXmlSyntax(stream, ruleTabs);
 }
 #pragma endregion

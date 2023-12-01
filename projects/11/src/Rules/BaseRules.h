@@ -7,7 +7,6 @@
 #include "../VMWriter.h"
 
 class Rule;
-class ParentRule;
 class SequenceRule;
 class AlternationRule;
 class ZeroOrMoreRule;
@@ -23,6 +22,7 @@ class Rule
 {
 public:
     Rule() = default;
+    Rule(RuleVector const& rules);
     virtual ~Rule() = default;
 
     virtual bool initialize(JackTokenizer* pTokenizer);
@@ -30,8 +30,27 @@ public:
     virtual void writeXmlSyntax(std::ofstream* stream, int tabs);
     virtual void writeXmlTokens(std::ofstream* stream);
 
-    Rule* getParentRule();
-    void setParentRule(Rule* pRule);
+    Rule* getParent();
+    void setParent(Rule* pRule);
+    template <typename TRule> TRule* getParentRecursive()
+    {
+        Rule* parentRule = getParent();
+
+        while (parentRule != nullptr)
+        {
+            if (auto castedRule = dynamic_cast<TRule*>(parentRule))
+            {
+                return castedRule;
+            }
+
+            parentRule = parentRule->getParent();
+        }
+
+        return nullptr;
+    }
+
+    Rule* getChild(int index);
+    RuleVector& getChildRules();
 
     template <typename TRule> TRule* cast()
     {
@@ -40,30 +59,10 @@ public:
 
 private:
     Rule* mParentRule = nullptr;
-};
-
-class ParentRule : public Rule
-{
-public:
-    explicit ParentRule(RuleVector const& rules);
-    ~ParentRule() override = default;
-
-    bool initialize(JackTokenizer* pTokenizer) override;
-    void compile(VMWriter* vmWriter) override;
-    void writeXmlSyntax(std::ofstream* stream, int tabs) override;
-    void writeXmlTokens(std::ofstream* stream) override;
-
-    RuleVector& getChildRules();
-    template <typename TRule> TRule* getChild(int index)
-    {
-        return dynamic_cast<TRule*>(mChildRules[index].get());
-    }
-
-private:
     RuleVector mChildRules;
 };
 
-class SequenceRule : public ParentRule
+class SequenceRule : public Rule
 {
 public:
     explicit SequenceRule(RuleVector const& rules);
@@ -73,7 +72,7 @@ public:
     void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 };
 
-class AlternationRule : public ParentRule
+class AlternationRule : public Rule
 {
 public:
     explicit AlternationRule(RuleVector const& rules);
@@ -89,7 +88,7 @@ private:
     std::shared_ptr<Rule> mPassedRule = nullptr;
 };
 
-class ZeroOrMoreRule : public ParentRule
+class ZeroOrMoreRule : public Rule
 {
 public:
     explicit ZeroOrMoreRule(CreateRuleFunc const& createRuleFunc);
@@ -102,7 +101,7 @@ private:
     CreateRuleFunc onCreateRule;
 };
 
-class ZeroOrOneRule : public ParentRule
+class ZeroOrOneRule : public Rule
 {
 public:
     explicit ZeroOrOneRule(CreateRuleFunc const& createRuleFunc);

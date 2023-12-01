@@ -95,8 +95,5 @@
     <ClInclude Include="..\ESymbolKind.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Rules\RuleUtils.h">
-      <Filter>Header Files\Rules</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
