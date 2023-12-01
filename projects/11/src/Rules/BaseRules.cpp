@@ -17,6 +17,16 @@ void Rule::compile(VMWriter* vmWriter)
     // default virtual empty method
 }
 
+void Rule::writeXmlSyntax(ofstream* stream)
+{
+    // default virtual empty method
+}
+
+void Rule::writeXmlTokens(ofstream* stream)
+{
+    // default virtual empty method
+}
+
 Rule* Rule::getParentRule()
 {
     return mParentRule;
@@ -37,17 +47,10 @@ void Rule::setRuleLevel(int ruleLevel)
     mRuleLevel = ruleLevel;
 }
 
-void Rule::writeOutput(string const& text) const
+void Rule::writeXmlSyntaxImpl(ofstream* stream, string const& text)
 {
     auto tabs = string(mRuleLevel * 2, ' ');
-    auto formattedOutput = tabs + text + "\n";
-    CompilationEngine::writeOutput(formattedOutput);
-}
-
-void Rule::writeToken(string const& text) const
-{
-    auto formattedOutput = text + "\n";
-    CompilationEngine::writeToken(formattedOutput);
+    *stream << tabs << text << "\n";
 }
 #pragma endregion
 
@@ -74,6 +77,22 @@ void ParentRule::compile(VMWriter* vmWriter)
     for (const auto& pRule : mChildRules)
     {
         pRule->compile(vmWriter);
+    }
+}
+
+void ParentRule::writeXmlSyntax(std::ofstream* stream)
+{
+    for (const auto& pRule : mChildRules)
+    {
+        pRule->writeXmlSyntax(stream);
+    }
+}
+
+void ParentRule::writeXmlTokens(std::ofstream* stream)
+{
+    for (const auto& pRule : mChildRules)
+    {
+        pRule->writeXmlTokens(stream);
     }
 }
 
@@ -142,6 +161,11 @@ void AlternationRule::compile(VMWriter* vmWriter)
     }
 
     mPassedRule->compile(vmWriter);
+}
+
+void AlternationRule::writeXmlSyntax(std::ofstream* stream)
+{
+    mPassedRule->writeXmlSyntax(stream);
 }
 
 void AlternationRule::setRuleLevel(int ruleLevel)

@@ -33,7 +33,7 @@ public:
                 return pCastedRule;
             }
 
-            ParentRule* pParentRule ;
+            ParentRule* pParentRule;
 
             if (auto pParentRule = dynamic_cast<ParentRule*>(pChildRule))
             {

@@ -25,6 +25,8 @@ public:
 
     virtual bool initialize(JackTokenizer* pTokenizer);
     virtual void compile(VMWriter* vmWriter);
+    virtual void writeXmlSyntax(std::ofstream* stream);
+    virtual void writeXmlTokens(std::ofstream* stream);
 
     Rule* getParentRule();
     void setParentRule(Rule* pRule);
@@ -38,8 +40,7 @@ public:
     }
 
 protected:
-    void writeOutput(std::string const& text) const;
-    void writeToken(std::string const& text) const;
+    void writeXmlSyntaxImpl(std::ofstream* stream, std::string const& text);
 
 private:
     Rule* mParentRule = nullptr;
@@ -54,6 +55,8 @@ public:
 
     bool initialize(JackTokenizer* pTokenizer) override;
     void compile(VMWriter* vmWriter) override;
+    void writeXmlSyntax(std::ofstream* stream) override;
+    void writeXmlTokens(std::ofstream* stream) override;
 
     RuleVector& getChildRules();
     template <typename TRule> TRule* getChildRule(int index)
@@ -82,6 +85,7 @@ public:
 
     bool initialize(JackTokenizer* pTokenizer) override;
     void compile(VMWriter* vmWriter) override;
+    void writeXmlSyntax(std::ofstream* stream) override;
 
     void setRuleLevel(int ruleLevel) override;
     Rule* getPassedRule();

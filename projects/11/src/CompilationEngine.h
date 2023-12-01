@@ -24,9 +24,6 @@ public:
     /// </summary>
     void compileFile();
 
-    static void writeOutput(std::string& text);
-    static void writeToken(std::string& text);
-
 private:
     void beforeCompile();
     void afterCompile();
@@ -39,9 +36,6 @@ private:
     std::string mXmlSyntaxFileName = "";
     std::string mXmlTokensFileName = "";
     std::string mVMCodeFileName = "";
-
-    static std::function<void(std::string&)> onWriteOutput;
-    static std::function<void(std::string&)> onWriteToken;
 
     std::unique_ptr<std::ofstream> mXmlSyntaxFile;
     std::unique_ptr<std::ofstream> mXmlTokensFile;

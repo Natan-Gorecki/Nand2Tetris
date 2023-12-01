@@ -50,11 +50,15 @@ bool LexicalRule::initialize(JackTokenizer* pTokenizer)
     return result;
 }
 
-void LexicalRule::compile(VMWriter* vmWriter)
+void LexicalRule::writeXmlSyntax(std::ofstream* stream)
 {
     string toWrite = "<" + getClassName() + ">" + encodeXml(toString()) + "</" + getClassName() + ">";
-    writeOutput(toWrite);
-    writeToken(toWrite);
+    writeXmlSyntaxImpl(stream, toWrite);
+}
+
+void LexicalRule::writeXmlTokens(std::ofstream* stream)
+{
+    *stream << "<" << getClassName() << ">" << encodeXml(toString()) << "</" << getClassName() << ">\n";
 }
 
 string LexicalRule::encodeXml(string text) const

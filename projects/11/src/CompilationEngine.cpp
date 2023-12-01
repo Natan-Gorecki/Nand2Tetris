@@ -8,9 +8,6 @@
 using namespace std;
 using namespace std::filesystem;
 
-std::function<void(std::string&)> CompilationEngine::onWriteOutput;
-std::function<void(std::string&)> CompilationEngine::onWriteToken;
-
 /// <summary>
 /// Opens the output file and gets ready to write into it.
 /// <para/> The next routine called must be compileClass.
@@ -24,21 +21,6 @@ CompilationEngine::CompilationEngine(const string& filename)
     mXmlSyntaxFileName = path.replace_filename(name + ".xml").string();
     mXmlTokensFileName = path.replace_filename(name + "_Tokens.xml").string();
     mVMCodeFileName = path.replace_filename(name + ".vm").string();
-
-    onWriteOutput = [this](string const& text)
-    {
-        if (mWriteXmlSyntax)
-        {
-            *mXmlSyntaxFile << text;
-        }
-    };
-    onWriteToken = [this](string const& text)
-    {
-        if (mWriteXmlTokens)
-        {
-            *mXmlTokensFile << text;
-        }
-    };
 }
 
 /// <summary>
@@ -54,7 +36,19 @@ void CompilationEngine::compileFile()
     {
         throw JackCompilerError("Failed to initialize class.");
     }
-    classRule->compile(mVMWriter.get());
+
+    if (mWriteXmlSyntax)
+    {
+        classRule->writeXmlSyntax(mXmlSyntaxFile.get());
+    }
+    if (mWriteXmlTokens)
+    {
+        classRule->writeXmlTokens(mXmlTokensFile.get());
+    }
+    if (mWriteVMCode)
+    {
+        classRule->compile(mVMWriter.get());
+    }
 
     afterCompile();
 }
@@ -115,14 +109,4 @@ void CompilationEngine::afterCompile()
         mVMWriter = nullptr;
         std::cout << "Created " << mVMCodeFileName << " file." << std::endl;
     }
-}
-
-void CompilationEngine::writeOutput(std::string& text)
-{
-    onWriteOutput(text);
-}
-
-void CompilationEngine::writeToken(std::string& text)
-{
-    onWriteToken(text);
 }

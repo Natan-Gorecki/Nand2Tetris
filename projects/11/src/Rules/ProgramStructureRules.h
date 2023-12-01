@@ -22,7 +22,7 @@ public:
     ClassRule();
     ~ClassRule() override = default;
 
-    void compile(VMWriter* vmWriter) override;
+    void writeXmlSyntax(std::ofstream* stream) override;
 
     SymbolTable& getSymbolTable();
 
@@ -37,7 +37,7 @@ public:
     ~ClassVarDecRule() override = default;
 
     bool initialize(JackTokenizer* pTokenizer) override;
-    void compile(VMWriter* vmWriter) override;
+    void writeXmlSyntax(std::ofstream* stream) override;
 };
 
 class TypeRule : public AlternationRule
@@ -55,6 +55,7 @@ public:
 
     bool initialize(JackTokenizer* pTokenizer) override;
     void compile(VMWriter* vmWriter) override;
+    void writeXmlSyntax(std::ofstream* stream) override;
 
     SymbolTable& getSymbolTable();
 
@@ -69,7 +70,7 @@ public:
     ~ParameterListRule() override = default;
 
     bool initialize(JackTokenizer* pTokenizer) override;
-    void compile(VMWriter* vmWriter) override;
+    void writeXmlSyntax(std::ofstream* stream) override;
 };
 
 class SubroutineBodyRule : public SequenceRule
@@ -79,7 +80,7 @@ public:
     ~SubroutineBodyRule() override = default;
 
     bool initialize(JackTokenizer* pTokenizer) override;
-    void compile(VMWriter* vmWriter) override;
+    void writeXmlSyntax(std::ofstream* stream) override;
 };
 
 class VarDecRule : public SequenceRule
@@ -88,7 +89,7 @@ public:
     VarDecRule();
     ~VarDecRule() override = default;
 
-    void compile(VMWriter* vmWriter) override;
+    void writeXmlSyntax(std::ofstream* stream) override;
 };
 
 class ClassNameRule : public IdentifierRule

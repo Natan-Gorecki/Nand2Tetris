@@ -22,7 +22,8 @@ public:
     ~LexicalRule() override = default;
 
     bool initialize(JackTokenizer* pTokenizer) final;
-    void compile(VMWriter* vmWriter) final;
+    void writeXmlSyntax(std::ofstream* stream) final;
+    void writeXmlTokens(std::ofstream* stream) final;
 
     virtual std::string toString() = 0;
 

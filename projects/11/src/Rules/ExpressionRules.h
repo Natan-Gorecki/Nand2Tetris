@@ -18,6 +18,7 @@ public:
     ~ExpressionRule() override = default;
 
     void compile(VMWriter* vmWriter) override;
+    void writeXmlSyntax(std::ofstream* stream) override;
 };
 
 class TermRule : public ParentRule
@@ -28,6 +29,7 @@ public:
 
     bool initialize(JackTokenizer* pTokenizer) override;
     void compile(VMWriter* vmWriter) override;
+    void writeXmlSyntax(std::ofstream* stream) override;
 
 private:
     std::vector<CreateRuleFunc> mCreateRuleFuncs;
@@ -51,6 +53,7 @@ public:
     ~ExpressionListRule() override = default;
 
     void compile(VMWriter* vmWriter) override;
+    void writeXmlSyntax(std::ofstream* stream) override;
 
     int getExpressionCount();
 };

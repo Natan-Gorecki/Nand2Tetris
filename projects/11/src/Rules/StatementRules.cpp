@@ -18,11 +18,11 @@ StatementsRule::StatementsRule() : SequenceRule(
 {
 }
 
-void StatementsRule::compile(VMWriter* vmWriter)
+void StatementsRule::writeXmlSyntax(std::ofstream* stream)
 {
-    writeOutput("<statements>");
-    SequenceRule::compile(vmWriter);
-    writeOutput("</statements>");
+    writeXmlSyntaxImpl(stream, "<statements>");
+    SequenceRule::writeXmlSyntax(stream);
+    writeXmlSyntaxImpl(stream, "</statements>");
 }
 #pragma endregion
 
@@ -60,11 +60,11 @@ LetStatementRule::LetStatementRule() : SequenceRule(
 {
 }
 
-void LetStatementRule::compile(VMWriter* vmWriter)
+void LetStatementRule::writeXmlSyntax(std::ofstream* stream)
 {
-    writeOutput("<letStatement>");
-    SequenceRule::compile(vmWriter);
-    writeOutput("</letStatement>");
+    writeXmlSyntaxImpl(stream, "<letStatement>");
+    SequenceRule::writeXmlSyntax(stream);
+    writeXmlSyntaxImpl(stream, "</letStatement>");
 }
 #pragma endregion
 
@@ -92,11 +92,11 @@ IfStatementRule::IfStatementRule() : SequenceRule(
 {
 }
 
-void IfStatementRule::compile(VMWriter* vmWriter)
+void IfStatementRule::writeXmlSyntax(std::ofstream* stream)
 {
-    writeOutput("<ifStatement>");
-    SequenceRule::compile(vmWriter);
-    writeOutput("</ifStatement>");
+    writeXmlSyntaxImpl(stream, "<ifStatement>");
+    SequenceRule::writeXmlSyntax(stream);
+    writeXmlSyntaxImpl(stream, "</ifStatement>");
 }
 #pragma endregion
 
@@ -114,11 +114,11 @@ WhileStatementRule::WhileStatementRule() : SequenceRule(
 {
 }
 
-void WhileStatementRule::compile(VMWriter* vmWriter)
+void WhileStatementRule::writeXmlSyntax(std::ofstream* stream)
 {
-    writeOutput("<whileStatement>");
-    SequenceRule::compile(vmWriter);
-    writeOutput("</whileStatement>");
+    writeXmlSyntaxImpl(stream, "<whileStatement>");
+    SequenceRule::writeXmlSyntax(stream);
+    writeXmlSyntaxImpl(stream, "</whileStatement>");
 }
 #pragma endregion
 
@@ -134,11 +134,15 @@ DoStatementRule::DoStatementRule() : SequenceRule(
 
 void DoStatementRule::compile(VMWriter* vmWriter)
 {
-    writeOutput("<doStatement>");
     SequenceRule::compile(vmWriter);
-    writeOutput("</doStatement>");
-
     vmWriter->writePop(ESegment::TEMP, 0);
+}
+
+void DoStatementRule::writeXmlSyntax(std::ofstream* stream)
+{
+    writeXmlSyntaxImpl(stream, "<doStatement>");
+    SequenceRule::writeXmlSyntax(stream);
+    writeXmlSyntaxImpl(stream, "</doStatement>");
 }
 #pragma endregion
 
@@ -155,10 +159,10 @@ ReturnStatementRule::ReturnStatementRule() : SequenceRule(
 {
 }
 
-void ReturnStatementRule::compile(VMWriter* vmWriter)
+void ReturnStatementRule::writeXmlSyntax(std::ofstream* stream)
 {
-    writeOutput("<returnStatement>");
-    SequenceRule::compile(vmWriter);
-    writeOutput("</returnStatement>");
+    writeXmlSyntaxImpl(stream, "<returnStatement>");
+    SequenceRule::writeXmlSyntax(stream);
+    writeXmlSyntaxImpl(stream, "</returnStatement>");
 }
 #pragma endregion

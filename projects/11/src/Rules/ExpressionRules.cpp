@@ -25,7 +25,6 @@ ExpressionRule::ExpressionRule() : SequenceRule(
 
 void ExpressionRule::compile(VMWriter* vmWriter)
 {
-    writeOutput("<expression>");
     auto term1 = getChildRule<TermRule>(0);
     term1->compile(vmWriter);
 
@@ -36,7 +35,14 @@ void ExpressionRule::compile(VMWriter* vmWriter)
         term2->compile(vmWriter);
         op->compile(vmWriter);
     }
-    writeOutput("</expression>");
+    
+}
+
+void ExpressionRule::writeXmlSyntax(ofstream* stream)
+{
+    writeXmlSyntaxImpl(stream, "<expression>");
+    SequenceRule::writeXmlSyntax(stream);
+    writeXmlSyntaxImpl(stream, "</expression>");
 }
 #pragma endregion
 
@@ -97,10 +103,22 @@ void TermRule::compile(VMWriter* vmWriter)
     if (auto integerRule = getChildRule<IntegerConstantRule>(0))
     {
         vmWriter->writePush(ESegment::CONSTANT, integerRule->getValue());
+        return;
     }
-    writeOutput("<term>");
-    ParentRule::compile(vmWriter);
-    writeOutput("</term>");
+    auto sequenceRule = getChildRule<SequenceRule>(0);
+    if (auto symbolRule = sequenceRule->getChildRule<SymbolRule>(0))
+    {
+        auto expressionRule = sequenceRule->getChildRule<ExpressionRule>(1);
+        expressionRule->compile(vmWriter);
+        return;
+    }
+}
+
+void TermRule::writeXmlSyntax(ofstream* stream)
+{
+    writeXmlSyntaxImpl(stream, "<term>");
+    ParentRule::writeXmlSyntax(stream);
+    writeXmlSyntaxImpl(stream, "</term>");
 }
 #pragma endregion
 
@@ -176,9 +194,14 @@ ExpressionListRule::ExpressionListRule() : SequenceRule(
 
 void ExpressionListRule::compile(VMWriter* vmWriter)
 {
-    writeOutput("<expressionList>");
     SequenceRule::compile(vmWriter);
-    writeOutput("</expressionList>");
+}
+
+void ExpressionListRule::writeXmlSyntax(std::ofstream* stream)
+{
+    writeXmlSyntaxImpl(stream, "<expressionList>");
+    SequenceRule::writeXmlSyntax(stream);
+    writeXmlSyntaxImpl(stream, "</expressionList>");
 }
 
 int ExpressionListRule::getExpressionCount()
