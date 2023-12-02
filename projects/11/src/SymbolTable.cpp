@@ -44,101 +44,64 @@ int SymbolTable::varCount(ESymbolKind kind)
 }
 
 /// <summary>
-/// Returns the kind of the named identifier.
-/// If the identifier is not found, returns UNDEFINED.
+/// Retrieves information about a symbol with the given name from the symbol table.
+/// If the symbol is not found, returns a Symbol with default values.
 /// </summary>
-ESymbolKind SymbolTable::kindOf(std::string name)
+/// <param name="name">The name of the symbol to retrieve.</param>
+/// <returns>A Symbol struct containing information about the symbol.</returns>
+Symbol SymbolTable::getSymbol(std::string name)
 {
     int index = -1;
 
     index = findSymbol(varSymbols, name);
     if (index != -1)
     {
-        return ESymbolKind::VAR;
+        return Symbol
+        {
+            name,
+            ESymbolKind::VAR,
+            varSymbols[index].second,
+            index
+        };
     }
 
     index = findSymbol(argSymbols, name);
     if (index != -1)
     {
-        return ESymbolKind::ARG;
+        return Symbol
+        {
+            name,
+            ESymbolKind::ARG,
+            argSymbols[index].second,
+            index
+        };
     }
 
     index = findSymbol(fieldSymbols, name);
     if (index != -1)
     {
-        return ESymbolKind::FIELD;
+        return Symbol
+        {
+            name,
+            ESymbolKind::FIELD,
+            fieldSymbols[index].second,
+            index
+        };
     }
 
     index = findSymbol(staticSymbols, name);
     if (index != -1)
     {
-        return ESymbolKind::STATIC;
+        return Symbol
+        {
+            name,
+            ESymbolKind::STATIC,
+            staticSymbols[index].second,
+            index
+        };
     }
 
-    return ESymbolKind::UNDEFINED;
-}
-
-/// <summary>
-/// Returns the type of the named variable.
-/// </summary>
-std::string SymbolTable::typeOf(std::string name)
-{
-    int index = -1;
-
-    index = findSymbol(varSymbols, name);
-    if (index != -1)
-    {
-        return varSymbols[index].second;
-    }
-
-    index = findSymbol(argSymbols, name);
-    if (index != -1)
-    {
-        return argSymbols[index].second;
-    }
-
-    index = findSymbol(fieldSymbols, name);
-    if (index != -1)
-    {
-        return fieldSymbols[index].second;
-    }
-
-    index = findSymbol(staticSymbols, name);
-    if (index != -1)
-    {
-        return staticSymbols[index].second;
-    }
-
-    return "";
-}
-
-/// <summary>
-/// Returns the index of the named variable.
-/// </summary>
-int SymbolTable::indexOf(std::string name)
-{
-    int index = -1;
-
-    index = findSymbol(varSymbols, name);
-    if (index != -1)
-    {
-        return index;
-    }
-
-    index = findSymbol(argSymbols, name);
-    if (index != -1)
-    {
-        return index;
-    }
-
-    index = findSymbol(fieldSymbols, name);
-    if (index != -1)
-    {
-        return index;
-    }
-
-    index = findSymbol(staticSymbols, name);
-    return index;
+    return Symbol{};
 }
 
 std::vector<std::pair<std::string, std::string>>& SymbolTable::getVector(ESymbolKind symbolKind)

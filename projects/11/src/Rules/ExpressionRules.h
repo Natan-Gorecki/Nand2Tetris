@@ -51,7 +51,6 @@ public:
     ExpressionListRule();
     ~ExpressionListRule() override = default;
 
-    void compile(VMWriter* vmWriter) override;
     void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 
     int getExpressionCount();
@@ -71,6 +70,8 @@ class UnaryOpRule : public AlternationRule
 public:
     UnaryOpRule();
     ~UnaryOpRule() override = default;
+
+    void compile(VMWriter* vmWriter) override;
 };
 
 class KeywordConstantRule : public AlternationRule
@@ -78,4 +79,6 @@ class KeywordConstantRule : public AlternationRule
 public:
     KeywordConstantRule();
     ~KeywordConstantRule() override = default;
+
+    void compile(VMWriter* vmWriter) override;
 };

@@ -3,6 +3,7 @@
 #include "ExpressionRules.h"
 #include "LexicalRules.h"
 #include "ProgramStructureRules.h"
+#include "RuleUtils.h"
 
 using namespace std;
 
@@ -24,17 +25,13 @@ ExpressionRule::ExpressionRule() : SequenceRule(
 
 void ExpressionRule::compile(VMWriter* vmWriter)
 {
-    auto term1 = getChild(0)->cast<TermRule>();
-    term1->compile(vmWriter);
+    getChild(0)->compile(vmWriter);
 
-    if (getChild(1)->getChildRules().size() > 0)
+    for (const auto& rule : getChild(1)->getChildRules())
     {
-        auto op = getChild(1)->getChild(0)->getChild(0)->cast<OpRule>();
-        auto term2 = getChild(1)->getChild(0)->getChild(1)->cast<TermRule>();
-        term2->compile(vmWriter);
-        op->compile(vmWriter);
+        rule->getChild(1)->compile(vmWriter);
+        rule->getChild(0)->compile(vmWriter);
     }
-    
 }
 
 void ExpressionRule::writeXmlSyntax(ofstream* stream, int tabs)
@@ -100,13 +97,56 @@ void TermRule::compile(VMWriter* vmWriter)
         vmWriter->writePush(ESegment::CONSTANT, integerRule->getValue());
         return;
     }
-    auto sequenceRule = getChild(0)->cast<SequenceRule>();
-    if (auto symbolRule = sequenceRule->getChild(0)->cast<SymbolRule>())
+    if (auto stringRule = getChild(0)->cast<StringConstantRule>())
     {
-        auto expressionRule = sequenceRule->getChild(1)->cast<ExpressionRule>();
-        expressionRule->compile(vmWriter);
+        auto stringValue = stringRule->toString();
+        vmWriter->writePush(ESegment::CONSTANT, stringValue.length());
+        vmWriter->writeCall("String.new", 1);
+
+        for (int i = 0; i < stringValue.length(); i++)
+        {
+            vmWriter->writePush(ESegment::CONSTANT, stringValue[i]);
+            vmWriter->writeCall("String.appendChar", 2);
+        }
         return;
     }
+    if (auto keywordRule = getChild(0)->cast<KeywordConstantRule>())
+    {
+        keywordRule->compile(vmWriter);
+        return;
+    }
+    if (auto varNameRule = getChild(0)->cast<VarNameRule>())
+    {
+        auto symbol = RuleUtils::findSymbol(this, varNameRule->toString());
+        vmWriter->writePush(symbol.getSegment(), symbol.index);
+        return;
+    }
+    if (auto subroutineRule = getChild(0)->cast<SubroutineCallRule>())
+    {
+        subroutineRule->compile(vmWriter);
+        return;
+    }
+
+    auto sequenceRule = getChild(0)->cast<SequenceRule>();
+    if (sequenceRule->getChild(0)->cast<UnaryOpRule>())
+    {
+        sequenceRule->getChild(1)->compile(vmWriter);
+        sequenceRule->getChild(0)->compile(vmWriter);
+        return;
+    }
+    if (sequenceRule->getChild(0)->cast<SymbolRule>())
+    {
+        sequenceRule->getChild(0)->compile(vmWriter);
+        return;
+    }
+
+    // arrays
+    auto symbol = RuleUtils::findSymbol(this, sequenceRule->getChild(0)->cast<VarNameRule>()->toString());
+    vmWriter->writePush(symbol.getSegment(), symbol.index);
+    sequenceRule->getChild(2)->compile(vmWriter);
+    vmWriter->writeArithmetic(EArithmetic::ADD);
+    vmWriter->writePop(ESegment::POINTER, 1);
+    vmWriter->writePush(ESegment::THAT, 0);
 }
 
 void TermRule::writeXmlSyntax(ofstream* stream, int tabs)
@@ -157,17 +197,44 @@ SubroutineCallRule::SubroutineCallRule() : AlternationRule(
 
 void SubroutineCallRule::compile(VMWriter* vmWriter)
 {
-    bool isMethod = getTrueRule()->getChild(0)->cast<SubroutineNameRule>() != nullptr;
+    string className, subroutineName;
+    ExpressionListRule* expressionListRule = nullptr;
 
-    if (!isMethod)
+    // subroutineName(expressionList)
+    if (auto subroutineNameRule = getTrueRule()->getChild(0)->cast<SubroutineNameRule>())
     {
-        auto className = getTrueRule()->getChild(0)->cast<AlternationRule>()->getTrueRule()->cast<ClassNameRule>()->toString();
-        auto subroutineName = getTrueRule()->getChild(2)->cast<SubroutineNameRule>()->toString();
-        auto expressionCount = getTrueRule()->getChild(4)->cast<ExpressionListRule>()->getExpressionCount();
-        AlternationRule::compile(vmWriter);
+        className = getParentRecursive<ClassRule>()->getChild(1)->cast<ClassNameRule>()->toString();
+        subroutineName = subroutineNameRule->toString();
+        expressionListRule = getTrueRule()->getChild(2)->cast<ExpressionListRule>();
 
-        vmWriter->writeCall(className + "." + subroutineName, expressionCount);
+        vmWriter->writePush(ESegment::POINTER, 0);
+        expressionListRule->compile(vmWriter);
+        
+        vmWriter->writeCall(className + "." + subroutineName, expressionListRule->getExpressionCount() + 1);
+        return;
     }
+
+    // varName.subroutineName(expressionList)
+    if (auto varNameRule = getTrueRule()->getChild(0)->cast<AlternationRule>()->getTrueRule()->cast<VarNameRule>())
+    {
+        auto symbol = RuleUtils::findSymbol(this, varNameRule->toString());
+        subroutineName = getTrueRule()->getChild(2)->cast<SubroutineNameRule>()->toString();
+        expressionListRule = getTrueRule()->getChild(4)->cast<ExpressionListRule>();
+
+        vmWriter->writePush(symbol.getSegment(), symbol.index);
+        expressionListRule->compile(vmWriter);
+
+        vmWriter->writeCall(className + "." + subroutineName, expressionListRule->getExpressionCount() + 1);
+        return;
+    }
+
+    // className.subroutineName(expressionList)
+    className = getTrueRule()->getChild(0)->cast<AlternationRule>()->getTrueRule()->cast<ClassNameRule>()->toString();
+    subroutineName = getTrueRule()->getChild(2)->cast<SubroutineNameRule>()->toString();
+    expressionListRule = getTrueRule()->getChild(4)->cast<ExpressionListRule>();
+
+    expressionListRule->compile(vmWriter);
+    vmWriter->writeCall(className + "." + subroutineName, expressionListRule->getExpressionCount());
 }
 
 void SubroutineCallRule::writeXmlSyntax(std::ofstream* stream, int tabs)
@@ -196,11 +263,6 @@ ExpressionListRule::ExpressionListRule() : SequenceRule(
         })
     })
 {
-}
-
-void ExpressionListRule::compile(VMWriter* vmWriter)
-{
-    SequenceRule::compile(vmWriter);
 }
 
 void ExpressionListRule::writeXmlSyntax(std::ofstream* stream, int tabs)
@@ -240,16 +302,35 @@ OpRule::OpRule() : AlternationRule(
 
 void OpRule::compile(VMWriter* vmWriter)
 {
-    AlternationRule::compile(vmWriter);
-
     auto symbol = getTrueRule()->cast<SymbolRule>()->getValue();
     switch (symbol)
     {
     case '+':
         vmWriter->writeArithmetic(EArithmetic::ADD);
         break;
+    case '-':
+        vmWriter->writeArithmetic(EArithmetic::SUB);
+        break;
     case '*':
         vmWriter->writeCall("Math.multiply", 2);
+        break;
+    case '/':
+        vmWriter->writeCall("Math.divide", 2);
+        break;
+    case '&':
+        vmWriter->writeArithmetic(EArithmetic::AND);
+        break;
+    case '|':
+        vmWriter->writeArithmetic(EArithmetic::OR);
+        break;
+    case '<':
+        vmWriter->writeArithmetic(EArithmetic::LT);
+        break;
+    case '>':
+        vmWriter->writeArithmetic(EArithmetic::GT);
+        break;
+    case '=':
+        vmWriter->writeArithmetic(EArithmetic::EQ);
         break;
     }
 }
@@ -263,6 +344,20 @@ UnaryOpRule::UnaryOpRule() : AlternationRule(
     })
 {
 }
+
+void UnaryOpRule::compile(VMWriter* vmWriter)
+{
+    auto symbol = getTrueRule()->cast<SymbolRule>()->getValue();
+    switch (symbol)
+    {
+    case '-':
+        vmWriter->writeArithmetic(EArithmetic::NEG);
+        break;
+    case '~':
+        vmWriter->writeArithmetic(EArithmetic::NOT);
+        break;
+    }
+}
 #pragma endregion
 
 #pragma region KeywordConstantRule
@@ -274,5 +369,25 @@ KeywordConstantRule::KeywordConstantRule() : AlternationRule(
         make_shared<KeywordRule>("this")
     })
 {
+}
+
+void KeywordConstantRule::compile(VMWriter* vmWriter)
+{
+    auto constant = getTrueRule()->cast<KeywordRule>()->toString();
+
+    if (constant == "true")
+    {
+        vmWriter->writePush(ESegment::CONSTANT, 1);
+        vmWriter->writeArithmetic(EArithmetic::NEG);
+        return;
+    }
+
+    if (constant == "this")
+    {
+        vmWriter->writePush(ESegment::POINTER, 0);
+        return;
+    }
+
+    vmWriter->writePush(ESegment::CONSTANT, 0);
 }
 #pragma endregion

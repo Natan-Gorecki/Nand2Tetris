@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include "ESymbolKind.h"
+#include "Symbol.h"
 
 /// <summary>
 /// SymbolTable is responsible for building, populating and using symbols.
@@ -24,18 +25,12 @@ public:
     /// </summary>
     int varCount(ESymbolKind kind);
     /// <summary>
-    /// Returns the kind of the named identifier.
-    /// If the identifier is not found, returns UNDEFINED.
+    /// Retrieves information about a symbol with the given name from the symbol table.
+    /// If the symbol is not found, returns a Symbol with default values.
     /// </summary>
-    ESymbolKind kindOf(std::string name);
-    /// <summary>
-    /// Returns the type of the named variable.
-    /// </summary>
-    std::string typeOf(std::string name);
-    /// <summary>
-    /// Returns the index of the named variable.
-    /// </summary>
-    int indexOf(std::string name);
+    /// <param name="name">The name of the symbol to retrieve.</param>
+    /// <returns>A Symbol struct containing information about the symbol.</returns>
+    Symbol getSymbol(std::string name);
 
 private:
     std::vector<std::pair<std::string, std::string>>& getVector(ESymbolKind symbolKind);

@@ -48,6 +48,9 @@
     <ClCompile Include="..\SymbolTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Rules\RuleUtils.cpp">
+      <Filter>Source Files\Rules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\CompilationEngine.h">
@@ -93,6 +96,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\ESymbolKind.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Rules\RuleUtils.h">
+      <Filter>Header Files\Rules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Symbol.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

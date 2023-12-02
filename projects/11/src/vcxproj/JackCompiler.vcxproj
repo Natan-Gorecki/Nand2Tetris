@@ -139,6 +139,7 @@
     <ClCompile Include="..\Rules\ExpressionRules.cpp" />
     <ClCompile Include="..\Rules\LexicalRules.cpp" />
     <ClCompile Include="..\Rules\ProgramStructureRules.cpp" />
+    <ClCompile Include="..\Rules\RuleUtils.cpp" />
     <ClCompile Include="..\Rules\StatementRules.cpp" />
     <ClCompile Include="..\SymbolTable.cpp" />
     <ClCompile Include="..\VMWriter.cpp" />
@@ -156,7 +157,9 @@
     <ClInclude Include="..\Rules\ExpressionRules.h" />
     <ClInclude Include="..\Rules\LexicalRules.h" />
     <ClInclude Include="..\Rules\ProgramStructureRules.h" />
+    <ClInclude Include="..\Rules\RuleUtils.h" />
     <ClInclude Include="..\Rules\StatementRules.h" />
+    <ClInclude Include="..\Symbol.h" />
     <ClInclude Include="..\SymbolTable.h" />
     <ClInclude Include="..\VMWriter.h" />
   </ItemGroup>

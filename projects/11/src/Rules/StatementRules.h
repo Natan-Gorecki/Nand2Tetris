@@ -36,9 +36,6 @@ public:
 
     void compile(VMWriter* vmWriter) override;
     void writeXmlSyntax(std::ofstream* stream, int tabs) override;
-
-private:
-    ESegment symbolKindToSegment(ESymbolKind symbolKind);
 };
 
 class IfStatementRule : public SequenceRule

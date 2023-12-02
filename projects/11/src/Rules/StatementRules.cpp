@@ -2,6 +2,7 @@
 #include "ExpressionRules.h"
 #include "LexicalRules.h"
 #include "ProgramStructureRules.h"
+#include "RuleUtils.h"
 #include "StatementRules.h"
 #include "../CompilationEngine.h"
 #include "../JackCompilerError.h"
@@ -65,29 +66,15 @@ void LetStatementRule::compile(VMWriter* vmWriter)
 {
     getChild(4)->compile(vmWriter);
     auto variableName = getChild(1)->cast<VarNameRule>()->toString();
-
-    auto& classTable = getParentRecursive<ClassRule>()->getSymbolTable();
-    auto& subroutineTable = getParentRecursive<SubroutineDecRule>()->getSymbolTable();
-
-    ESymbolKind variableKind = subroutineTable.kindOf(variableName);
-    int variableIndex = subroutineTable.indexOf(variableName);
-    if (variableKind == ESymbolKind::UNDEFINED)
-    {
-        variableKind = classTable.kindOf(variableName);
-        variableIndex = classTable.indexOf(variableName);
-    }
-    if (variableKind == ESymbolKind::UNDEFINED)
-    {
-        throw JackCompilerError("Could not find " + variableName + " variable.");
-    }
+    auto symbol = RuleUtils::findSymbol(this, variableName);
 
     if (getChild(2)->getChildRules().empty())
     {
-        vmWriter->writePop(symbolKindToSegment(variableKind), variableIndex);
+        vmWriter->writePop(symbol.getSegment(), symbol.index);
         return;
     }
 
-    vmWriter->writePush(symbolKindToSegment(variableKind), variableIndex);
+    vmWriter->writePush(symbol.getSegment(), symbol.index);
     getChild(2)->getChild(0)->getChild(1)->compile(vmWriter);
     vmWriter->writeArithmetic(EArithmetic::ADD);
     vmWriter->writePop(ESegment::POINTER, 1);
@@ -99,24 +86,6 @@ void LetStatementRule::writeXmlSyntax(std::ofstream* stream, int tabs)
     XML_SYNTAX("<letStatement>");
     SequenceRule::writeXmlSyntax(stream, tabs);
     XML_SYNTAX("</letStatement>");
-}
-
-ESegment LetStatementRule::symbolKindToSegment(ESymbolKind symbolKind)
-{
-    switch (symbolKind)
-    {
-    case ESymbolKind::STATIC:
-        return ESegment::STATIC;
-    case ESymbolKind::FIELD:
-        return ESegment::THIS;
-    case ESymbolKind::ARG:
-        return ESegment::ARGUMENT;
-    case ESymbolKind::VAR:
-        return ESegment::LOCAL;
-    case ESymbolKind::UNDEFINED:
-    default:
-        throw JackCompilerError("Symbol kind is undefined.");
-    }
 }
 #pragma endregion
 
