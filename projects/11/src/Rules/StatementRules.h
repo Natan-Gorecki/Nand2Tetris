@@ -34,7 +34,11 @@ public:
     LetStatementRule();
     ~LetStatementRule() override = default;
 
+    void compile(VMWriter* vmWriter) override;
     void writeXmlSyntax(std::ofstream* stream, int tabs) override;
+
+private:
+    ESegment symbolKindToSegment(ESymbolKind symbolKind);
 };
 
 class IfStatementRule : public SequenceRule
@@ -43,7 +47,11 @@ public:
     IfStatementRule();
     ~IfStatementRule() override = default;
 
+    void compile(VMWriter* vmWriter) override;
     void writeXmlSyntax(std::ofstream* stream, int tabs) override;
+
+private:
+    static int unique;
 };
 
 class WhileStatementRule : public SequenceRule
@@ -52,7 +60,11 @@ public:
     WhileStatementRule();
     ~WhileStatementRule() override = default;
 
+    void compile(VMWriter* vmWriter) override;
     void writeXmlSyntax(std::ofstream* stream, int tabs) override;
+
+private:
+    static int unique;
 };
 
 class DoStatementRule : public SequenceRule
@@ -71,5 +83,6 @@ public:
     ReturnStatementRule();
     ~ReturnStatementRule() override = default;
 
+    void compile(VMWriter* vmWriter) override;
     void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 };

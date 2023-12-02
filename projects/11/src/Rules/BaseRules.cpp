@@ -59,6 +59,10 @@ void Rule::setParent(Rule* pRule)
 
 Rule* Rule::getChild(int index)
 {
+    if (index >= mChildRules.size())
+    {
+        return nullptr;
+    }
     return mChildRules[index].get();
 }
 
