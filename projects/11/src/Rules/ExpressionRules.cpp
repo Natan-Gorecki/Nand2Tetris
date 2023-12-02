@@ -214,10 +214,14 @@ void SubroutineCallRule::compile(VMWriter* vmWriter)
         return;
     }
 
+    // currently there is no way to distiguish between class and variable - we do not track all classes
+    auto identifierRule = getTrueRule()->getChild(0)->cast<AlternationRule>()->getTrueRule()->cast<IdentifierRule>();
+    auto symbol = RuleUtils::findSymbol(this, identifierRule->toString());
+
     // varName.subroutineName(expressionList)
-    if (auto varNameRule = getTrueRule()->getChild(0)->cast<AlternationRule>()->getTrueRule()->cast<VarNameRule>())
+    if (symbol.kind != ESymbolKind::UNDEFINED)
     {
-        auto symbol = RuleUtils::findSymbol(this, varNameRule->toString());
+        className = symbol.type;
         subroutineName = getTrueRule()->getChild(2)->cast<SubroutineNameRule>()->toString();
         expressionListRule = getTrueRule()->getChild(4)->cast<ExpressionListRule>();
 
@@ -274,7 +278,7 @@ void ExpressionListRule::writeXmlSyntax(std::ofstream* stream, int tabs)
 
 int ExpressionListRule::getExpressionCount()
 {
-    if (getChildRules().empty())
+    if (getChild(0)->getChildRules().empty())
     {
         return 0;
     }

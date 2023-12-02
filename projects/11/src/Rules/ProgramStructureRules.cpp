@@ -165,7 +165,8 @@ void SubroutineDecRule::compile(VMWriter* vmWriter)
     }
     if (subroutineType == "constructor")
     {
-        vmWriter->writePush(ESegment::CONSTANT, variablesCount);
+        auto fieldsCount = getParentRecursive<ClassRule>()->getSymbolTable().varCount(ESymbolKind::FIELD);
+        vmWriter->writePush(ESegment::CONSTANT, fieldsCount);
         vmWriter->writeCall("Memory.alloc", 1);
         vmWriter->writePop(ESegment::POINTER, 0);
     }

@@ -13,10 +13,6 @@ Symbol RuleUtils::findSymbol(Rule* rule, std::string name)
     {
         symbol = classTable.getSymbol(name);
     }
-    if (symbol.kind == ESymbolKind::UNDEFINED)
-    {
-        throw JackCompilerError("Could not find " + name + " symbol.");
-    }
 
     return symbol;
 }

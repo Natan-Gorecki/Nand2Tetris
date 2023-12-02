@@ -123,12 +123,20 @@ void IfStatementRule::compile(VMWriter* vmWriter)
 
     vmWriter->writeLabel("IF_TRUE" + to_string(uniqueNumber));
     getChild(5)->compile(vmWriter);
-    vmWriter->writeGoto("IF_END" + to_string(uniqueNumber));
 
-    vmWriter->writeLabel("IF_FALSE" + to_string(uniqueNumber));
-    getChild(7)->compile(vmWriter);
+    if (getChild(7)->getChildRules().size() > 0)
+    {
+        vmWriter->writeGoto("IF_END" + to_string(uniqueNumber));
+        vmWriter->writeLabel("IF_FALSE" + to_string(uniqueNumber));
+        getChild(7)->compile(vmWriter);
 
-    vmWriter->writeLabel("IF_END" + to_string(uniqueNumber));
+        vmWriter->writeLabel("IF_END" + to_string(uniqueNumber));
+    }
+    else
+    {
+        // added else clause to make it identical with default compiler
+        vmWriter->writeLabel("IF_FALSE" + to_string(uniqueNumber));
+    }
 }
 
 void IfStatementRule::writeXmlSyntax(std::ofstream* stream, int tabs)
