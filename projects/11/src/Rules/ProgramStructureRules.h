@@ -58,9 +58,12 @@ public:
     void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 
     SymbolTable& getSymbolTable();
+    int getUniqueNumber(Rule* rule);
 
 private:
     SymbolTable mSymbolTable;
+    int whileCounter = 0;
+    int ifCounter = 0;
 };
 
 class ParameterListRule : public ZeroOrOneRule

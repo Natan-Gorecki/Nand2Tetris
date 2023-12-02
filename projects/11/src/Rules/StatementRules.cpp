@@ -90,8 +90,6 @@ void LetStatementRule::writeXmlSyntax(std::ofstream* stream, int tabs)
 #pragma endregion
 
 #pragma region IfStatementRule
-int IfStatementRule::unique = 0;
-
 IfStatementRule::IfStatementRule() : SequenceRule(
     {
         make_shared<KeywordRule>("if"),
@@ -117,19 +115,20 @@ IfStatementRule::IfStatementRule() : SequenceRule(
 
 void IfStatementRule::compile(VMWriter* vmWriter)
 {
-    int uniqueNumber = unique++;
+    auto uniqueNumber = getParentRecursive<SubroutineDecRule>()->getUniqueNumber(this);
 
     getChild(2)->compile(vmWriter);
-    vmWriter->writeArithmetic(EArithmetic::NOT);
-    vmWriter->writeIf("IF_TRUE" + uniqueNumber);
-    
-    getChild(7)->compile(vmWriter);
-    vmWriter->writeGoto("IF_FALSE" + uniqueNumber);
-    
-    vmWriter->writeLabel("IF_TRUE" + uniqueNumber);
-    getChild(5)->compile(vmWriter);
+    vmWriter->writeIf("IF_TRUE" + to_string(uniqueNumber));
+    vmWriter->writeGoto("IF_FALSE" + to_string(uniqueNumber));
 
-    vmWriter->writeLabel("IF_FALSE" + uniqueNumber);
+    vmWriter->writeLabel("IF_TRUE" + to_string(uniqueNumber));
+    getChild(5)->compile(vmWriter);
+    vmWriter->writeGoto("IF_END" + to_string(uniqueNumber));
+
+    vmWriter->writeLabel("IF_FALSE" + to_string(uniqueNumber));
+    getChild(7)->compile(vmWriter);
+
+    vmWriter->writeLabel("IF_END" + to_string(uniqueNumber));
 }
 
 void IfStatementRule::writeXmlSyntax(std::ofstream* stream, int tabs)
@@ -141,8 +140,6 @@ void IfStatementRule::writeXmlSyntax(std::ofstream* stream, int tabs)
 #pragma endregion
 
 #pragma region WhileStatementRule
-int WhileStatementRule::unique = 0;
-
 WhileStatementRule::WhileStatementRule() : SequenceRule(
     {
         make_shared<KeywordRule>("while"),
@@ -158,18 +155,18 @@ WhileStatementRule::WhileStatementRule() : SequenceRule(
 
 void WhileStatementRule::compile(VMWriter* vmWriter)
 {
-    int uniqueNumber = unique++;
+    auto uniqueNumber = getParentRecursive<SubroutineDecRule>()->getUniqueNumber(this);
 
-    vmWriter->writeLabel("WHILE_EXP" + uniqueNumber);
+    vmWriter->writeLabel("WHILE_EXP" + to_string(uniqueNumber));
     getChild(2)->compile(vmWriter);
     
     vmWriter->writeArithmetic(EArithmetic::NOT);
-    vmWriter->writeIf("WHILE_END" + uniqueNumber);
+    vmWriter->writeIf("WHILE_END" + to_string(uniqueNumber));
 
     getChild(5)->compile(vmWriter);
-    vmWriter->writeGoto("WHILE_EXP" + uniqueNumber);
+    vmWriter->writeGoto("WHILE_EXP" + to_string(uniqueNumber));
 
-    vmWriter->writeLabel("WHILE_END" + uniqueNumber);
+    vmWriter->writeLabel("WHILE_END" + to_string(uniqueNumber));
 }
 
 void WhileStatementRule::writeXmlSyntax(std::ofstream* stream, int tabs)
@@ -219,6 +216,12 @@ ReturnStatementRule::ReturnStatementRule() : SequenceRule(
 
 void ReturnStatementRule::compile(VMWriter* vmWriter)
 {
+    if (getChild(1)->getChildRules().empty())
+    {
+        // void method are handled by SubroutineDecRule
+        return;
+    }
+
     SequenceRule::compile(vmWriter);
     vmWriter->writeReturn();
 }

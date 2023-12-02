@@ -136,7 +136,7 @@ void TermRule::compile(VMWriter* vmWriter)
     }
     if (sequenceRule->getChild(0)->cast<SymbolRule>())
     {
-        sequenceRule->getChild(0)->compile(vmWriter);
+        sequenceRule->getChild(1)->compile(vmWriter);
         return;
     }
 
@@ -377,8 +377,8 @@ void KeywordConstantRule::compile(VMWriter* vmWriter)
 
     if (constant == "true")
     {
-        vmWriter->writePush(ESegment::CONSTANT, 1);
-        vmWriter->writeArithmetic(EArithmetic::NEG);
+        vmWriter->writePush(ESegment::CONSTANT, 0);
+        vmWriter->writeArithmetic(EArithmetic::NOT);
         return;
     }
 

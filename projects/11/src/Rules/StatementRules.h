@@ -46,9 +46,6 @@ public:
 
     void compile(VMWriter* vmWriter) override;
     void writeXmlSyntax(std::ofstream* stream, int tabs) override;
-
-private:
-    static int unique;
 };
 
 class WhileStatementRule : public SequenceRule
@@ -59,9 +56,6 @@ public:
 
     void compile(VMWriter* vmWriter) override;
     void writeXmlSyntax(std::ofstream* stream, int tabs) override;
-
-private:
-    static int unique;
 };
 
 class DoStatementRule : public SequenceRule

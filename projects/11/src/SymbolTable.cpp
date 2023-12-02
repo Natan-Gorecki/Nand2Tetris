@@ -124,7 +124,7 @@ std::vector<std::pair<std::string, std::string>>& SymbolTable::getVector(ESymbol
 
 int SymbolTable::findSymbol(const std::vector<std::pair<std::string, std::string>>& symbols, const std::string& key)
 {
-    for (auto i = 0; i <= symbols.size(); i++)
+    for (auto i = 0; i < symbols.size(); i++)
     {
         if (symbols[i].first == key)
         {

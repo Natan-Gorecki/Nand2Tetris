@@ -3,6 +3,7 @@
 #include "ProgramStructureRules.h"
 #include "StatementRules.h"
 #include "../CompilationEngine.h"
+#include "../JackCompilerError.h"
 
 using namespace std;
 
@@ -171,8 +172,7 @@ void SubroutineDecRule::compile(VMWriter* vmWriter)
 
     getChild(6)->compile(vmWriter);
 
-    auto returnType = getChild(1)->cast<AlternationRule>()->getTrueRule()->cast<LexicalRule>()->toString();
-    if (returnType == "void")
+    if (auto keywordRule = getChild(1)->cast<AlternationRule>()->getTrueRule()->cast<KeywordRule>())
     {
         vmWriter->writePush(ESegment::CONSTANT, 0);
         vmWriter->writeReturn();
@@ -189,6 +189,19 @@ void SubroutineDecRule::writeXmlSyntax(std::ofstream* stream, int tabs)
 SymbolTable& SubroutineDecRule::getSymbolTable()
 {
     return mSymbolTable;
+}
+
+int SubroutineDecRule::getUniqueNumber(Rule* rule)
+{
+    if (auto whileRule = rule->cast<WhileStatementRule>())
+    {
+        return whileCounter++;
+    }
+    if (auto ifRule = rule->cast<IfStatementRule>())
+    {
+        return ifCounter++;
+    }
+    throw JackCompilerError("Unique number is unsupported for rule.");
 }
 #pragma endregion
 
