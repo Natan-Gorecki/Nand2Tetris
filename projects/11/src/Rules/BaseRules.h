@@ -82,7 +82,7 @@ public:
     void compile(VMWriter* vmWriter) override;
     void writeXmlSyntax(std::ofstream* stream, int tabs) override;
 
-    Rule* getPassedRule();
+    Rule* getTrueRule();
 
 private:
     std::shared_ptr<Rule> mPassedRule = nullptr;

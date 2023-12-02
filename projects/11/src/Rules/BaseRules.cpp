@@ -142,7 +142,7 @@ void AlternationRule::writeXmlSyntax(std::ofstream* stream, int tabs)
     mPassedRule->writeXmlSyntax(stream, tabs);
 }
 
-Rule* AlternationRule::getPassedRule()
+Rule* AlternationRule::getTrueRule()
 {
     return mPassedRule.get();
 }

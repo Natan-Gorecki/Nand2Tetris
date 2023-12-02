@@ -157,13 +157,13 @@ SubroutineCallRule::SubroutineCallRule() : AlternationRule(
 
 void SubroutineCallRule::compile(VMWriter* vmWriter)
 {
-    bool isMethod = getPassedRule()->getChild(0)->cast<SubroutineNameRule>() != nullptr;
+    bool isMethod = getTrueRule()->getChild(0)->cast<SubroutineNameRule>() != nullptr;
 
     if (!isMethod)
     {
-        auto className = getPassedRule()->getChild(0)->cast<AlternationRule>()->getPassedRule()->cast<ClassNameRule>()->toString();
-        auto subroutineName = getPassedRule()->getChild(2)->cast<SubroutineNameRule>()->toString();
-        auto expressionCount = getPassedRule()->getChild(4)->cast<ExpressionListRule>()->getExpressionCount();
+        auto className = getTrueRule()->getChild(0)->cast<AlternationRule>()->getTrueRule()->cast<ClassNameRule>()->toString();
+        auto subroutineName = getTrueRule()->getChild(2)->cast<SubroutineNameRule>()->toString();
+        auto expressionCount = getTrueRule()->getChild(4)->cast<ExpressionListRule>()->getExpressionCount();
         AlternationRule::compile(vmWriter);
 
         vmWriter->writeCall(className + "." + subroutineName, expressionCount);
@@ -242,7 +242,7 @@ void OpRule::compile(VMWriter* vmWriter)
 {
     AlternationRule::compile(vmWriter);
 
-    auto symbol = getPassedRule()->cast<SymbolRule>()->getValue();
+    auto symbol = getTrueRule()->cast<SymbolRule>()->getValue();
     switch (symbol)
     {
     case '+':

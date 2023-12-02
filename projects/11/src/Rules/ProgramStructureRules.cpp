@@ -72,9 +72,9 @@ bool ClassVarDecRule::initialize(JackTokenizer* pTokenizer)
     auto classRule = getParentRecursive<ClassRule>();
     auto& symbolTable = classRule->getSymbolTable();
 
-    auto keywordRule = getChild(0)->cast<AlternationRule>()->getPassedRule()->cast<KeywordRule>();
+    auto keywordRule = getChild(0)->cast<AlternationRule>()->getTrueRule()->cast<KeywordRule>();
     auto symbolKind = keywordRule->toString() == "static" ? ESymbolKind::STATIC : ESymbolKind::FIELD;
-    auto type = getChild(1)->cast<TypeRule>()->getPassedRule()->cast<LexicalRule>()->toString();
+    auto type = getChild(1)->cast<TypeRule>()->getTrueRule()->cast<LexicalRule>()->toString();
     auto name = getChild(2)->cast<LexicalRule>()->toString();
 
     symbolTable.define(name, type, symbolKind);
@@ -138,7 +138,7 @@ bool SubroutineDecRule::initialize(JackTokenizer* pTokenizer)
         return false;
     }
 
-    auto subroutineType = getChild(0)->cast<AlternationRule>()->getPassedRule()->cast<KeywordRule>()->toString();
+    auto subroutineType = getChild(0)->cast<AlternationRule>()->getTrueRule()->cast<KeywordRule>()->toString();
     if (subroutineType == "method")
     {
         auto classRule = getParentRecursive<ClassRule>();
@@ -158,7 +158,7 @@ void SubroutineDecRule::compile(VMWriter* vmWriter)
 
     vmWriter->writeFunction(className + "." + subroutineName, variablesCount);
 
-    auto subroutineType = getChild(0)->cast<AlternationRule>()->getPassedRule()->cast<KeywordRule>()->toString();
+    auto subroutineType = getChild(0)->cast<AlternationRule>()->getTrueRule()->cast<KeywordRule>()->toString();
     if (subroutineType == "method")
     {
         vmWriter->writePush(ESegment::ARGUMENT, 0);
@@ -167,7 +167,7 @@ void SubroutineDecRule::compile(VMWriter* vmWriter)
 
     SequenceRule::compile(vmWriter);
 
-    auto returnType = getChild(1)->cast<AlternationRule>()->getPassedRule()->cast<LexicalRule>()->toString();
+    auto returnType = getChild(1)->cast<AlternationRule>()->getTrueRule()->cast<LexicalRule>()->toString();
     if (returnType == "void")
     {
         vmWriter->writePush(ESegment::CONSTANT, 0);
@@ -221,7 +221,7 @@ bool ParameterListRule::initialize(JackTokenizer* pTokenizer)
 
     auto sequenceRule = getChild(0)->cast<SequenceRule>();
     auto& symbolTable = getParentRecursive<SubroutineDecRule>()->getSymbolTable();
-    auto type = sequenceRule->getChild(0)->cast<TypeRule>()->getPassedRule()->cast<LexicalRule>()->toString();
+    auto type = sequenceRule->getChild(0)->cast<TypeRule>()->getTrueRule()->cast<LexicalRule>()->toString();
     auto name = sequenceRule->getChild(1)->cast<LexicalRule>()->toString();
 
     symbolTable.define(name, type, ESymbolKind::ARG);
@@ -229,7 +229,7 @@ bool ParameterListRule::initialize(JackTokenizer* pTokenizer)
     for (const auto& childRule : sequenceRule->getChild(2)->cast<ZeroOrMoreRule>()->getChildRules())
     {
         auto sequenceRule = childRule.get()->cast<SequenceRule>();
-        type = sequenceRule->getChild(1)->cast<TypeRule>()->getPassedRule()->cast<LexicalRule>()->toString();
+        type = sequenceRule->getChild(1)->cast<TypeRule>()->getTrueRule()->cast<LexicalRule>()->toString();
         name = sequenceRule->getChild(2)->cast<VarNameRule>()->toString();
 
         symbolTable.define(name, type, ESymbolKind::ARG);
@@ -272,7 +272,7 @@ bool SubroutineBodyRule::initialize(JackTokenizer* pTokenizer)
     {
         auto varDecRule = childRule->cast<VarDecRule>();
 
-        auto type = varDecRule->getChild(1)->cast<TypeRule>()->getPassedRule()->cast<LexicalRule>()->toString();
+        auto type = varDecRule->getChild(1)->cast<TypeRule>()->getTrueRule()->cast<LexicalRule>()->toString();
         auto name = varDecRule->getChild(2)->cast<LexicalRule>()->toString();
 
         symbolTable.define(name, type, ESymbolKind::VAR);
