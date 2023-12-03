@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Rules">
+      <UniqueIdentifier>{a1e5aa61-623b-4ca9-96db-74369345d1b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rules">
+      <UniqueIdentifier>{dfd6fb2a-30b4-47f8-8a28-a9f14da29e21}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\JackTokenizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JackCompiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CompilationEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main.cpp" />
+    <ClCompile Include="..\Rules\BaseRules.cpp">
+      <Filter>Source Files\Rules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Rules\ExpressionRules.cpp">
+      <Filter>Source Files\Rules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Rules\LexicalRules.cpp">
+      <Filter>Source Files\Rules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Rules\ProgramStructureRules.cpp">
+      <Filter>Source Files\Rules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Rules\StatementRules.cpp">
+      <Filter>Source Files\Rules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VMWriter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SymbolTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Rules\RuleUtils.cpp">
+      <Filter>Source Files\Rules</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\CompilationEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ETokenType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JackCompiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JackCompilerError.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JackTokenizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Rules\BaseRules.h">
+      <Filter>Header Files\Rules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Rules\ExpressionRules.h">
+      <Filter>Header Files\Rules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Rules\LexicalRules.h">
+      <Filter>Header Files\Rules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Rules\ProgramStructureRules.h">
+      <Filter>Header Files\Rules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Rules\StatementRules.h">
+      <Filter>Header Files\Rules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VMWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ESegment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EArithmetic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SymbolTable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ESymbolKind.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Rules\RuleUtils.h">
+      <Filter>Header Files\Rules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Symbol.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
