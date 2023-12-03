@@ -61,7 +61,7 @@ void LexicalRule::writeXmlTokens(std::ofstream* stream)
     *stream << "<" << getClassName() << ">" << encodeXml(toString()) << "</" << getClassName() << ">\n";
 }
 
-string LexicalRule::encodeXml(string text) const
+string LexicalRule::encodeXml(const string& text) const
 {
     string result;
 
@@ -150,7 +150,7 @@ string SymbolRule::toString()
     return string(1, mSymbol);
 }
 
-char SymbolRule::getValue()
+char SymbolRule::getValue() const
 {
     return mSymbol;
 }
@@ -172,7 +172,7 @@ string IntegerConstantRule::toString()
     return to_string(mIntVal);
 }
 
-int IntegerConstantRule::getValue()
+int IntegerConstantRule::getValue() const
 {
     return mIntVal;
 }

@@ -5,5 +5,5 @@
 class RuleUtils
 {
 public:
-    static Symbol findSymbol(Rule* rule, std::string name);
+    static Symbol findSymbol(Rule* rule, const std::string& name);
 };

@@ -13,7 +13,7 @@ public:
     /// <summary>
     /// Creates VMWriter.
     /// </summary>
-    VMWriter(std::shared_ptr<std::ofstream> outputFile);
+    explicit VMWriter(std::shared_ptr<std::ofstream> outputFile);
 
     /// <summary>
     /// Writes a VM push command.
@@ -30,31 +30,31 @@ public:
     /// <summary>
     /// Writes a VM label command.
     /// </summary>
-    void writeLabel(std::string label);
+    void writeLabel(const std::string& label);
     /// <summary>
     /// Writes a VM goto command.
     /// </summary>
-    void writeGoto(std::string label);
+    void writeGoto(const std::string& label);
     /// <summary>
     /// Writes a VM if-goto command.
     /// </summary>
-    void writeIf(std::string label);
+    void writeIf(const std::string& label);
     /// <summary>
     /// Writes a VM call command.
     /// </summary>
-    void writeCall(std::string name, int nArgs);
+    void writeCall(const std::string& name, int nArgs);
     /// <summary>
     /// Writes a VM function command.
     /// </summary>
-    void writeFunction(std::string name, int nArgs);
+    void writeFunction(const std::string& name, int nArgs);
     /// <summary>
     /// Writes a VM return command.
     /// </summary>
     void writeReturn();
 
 private:
-    std::string segmentToString(ESegment segment);
-    std::string arithmeticToString(EArithmetic segment);
+    std::string segmentToString(ESegment segment) const;
+    std::string arithmeticToString(EArithmetic segment) const;
     
     std::shared_ptr<std::ofstream> mOutputFile;
 };

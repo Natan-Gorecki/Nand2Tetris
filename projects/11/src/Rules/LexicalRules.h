@@ -32,7 +32,7 @@ protected:
     virtual std::string getClassName() = 0;
 
 private:
-    std::string encodeXml(std::string text) const;
+    std::string encodeXml(const std::string& text) const;
 };
 
 class KeywordRule : public LexicalRule
@@ -68,7 +68,7 @@ public:
     ~SymbolRule() override = default;
 
     std::string toString() override;
-    char getValue();
+    char getValue() const;
 
 protected:
     bool isFullfiled(JackTokenizer* pTokenizer) override;
@@ -85,7 +85,7 @@ public:
     ~IntegerConstantRule() override = default;
 
     std::string toString() override;
-    int getValue();
+    int getValue() const;
 
 protected:
     bool isFullfiled(JackTokenizer* pTokenizer) override;

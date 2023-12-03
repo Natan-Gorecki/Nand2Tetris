@@ -16,13 +16,13 @@ class ZeroOrOneRule;
 using RuleVector = std::vector<std::shared_ptr<Rule>>;
 using CreateRuleFunc = std::function<std::shared_ptr<Rule>(void)>;
 
-#define XML_SYNTAX(text) *stream << std::string(tabs * 2, ' ') << text << "\n";
+#define XML_SYNTAX(text) *stream << std::string(tabs * 2, ' ') << text << "\n"
 
 class Rule
 {
 public:
     Rule() = default;
-    Rule(RuleVector const& rules);
+    explicit Rule(RuleVector const& rules);
     virtual ~Rule() = default;
 
     virtual bool initialize(JackTokenizer* pTokenizer);

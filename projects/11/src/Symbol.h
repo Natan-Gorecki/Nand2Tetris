@@ -11,7 +11,7 @@ struct Symbol
     std::string type;
     int index;
 
-    ESegment getSegment()
+    ESegment getSegment() const
     {
         switch (kind)
         {
@@ -23,7 +23,6 @@ struct Symbol
             return ESegment::ARGUMENT;
         case ESymbolKind::VAR:
             return ESegment::LOCAL;
-        case ESymbolKind::UNDEFINED:
         default:
             return ESegment::UNDEFINED;
         }

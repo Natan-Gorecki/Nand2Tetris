@@ -23,18 +23,18 @@ public:
     /// <summary>
     /// Returns the number of variables of the given kind already defined in the table.
     /// </summary>
-    int varCount(ESymbolKind kind);
+    int varCount(ESymbolKind kind) const;
     /// <summary>
     /// Retrieves information about a symbol with the given name from the symbol table.
     /// If the symbol is not found, returns a Symbol with default values.
     /// </summary>
     /// <param name="name">The name of the symbol to retrieve.</param>
     /// <returns>A Symbol struct containing information about the symbol.</returns>
-    Symbol getSymbol(std::string name);
+    Symbol getSymbol(const std::string& name);
 
 private:
     std::vector<std::pair<std::string, std::string>>& getVector(ESymbolKind symbolKind);
-    int findSymbol(const std::vector<std::pair<std::string, std::string>>& symbols, const std::string& key);
+    int findSymbol(const std::vector<std::pair<std::string, std::string>>& symbols, std::string_view key) const;
 
     std::vector<std::pair<std::string, std::string>> staticSymbols;
     std::vector<std::pair<std::string, std::string>> fieldSymbols;

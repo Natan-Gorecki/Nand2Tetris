@@ -1,9 +1,9 @@
 #include "BaseRules.h"
-#include "../JackCompilerError.h"
 #include "ProgramStructureRules.h"
 #include "RuleUtils.h"
+#include "../JackCompilerError.h"
 
-Symbol RuleUtils::findSymbol(Rule* rule, std::string name)
+Symbol RuleUtils::findSymbol(Rule* rule, const std::string& name)
 {
     auto& classTable = rule->getParentRecursive<ClassRule>()->getSymbolTable();
     auto& subroutineTable = rule->getParentRecursive<SubroutineDecRule>()->getSymbolTable();

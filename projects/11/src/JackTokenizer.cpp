@@ -1,8 +1,8 @@
 #include <algorithm>
 #include <iostream>
 #include "JackTokenizer.h"
-#include "Rules/LexicalRules.h"
 #include "JackCompilerError.h"
+#include "Rules/LexicalRules.h"
 
 using namespace std;
 

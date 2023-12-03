@@ -31,8 +31,7 @@ void CompilationEngine::compileFile()
     beforeCompile();
 
     auto classRule = std::make_unique<ClassRule>();
-    auto jackTokenizer = std::make_unique<JackTokenizer>(mInputFileName);
-    if (!classRule->initialize(jackTokenizer.get()))
+    if (!classRule->initialize(std::make_unique<JackTokenizer>(mInputFileName).get()))
     {
         throw JackCompilerError("Failed to initialize class.");
     }

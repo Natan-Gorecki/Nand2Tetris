@@ -103,9 +103,9 @@ void TermRule::compile(VMWriter* vmWriter)
         vmWriter->writePush(ESegment::CONSTANT, static_cast<int>(stringValue.length()));
         vmWriter->writeCall("String.new", 1);
 
-        for (int i = 0; i < stringValue.length(); i++)
+        for (auto character : stringValue)
         {
-            vmWriter->writePush(ESegment::CONSTANT, stringValue[i]);
+            vmWriter->writePush(ESegment::CONSTANT, character);
             vmWriter->writeCall("String.appendChar", 2);
         }
         return;
@@ -197,7 +197,8 @@ SubroutineCallRule::SubroutineCallRule() : AlternationRule(
 
 void SubroutineCallRule::compile(VMWriter* vmWriter)
 {
-    string className, subroutineName;
+    string className;
+    string subroutineName;
     ExpressionListRule* expressionListRule = nullptr;
 
     // subroutineName(expressionList)
@@ -216,10 +217,9 @@ void SubroutineCallRule::compile(VMWriter* vmWriter)
 
     // currently there is no way to distiguish between class and variable - we do not track all classes
     auto identifierRule = getTrueRule()->getChild(0)->cast<AlternationRule>()->getTrueRule()->cast<IdentifierRule>();
-    auto symbol = RuleUtils::findSymbol(this, identifierRule->toString());
 
     // varName.subroutineName(expressionList)
-    if (symbol.kind != ESymbolKind::UNDEFINED)
+    if (auto symbol = RuleUtils::findSymbol(this, identifierRule->toString()); symbol.kind != ESymbolKind::UNDEFINED)
     {
         className = symbol.type;
         subroutineName = getTrueRule()->getChild(2)->cast<SubroutineNameRule>()->toString();
@@ -336,6 +336,8 @@ void OpRule::compile(VMWriter* vmWriter)
     case '=':
         vmWriter->writeArithmetic(EArithmetic::EQ);
         break;
+    default:
+        break;
     }
 }
 #pragma endregion
@@ -359,6 +361,8 @@ void UnaryOpRule::compile(VMWriter* vmWriter)
         break;
     case '~':
         vmWriter->writeArithmetic(EArithmetic::NOT);
+        break;
+    default:
         break;
     }
 }

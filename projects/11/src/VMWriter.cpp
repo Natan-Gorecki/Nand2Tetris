@@ -38,7 +38,7 @@ void VMWriter::writeArithmetic(EArithmetic command)
 /// <summary>
 /// Writes a VM label command.
 /// </summary>
-void VMWriter::writeLabel(std::string label)
+void VMWriter::writeLabel(const std::string& label)
 {
     *mOutputFile << "label " << label << "\n";
 }
@@ -46,7 +46,7 @@ void VMWriter::writeLabel(std::string label)
 /// <summary>
 /// Writes a VM goto command.
 /// </summary>
-void VMWriter::writeGoto(std::string label)
+void VMWriter::writeGoto(const std::string& label)
 {
     *mOutputFile << "goto " << label << "\n";
 }
@@ -54,7 +54,7 @@ void VMWriter::writeGoto(std::string label)
 /// <summary>
 /// Writes a VM if-goto command.
 /// </summary>
-void VMWriter::writeIf(std::string label)
+void VMWriter::writeIf(const std::string& label)
 {
     *mOutputFile << "if-goto " << label << "\n";
 }
@@ -62,7 +62,7 @@ void VMWriter::writeIf(std::string label)
 /// <summary>
 /// Writes a VM call command.
 /// </summary>
-void VMWriter::writeCall(std::string name, int nArgs)
+void VMWriter::writeCall(const std::string& name, int nArgs)
 {
     *mOutputFile << "call " << name << " " << nArgs << "\n";
 }
@@ -70,7 +70,7 @@ void VMWriter::writeCall(std::string name, int nArgs)
 /// <summary>
 /// Writes a VM function command.
 /// </summary>
-void VMWriter::writeFunction(std::string name, int nArgs)
+void VMWriter::writeFunction(const std::string& name, int nArgs)
 {
     *mOutputFile << "function " << name << " " << nArgs << "\n";
 }
@@ -83,7 +83,7 @@ void VMWriter::writeReturn()
     *mOutputFile << "return\n";
 }
 
-string VMWriter::segmentToString(ESegment segment)
+string VMWriter::segmentToString(ESegment segment) const
 {
     switch (segment)
     {
@@ -103,13 +103,12 @@ string VMWriter::segmentToString(ESegment segment)
         return "pointer";
     case ESegment::TEMP:
         return "temp";
-    case ESegment::UNDEFINED:
     default:
         throw JackCompilerError("Undefined segment.");
     }
 }
 
-string VMWriter::arithmeticToString(EArithmetic arithmetic)
+string VMWriter::arithmeticToString(EArithmetic arithmetic) const
 {
     switch (arithmetic)
     {
@@ -131,7 +130,6 @@ string VMWriter::arithmeticToString(EArithmetic arithmetic)
         return "or";
     case EArithmetic::NOT:
         return "not";
-    case EArithmetic::UNDEFINED:
     default:
         throw JackCompilerError("Undefined arithmetic or logical command");
     }

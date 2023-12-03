@@ -138,8 +138,7 @@ bool SubroutineDecRule::initialize(JackTokenizer* pTokenizer)
         return false;
     }
 
-    auto subroutineType = getChild(0)->cast<AlternationRule>()->getTrueRule()->cast<KeywordRule>()->toString();
-    if (subroutineType == "method")
+    if (auto subroutineType = getChild(0)->cast<AlternationRule>()->getTrueRule()->cast<KeywordRule>()->toString(); subroutineType == "method")
     {
         auto classRule = getParentRecursive<ClassRule>();
         auto className = classRule->getChild(1)->cast<ClassNameRule>()->toString();

@@ -8,7 +8,7 @@
 void SymbolTable::define(std::string name, std::string type, ESymbolKind kind)
 {
     auto& vector = getVector(kind);
-    vector.push_back({ name, type });
+    vector.emplace_back(name, type);
 }
 
 /// <summary>
@@ -19,13 +19,13 @@ void SymbolTable::define(std::string name, std::string type, ESymbolKind kind, i
 {
     auto& vector = getVector(kind);
     auto position = vector.begin() + index;
-    vector.insert(position, { name, type });
+    vector.emplace(position, name, type);
 }
 
 /// <summary>
 /// Returns the number of variables of the given kind already defined in the table.
 /// </summary>
-int SymbolTable::varCount(ESymbolKind kind)
+int SymbolTable::varCount(ESymbolKind kind) const
 {
     switch (kind)
     {
@@ -37,7 +37,6 @@ int SymbolTable::varCount(ESymbolKind kind)
         return (int)argSymbols.size();
     case ESymbolKind::VAR:
         return (int)varSymbols.size();
-    case ESymbolKind::UNDEFINED:
     default:
         return -1;
     }
@@ -49,7 +48,7 @@ int SymbolTable::varCount(ESymbolKind kind)
 /// </summary>
 /// <param name="name">The name of the symbol to retrieve.</param>
 /// <returns>A Symbol struct containing information about the symbol.</returns>
-Symbol SymbolTable::getSymbol(std::string name)
+Symbol SymbolTable::getSymbol(const std::string& name)
 {
     int index = -1;
 
@@ -116,13 +115,12 @@ std::vector<std::pair<std::string, std::string>>& SymbolTable::getVector(ESymbol
         return argSymbols;
     case ESymbolKind::VAR:
         return varSymbols;
-    case ESymbolKind::UNDEFINED:
     default:
         throw JackCompilerError("Cannot define UNDEFINED symbol.");
     }
 }
 
-int SymbolTable::findSymbol(const std::vector<std::pair<std::string, std::string>>& symbols, const std::string& key)
+int SymbolTable::findSymbol(const std::vector<std::pair<std::string, std::string>>& symbols, std::string_view key) const
 {
     for (auto i = 0; i < symbols.size(); i++)
     {

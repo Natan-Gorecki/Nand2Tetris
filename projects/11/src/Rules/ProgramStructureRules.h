@@ -2,7 +2,7 @@
 
 #include "BaseRules.h"
 #include "LexicalRules.h"
-#include "..\SymbolTable.h"
+#include "../SymbolTable.h"
 
 class ClassRule;
 class ClassVarDecRule;

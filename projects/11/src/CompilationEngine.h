@@ -17,7 +17,7 @@ public:
     /// </summary>
     /// <param name="filename">Name of the input file</param>
     /// <param name="jackTokenizer">Instance of Jack tokenizer</param>
-    CompilationEngine(const std::string& filename);
+    explicit CompilationEngine(const std::string& filename);
 
     /// <summary>
     /// Compiles a single file.
