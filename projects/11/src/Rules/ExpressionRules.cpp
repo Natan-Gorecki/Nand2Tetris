@@ -142,8 +142,8 @@ void TermRule::compile(VMWriter* vmWriter)
 
     // arrays
     auto symbol = RuleUtils::findSymbol(this, sequenceRule->getChild(0)->cast<VarNameRule>()->toString());
-    vmWriter->writePush(symbol.getSegment(), symbol.index);
     sequenceRule->getChild(2)->compile(vmWriter);
+    vmWriter->writePush(symbol.getSegment(), symbol.index);
     vmWriter->writeArithmetic(EArithmetic::ADD);
     vmWriter->writePop(ESegment::POINTER, 1);
     vmWriter->writePush(ESegment::THAT, 0);

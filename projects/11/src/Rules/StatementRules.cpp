@@ -64,20 +64,25 @@ LetStatementRule::LetStatementRule() : SequenceRule(
 
 void LetStatementRule::compile(VMWriter* vmWriter)
 {
-    getChild(4)->compile(vmWriter);
     auto variableName = getChild(1)->cast<VarNameRule>()->toString();
     auto symbol = RuleUtils::findSymbol(this, variableName);
 
     if (getChild(2)->getChildRules().empty())
     {
+        getChild(4)->compile(vmWriter);
         vmWriter->writePop(symbol.getSegment(), symbol.index);
         return;
     }
 
-    vmWriter->writePush(symbol.getSegment(), symbol.index);
     getChild(2)->getChild(0)->getChild(1)->compile(vmWriter);
+    vmWriter->writePush(symbol.getSegment(), symbol.index);
     vmWriter->writeArithmetic(EArithmetic::ADD);
+
+    getChild(4)->compile(vmWriter);
+    vmWriter->writePop(ESegment::TEMP, 0);
+
     vmWriter->writePop(ESegment::POINTER, 1);
+    vmWriter->writePush(ESegment::TEMP, 0);
     vmWriter->writePop(ESegment::THAT, 0);
 }
 
