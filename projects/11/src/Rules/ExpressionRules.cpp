@@ -100,7 +100,7 @@ void TermRule::compile(VMWriter* vmWriter)
     if (auto stringRule = getChild(0)->cast<StringConstantRule>())
     {
         auto stringValue = stringRule->toString();
-        vmWriter->writePush(ESegment::CONSTANT, stringValue.length());
+        vmWriter->writePush(ESegment::CONSTANT, static_cast<int>(stringValue.length()));
         vmWriter->writeCall("String.new", 1);
 
         for (int i = 0; i < stringValue.length(); i++)
@@ -284,7 +284,7 @@ int ExpressionListRule::getExpressionCount()
     }
 
     auto zeroOrMoreRule = getChild(0)->getChild(0)->getChild(1)->cast<ZeroOrMoreRule>();
-    return 1 + zeroOrMoreRule->getChildRules().size();
+    return 1 + static_cast<int>(zeroOrMoreRule->getChildRules().size());
 }
 #pragma endregion
 
