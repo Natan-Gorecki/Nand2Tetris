@@ -24,7 +24,7 @@ jobs:
 
       - name: Run build-wrapper
         run: |
-          build-wrapper-win-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} msbuild Nand2Tetris.sln /p:Configuration=Release
+          build-wrapper-win-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} msbuild src/Nand2Tetris.sln /p:Configuration=Release
 
       - name: Run sonar-scanner
         env:
