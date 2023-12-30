@@ -10,34 +10,293 @@
  * the screen is indexed (0,0).
  */
 class Screen {
+    static int twoToThe;
+    static int SCREEN;
+    static boolean blackColor;
 
     /** Initializes the Screen. */
     function void init() {
+        var int i;
+
+        let SCREEN = 16384;
+        let blackColor = true;
+        let twoToThe = Array.new(17);
+        let twoToThe[0] = 1;
+
+        while (i < 16) {
+            let i = i + 1;
+            let twoToThe[i] = twoToThe[i-1] + twoToThe[i-1];
+        }
+
+        return;
     }
 
     /** Erases the entire screen. */
     function void clearScreen() {
+        var int i;
+
+        while (i < 8192) {
+            let SCREEN[i] = 0;
+            let i = i + 1;
+        }
+
+        return;
+    }
+
+    function void updateLocation(int address, int value) {
+        if (blackColor) {
+            let SCREEN[address] = SCREEN[address] | value;
+        } else {
+            let SCREEN[address] = SCREEN[address] & (~value);
+        }
+        return;
     }
 
     /** Sets the current color, to be used for all subsequent drawXXX commands.
      *  Black is represented by true, white by false. */
     function void setColor(boolean b) {
+        let blackColor = b;
+        return;
     }
 
     /** Draws the (x,y) pixel, using the current color. */
     function void drawPixel(int x, int y) {
+        var int byteColumn;
+        var int xBit;
+        var int byteAddress;
+
+        if ((x < 0) | (x > 511) | (y < 0) | (y > 255)) {
+            do Sys.error(7);
+        }
+
+        let byteColumn = Math.divide(x, 16);
+        let xBit = x - Math.multiply(byteColumn, 16);
+        let byteAddress = Math.multiply(y, 32) + byteColumn;
+
+        do Screen.updateLocation(byteAddress, twoToThe[xBit]);
+        return;
+    }
+
+    function void drawConditional(int a, int b, boolean isPositionSwitched) {
+        if (isPositionSwitched) {
+            do Screen.drawPixel(b, a);
+        } else {
+            do Screen.drawPixel(a, b);
+        }
+        return;
     }
 
     /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
     function void drawLine(int x1, int y1, int x2, int y2) {
+        // Bresenham's line algorithm
+        var int b;
+        var int a;
+        var int dy;
+        var int dx;
+        var int tempVar;
+        var int diff;
+        var boolean isPositionSwitched;
+        var boolean isDecremental;
+        var int a2;
+        var int singleMoveAdjustment;
+        var int doubleMoveAdjustment;
+
+        if ((x1 < 0) | (x2 > 511) | (y1 < 0) | (y2 > 255)) {
+            do Sys.error(8);
+        }
+
+        let dx = Math.abs(x2 - x1);
+        let dy = Math.abs(y2 - y1);
+
+        let isPositionSwitched = dx < dy;
+        if ((isPositionSwitched & (y2 < y1)) | ((~isPositionSwitched) & (x2 < x1))) {
+            let tempVar = x1;
+            let x1 = x2;
+            let x2 = tempVar;
+
+            let tempVar = y1;
+            let y1 = y2;
+            let y2 = tempVar;
+        }
+
+        if (isPositionSwitched) {
+            let tempVar = dx;
+            let dx = dy;
+            let dy = tempVar;
+
+            let a = y1;
+            let b = x1;
+            let a2 = y2;
+            let isDecremental = x1 > x2;
+        } else {
+            let a = x1;
+            let b = y1;
+            let a2 = x2;
+            let isDecremental = y1 > y2;
+        }
+
+        let diff = Math.multiply(2, dy) - dx;
+        let singleMoveAdjustment = Math.multiply(2, dy);
+        let doubleMoveAdjustment = Math.multiply(2, dy - dx);
+
+        do Screen.drawConditional(a, b, isPositionSwitched);
+
+        while (a < a2) {
+            if (diff < 0) {
+                let diff = diff + singleMoveAdjustment;
+            } else {
+                let diff = diff + doubleMoveAdjustment;
+                if (isDecremental) {
+                    let b = b - 1;
+                } else {
+                    let b = b + 1;
+                }
+            }
+            let a = a + 1;
+            do Screen.drawConditional(a, b, isPositionSwitched);
+        }
+
+        return;
     }
 
     /** Draws a filled rectangle whose top left corner is (x1, y1)
      * and bottom right corner is (x2,y2), using the current color. */
     function void drawRectangle(int x1, int y1, int x2, int y2) {
+        var int byteAddress;
+        var int byte2Address;
+        var int dx;
+        var int x1Column;
+        var int x2Column;
+        var int rightSideBits;
+        var int leftSideBits;
+        var int x1Bits;
+        var int x2Bits;
+
+        if ((x1 > x2) | (y1 > y2) | (x1 < 0) | (x2 > 511) | (y1 < 0) | (y2 > 255)) {
+            do Sys.error(9);
+        }
+
+        let x1Column = Math.divide(x1, 16);
+        let x1Bits = x1 - Math.multiply(x1Column, 16);
+        let x2Column = Math.divide(x2, 16);
+        let x2Bits = x2 - Math.multiply(x2Column, 16);
+        let leftSideBits = ~(twoToThe[x1Bits] - 1);
+        let rightSideBits = twoToThe[x2Bits + 1] - 1;
+
+        let byteAddress = Math.multiply(y1, 32) + x1Column;
+        let dx = x2Column - x1Column;
+
+        while (~(y1 > y2)) {
+            let byte2Address = byteAddress + dx;
+            if (dx = 0) {
+                do Screen.updateLocation(byteAddress, rightSideBits & leftSideBits);
+            } else {
+                do Screen.updateLocation(byteAddress, leftSideBits);
+                let byteAddress = byteAddress + 1;
+
+                while (byteAddress < byte2Address) {
+                    do Screen.updateLocation(byteAddress, -1);
+                    let byteAddress = byteAddress + 1;
+                }
+
+                do Screen.updateLocation(byte2Address, rightSideBits);
+            }
+
+            let y1 = y1 + 1;
+            let byteAddress = byte2Address + 32 - dx;
+        }
+
+        return;
+    }
+
+    function void drawHorizontal(int y, int x1, int x2) {
+        var int byteAddress;
+        var int a1Column;
+        var int a2Column;
+        var int byte2Address;
+        var int rightSideBits;
+        var int leftSideBits;
+        var int da;
+        var int a1;
+        var int a2;
+        var int a1Bits;
+        var int a2Bits;
+        
+        let a1 = Math.min(x1, x2);
+        let a2 = Math.max(x1, x2);
+
+        if ((y > (-1)) & (y < 256) & (a1 < 512) & (a2 > (-1))) {
+            let a1 = Math.max(a1, 0);
+            let a2 = Math.min(a2, 511);
+
+            let a1Column = Math.divide(a1, 16);
+            let a1Bits = a1 - Math.multiply(a1Column, 16);
+            let a2Column = Math.divide(a2, 16);
+            let a2Bits = a2 - Math.multiply(a2Column, 16);
+
+            let leftSideBits = ~(twoToThe[a1Bits] - 1);
+            let rightSideBits = twoToThe[a2Bits + 1] - 1;
+
+            let byteAddress = Math.multiply(y, 32) + a1Column;
+            let da = a2Column - a1Column;
+            let byte2Address = byteAddress + da;
+            
+            if (da = 0) {
+                do Screen.updateLocation(byteAddress, rightSideBits & leftSideBits);
+            } else {
+                do Screen.updateLocation(byteAddress, leftSideBits);
+                let byteAddress = byteAddress + 1;
+
+                while (byteAddress < byte2Address) {
+                    do Screen.updateLocation(byteAddress, -1);
+                    let byteAddress = byteAddress + 1;
+                }
+
+                do Screen.updateLocation(byte2Address, rightSideBits);
+            }
+        }
+
+        return;
+    }
+
+    function void drawSymetric(int x, int y, int a, int b) {
+        do Screen.drawHorizontal(y - b, x + a, x - a);
+        do Screen.drawHorizontal(y + b, x + a, x - a);
+        do Screen.drawHorizontal(y - a, x - b, x + b);
+        do Screen.drawHorizontal(y + a, x - b, x + b);
+        return;
     }
 
     /** Draws a filled circle of radius r<=181 around (x,y), using the current color. */
     function void drawCircle(int x, int y, int r) {
+        // Midpoint circle algorithm
+        var int dy;
+        var int dx;
+        var int decisionVariable;
+
+        if ((x < 0) | (x > 511) | (y < 0) | (y > 255)) {
+            do Sys.error(12);
+        }
+        if ((x - r < 0) | (x + r > 511) | (y - r < 0) | (y + r > 255)) {
+            do Sys.error(13);
+        }
+
+        let dx = r;
+        let decisionVariable = 1 - r;
+        do Screen.drawSymetric(x, y, dy, dx);
+
+        while (dx > dy) {
+            if (decisionVariable < 0) {
+                let decisionVariable = decisionVariable + Math.multiply(2, dy) + 3;
+            } else {
+                let decisionVariable = decisionVariable + Math.multiply(2, dy - dx) + 5;
+                let dx = dx - 1;
+            }
+
+            let dy = dy + 1;
+            do Screen.drawSymetric(x, y, dy, dx);
+        }
+
+        return;
     }
 }

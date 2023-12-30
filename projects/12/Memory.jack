@@ -9,26 +9,97 @@
  * consists of 32,768 words, each holding a 16-bit binary number.
  */ 
 class Memory {
+    static Array memoryMap;
 
     /** Initializes the class. */
     function void init() {
+        let memoryMap = 0;
+        let memoryMap[2048] = 14334; // 16384 - 2050
+        let memoryMap[2049] = 2050;
+        return;
     }
 
     /** Returns the RAM value at the given address. */
     function int peek(int address) {
+        return memoryMap[address];
     }
 
     /** Sets the RAM value at the given address to the given value. */
     function void poke(int address, int value) {
+        let memoryMap[address] = value;
+        return;
     }
 
     /** Finds an available RAM block of the given size and returns
      *  a reference to its base address. */
     function int alloc(int size) {
+        var int pSegment;
+        var int pNextSegment;
+
+        if (size < 0) {
+            do Sys.error(5);
+        }
+        if (size = 0) {
+            let size = 1;
+        }
+
+        let pSegment = 2048;
+
+        while ((pSegment < 16383) & (pSegment[0] < size)) {
+            let pNextSegment = pSegment[1];
+            
+            if ((pSegment[0] = 0) | (pNextSegment > 16382) | (pNextSegment[0] = 0)) {
+                let pSegment = pNextSegment;
+            } else {
+                let pSegment[0] = (pSegment[1] - pSegment) + pNextSegment[0];
+                if (pNextSegment[1] = (pNextSegment + 2)) {
+                    let pSegment[1] = pSegment + 2;
+                } else {
+                    let pSegment[1] = pNextSegment[1];
+                }
+            }
+        }
+
+        if (pSegment + size > 16379) {
+            do Sys.error(6);
+        }
+
+        if (pSegment[0] > (size + 2)) {
+            let pSegment[size + 2] = pSegment[0] - size - 2;
+
+            if (pSegment[1] = (pSegment + 2)) {
+                let pSegment[size + 3] = pSegment + size + 4;
+            } else {
+                let pSegment[size + 3] = pSegment[1];
+            }
+
+            let pSegment[1] = pSegment + size + 2;
+        }
+
+        let pSegment[0] = 0;
+        return pSegment + 2;
     }
 
     /** De-allocates the given object (cast as an array) by making
      *  it available for future allocations. */
-    function void deAlloc(Array o) {
-    }    
+    function void deAlloc(Array object) {
+        var int pSegment;
+        var int pNextSegment;
+
+        let pSegment = object - 2;
+        let pNextSegment = pSegment[1];
+
+        if (pNextSegment[0] = 0) {
+            let pSegment[0] = pSegment[1] - pSegment - 2;
+        } else {
+            let pSegment[0] = pSegment[1] - pSegment + pNextSegment[0];
+            if (pNextSegment[1] = (pNextSegment + 2)) {
+                let pSegment[1] = pSegment + 2;
+            } else {
+                let pSegment[1] = pNextSegment[1];
+            }
+        }
+
+        return;
+    }
 }
