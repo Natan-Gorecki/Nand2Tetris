@@ -25,53 +25,47 @@ public:
     /// <summary>
     /// Returns the current line address, where only A_INSTRUCTION and C_INSTRUCTION are counted
     /// </summary>
-    int lineNumber();
+    int lineNumber() const;
     /// <summary>
     /// Returns the type of the current instruction.
     /// </summary>
-    InstructionType instructionType();
+    InstructionType instructionType() const;
     /// <summary>
     /// If the current instruction is (xxx), returns the symbol xxx.
     /// If the current instruction is @xxx, returns the symbol or decimal xxx (as a string).
     /// <para/> Should be called only if instructionType is A_INSTRUCTION or L_INSTRUCTION.
     /// </summary>
-    std::string symbol();
+    std::string symbol() const;
     /// <summary>
     /// Returns the symbolic dest part of the current C-instruction (8 possibilites).
     /// <para/> Should be called only if instructionType is C_INSTRUCTION.
     /// </summary>
-    std::string dest();
+    std::string dest() const;
     /// <summary>
     /// Returns the symbolic jump part of the current C-instruction (28 possibilites).
     /// <para/> Should be called only if instructionType is C_INSTRUCTION.
     /// </summary>
-    std::string comp();
+    std::string comp() const;
     /// <summary>
     /// Returns the symbolic jump part of the current C-instruction (8 possibilites).
     /// <para/> Should be called only if instructionType is C_INSTRUCTION.
     /// </summary>
-    std::string jump();
+    std::string jump() const;
 
-public:
     /// <summary>
     /// Opens the input file/stream and gets ready to parse it.
     /// </summary>
-    Parser(std::string filename);
-
-    /// <summary>
-    /// Closes the input file/stream
-    /// </summary>
-    ~Parser();
+    explicit Parser(const std::string& filename);
 
 private:
-    std::ifstream* input_stream = NULL;
-    std::string current_line = "";
-    int line_number = -1;
+    std::unique_ptr<std::ifstream> mInputStream;
+    std::string mCurrentLine = "";
+    int mLineNumber = -1;
 
-    InstructionType instruction_type = InstructionType::UNDEFINED;
+    InstructionType mInstructionType = InstructionType::UNDEFINED;
 
-    std::string f_symbol = "";
-    std::string f_dest= "";
-    std::string f_comp = "";
-    std::string f_jump = "";
+    std::string mSymbol = "";
+    std::string mDest= "";
+    std::string mComp = "";
+    std::string mJump = "";
 };
