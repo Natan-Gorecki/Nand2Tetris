@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        HackAssembler hackAssembler = HackAssembler(argv[1]);
+        auto hackAssembler = HackAssembler(argv[1]);
         
         auto startTime = std::chrono::high_resolution_clock::now();
         hackAssembler.searchSymbols();

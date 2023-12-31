@@ -6,7 +6,7 @@
 using namespace std;
 namespace fs = std::filesystem;
 
-bool isNumber(const string& text)
+bool isNumber(string_view text)
 {
     return !text.empty() && text.find_first_not_of("0123456789") == string::npos;
 }
@@ -117,7 +117,8 @@ void HackAssembler::writeAInstruction(ofstream* outputStream, int& variableAddre
     {
         if (!mSymbolTable->contains(mParser->symbol()))
         {
-            mSymbolTable->addEntry(mParser->symbol(), variableAddress++);
+            mSymbolTable->addEntry(mParser->symbol(), variableAddress);
+            variableAddress++;
         }
 
         symbolAddress = mSymbolTable->getAddress(mParser->symbol());
