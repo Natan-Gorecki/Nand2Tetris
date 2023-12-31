@@ -41,7 +41,7 @@ void HackAssembler::searchSymbols()
 /// <summary>
 /// Converts assembler code to machine instructions (2nd run)
 /// </summary>
-void HackAssembler::assemblerToMachineCode()
+void HackAssembler::assemblerToMachineCode(bool allowOverlowError)
 {
     SAFE_DELETE(parser);
     parser = new Parser(input_file);
@@ -93,7 +93,12 @@ void HackAssembler::assemblerToMachineCode()
 
             if (symbolAddress < 0 || symbolAddress > SHRT_MAX)
             {
-                throw std::runtime_error("Error: number " + parser->symbol() + " out of short scope");
+                if (!allowOverlowError)
+                {
+                    throw std::runtime_error("Error: number " + parser->symbol() + " out of short scope");
+                }
+                *outputStream << "OverflowError: @" + std::to_string(symbolAddress) << "\n";
+                continue;
             }
 
             std::string binary = std::bitset<16>(symbolAddress).to_string();

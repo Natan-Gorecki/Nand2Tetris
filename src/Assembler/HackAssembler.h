@@ -19,7 +19,7 @@ public:
 	/// <summary>
 	/// Converts assembler code to machine instructions (2nd run)
 	/// </summary>
-	void assemblerToMachineCode();
+	void assemblerToMachineCode(bool allowOverflowError);
 
 public:
 	/// <summary>
