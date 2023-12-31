@@ -15,7 +15,7 @@ fs::path getOSPath(const fs::path& path);
 bool isDirectoryPath(char* path);
 void ensureDirectoryExist(const fs::path& path);
 void moveFiles(const fs::path& inputPath, const fs::path& outputPath, const char* extension, FileOperation fileOperation);
-void executeConsoleApplication(const fs::path& path, const fs::path& arg, std::string arg2 = "");
+void executeConsoleApplication(const fs::path& path, const fs::path& arg, const char* arg2 = "");
 
 int main(int argc, char* argv[])
 {
@@ -113,16 +113,16 @@ void ensureDirectoryExist(const fs::path& path)
 
 void moveFiles(const fs::path& inputPath, const fs::path& outputPath, const char* extension, FileOperation fileOperation)
 {
-    std::function<void(const fs::path&, const fs::path&)> copyFile = [&](const fs::path& input, const fs::path& output)
+    std::function<void(const fs::path&, const fs::path&)> copyFile = [inputPath, outputPath](const fs::path& input, const fs::path& output)
         {
             fs::copy_file(input, output, fs::copy_options::overwrite_existing);
         };
-    std::function<void(const fs::path&, const fs::path&)> moveFile = [&](const fs::path& input, const fs::path& output)
+    std::function<void(const fs::path&, const fs::path&)> moveFile = [inputPath, outputPath](const fs::path& input, const fs::path& output)
         {
             fs::rename(input, output);
         };
     auto operationString = fileOperation == FileOperation::COPY ? "Copying " : "Moving ";
-    auto& performFileOperation = fileOperation == FileOperation::COPY ? copyFile : moveFile;
+    const auto& performFileOperation = fileOperation == FileOperation::COPY ? copyFile : moveFile;
 
     if (!fs::exists(inputPath))
     {
@@ -143,8 +143,7 @@ void moveFiles(const fs::path& inputPath, const fs::path& outputPath, const char
         return;
     }
 
-    fs::directory_iterator iterator(inputPath);
-    if (iterator == fs::end(iterator))
+    if (auto iterator = fs::directory_iterator(inputPath); iterator == fs::end(iterator))
     {
         std::cout << "Input directory " << inputPath << " is empty. Aborting...\n";
         exit(EXIT_FAILURE);
@@ -160,7 +159,7 @@ void moveFiles(const fs::path& inputPath, const fs::path& outputPath, const char
     }
 }
 
-void executeConsoleApplication(const fs::path& path, const fs::path& arg, std::string arg2)
+void executeConsoleApplication(const fs::path& path, const fs::path& arg, const char* arg2)
 {
     std::string command = path.string() + " " + arg.string() + " " + arg2;
     auto result = system(command.c_str());
