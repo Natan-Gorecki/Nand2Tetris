@@ -22,23 +22,17 @@ public:
     /// </summary>
     void assemblerToMachineCode(bool allowOverflowError);
 
-public:
     /// <summary>
     /// Creates parser, symbol table and handles file paths
     /// </summary>
-    HackAssembler(std::string inputFile);
-    /// <summary>
-    /// Releases allocated memory
-    /// </summary>
-    ~HackAssembler();
+    explicit HackAssembler(const std::string& inputFile);
 
 private:
     void writeAInstruction(std::ofstream* outputStream, int& variableAddress, bool allowOverflowError);
     void writeCInstruction(std::ofstream* outputStream);
 
-    Parser* parser = NULL;
-    SymbolTable* symbol_table = NULL;
-
-    std::string input_file;
-    std::string output_file;
+    std::unique_ptr<Parser> mParser;
+    std::unique_ptr<SymbolTable> mSymbolTable = std::make_unique<SymbolTable>();
+    std::string mInputFileName;
+    std::string mOutputFileName;
 };

@@ -1,6 +1,7 @@
 #include <chrono>
 #include <iostream>
 #include "HackAssembler.h"
+#include "HackAssemblerError.h"
 
 int main(int argc, char* argv[])
 {
@@ -39,7 +40,7 @@ int main(int argc, char* argv[])
 
         return EXIT_SUCCESS;
     }
-    catch (const std::runtime_error& error)
+    catch (const HackAssemblerError& error)
     {
         std::cout << error.what() << "\n";
         return EXIT_FAILURE;

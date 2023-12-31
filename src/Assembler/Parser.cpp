@@ -1,5 +1,6 @@
 #include <regex>
 #include <shlwapi.h>
+#include "HackAssemblerError.h"
 #include "Parser.h"
 
 const char* whitespace_chars = " \t\n\r\f\v";
@@ -160,7 +161,7 @@ Parser::Parser(std::string filename)
     input_stream = new std::ifstream(filename);
     if (!input_stream->is_open())
     {
-        throw std::runtime_error("Cannot open " + filename + " file");
+        throw HackAssemblerError("Cannot open " + filename + " file");
     }
 }
 

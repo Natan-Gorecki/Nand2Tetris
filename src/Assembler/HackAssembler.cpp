@@ -1,12 +1,14 @@
 #include <bitset>
 #include <filesystem>
 #include "HackAssembler.h"
+#include "HackAssemblerError.h"
 
-#define SAFE_DELETE(x) if(x) { delete x; x = NULL; }
+using namespace std;
+namespace fs = std::filesystem;
 
-bool isNumber(std::string text)
+bool isNumber(const string& text)
 {
-    return !text.empty() && text.find_first_not_of("0123456789") == std::string::npos;
+    return !text.empty() && text.find_first_not_of("0123456789") == string::npos;
 }
 
 /// <summary>
@@ -14,27 +16,28 @@ bool isNumber(std::string text)
 /// </summary>
 void HackAssembler::searchSymbols()
 {
-    SAFE_DELETE(parser);
-    parser = new Parser(input_file);
-    
-    while (parser->hasMoreLines())
+    mParser = make_unique<Parser>(mInputFileName);
+
+    while (mParser->hasMoreLines())
     {
-        parser->advance();
+        mParser->advance();
 
-        if (parser->instructionType() == InstructionType::L_INSTRUCTION)
+        if (mParser->instructionType() != InstructionType::L_INSTRUCTION)
         {
-            if (std::isdigit(parser->symbol()[0]))
-            {
-                throw std::runtime_error("Error: label symbol " + parser->symbol() + " starts with digit");
-            }
-
-            if (symbol_table->contains(parser->symbol()))
-            {
-                throw std::runtime_error("Error: label symbol " + parser->symbol() + " is duplicated");
-            }
-
-            symbol_table->addEntry(parser->symbol(), parser->lineNumber() + 1);
+            continue;
         }
+
+        if (std::isdigit(mParser->symbol()[0]))
+        {
+            throw HackAssemblerError("Error: label symbol " + mParser->symbol() + " starts with digit");
+        }
+
+        if (mSymbolTable->contains(mParser->symbol()))
+        {
+            throw HackAssemblerError("Error: label symbol " + mParser->symbol() + " is duplicated");
+        }
+
+        mSymbolTable->addEntry(mParser->symbol(), mParser->lineNumber() + 1);
     }
 }
 
@@ -43,33 +46,32 @@ void HackAssembler::searchSymbols()
 /// </summary>
 void HackAssembler::assemblerToMachineCode(bool allowOverflowError)
 {
-    SAFE_DELETE(parser);
-    parser = new Parser(input_file);
+    mParser = make_unique<Parser>(mInputFileName);
 
-    std::ofstream* outputStream = new std::ofstream(output_file);
+    auto outputStream = make_unique<ofstream>(mOutputFileName);
     if (!outputStream->is_open())
     {
-        throw std::runtime_error("Cannot find or open " + output_file + " file");
+        throw HackAssemblerError("Cannot find or open " + mOutputFileName + " file");
     }
     
     int variableAddress = 16;
-    while (parser->hasMoreLines())
+    while (mParser->hasMoreLines())
     {
-        parser->advance();
+        mParser->advance();
 
-        if (parser->instructionType() == InstructionType::COMMENT
-            || parser->instructionType() == InstructionType::L_INSTRUCTION)
+        if (mParser->instructionType() == InstructionType::COMMENT
+            || mParser->instructionType() == InstructionType::L_INSTRUCTION)
         {
             continue;
         }
 
-        if (parser->instructionType() == InstructionType::A_INSTRUCTION)
+        if (mParser->instructionType() == InstructionType::A_INSTRUCTION)
         {
-            writeAInstruction(outputStream, variableAddress, allowOverflowError);
+            writeAInstruction(outputStream.get(), variableAddress, allowOverflowError);
         }
-        else if (parser->instructionType() == InstructionType::C_INSTRUCTION)
+        else if (mParser->instructionType() == InstructionType::C_INSTRUCTION)
         {
-            writeCInstruction(outputStream);
+            writeCInstruction(outputStream.get());
         }
     }
 }
@@ -77,62 +79,51 @@ void HackAssembler::assemblerToMachineCode(bool allowOverflowError)
 /// <summary>
 /// Creates parser, symbol table and handles file paths
 /// </summary>
-HackAssembler::HackAssembler(std::string inputFile)
+HackAssembler::HackAssembler(const string& inputFile)
 {
-    this->symbol_table = new SymbolTable();
-
-    std::filesystem::path filePath = inputFile;
+    fs::path filePath = inputFile;
     if (filePath.extension() != ".asm")
     {
-        throw std::runtime_error("Error: File " + inputFile + " doesn't have .asm extension");
+        throw HackAssemblerError("Error: File " + inputFile + " doesn't have .asm extension");
     }
 
     if (filePath.is_relative()) 
     {
-        this->input_file = std::filesystem::current_path().string() + "\\" + filePath.string();
-        this->output_file = std::filesystem::current_path().string() + "\\" + filePath.replace_extension(".hack").string();
+        mInputFileName = fs::current_path().string() + "\\" + filePath.string();
+        mOutputFileName = fs::current_path().string() + "\\" + filePath.replace_extension(".hack").string();
     }
     else
     {
-        this->input_file = filePath.string();
-        this->output_file = filePath.replace_extension(".hack").string();
+        mInputFileName = filePath.string();
+        mOutputFileName = filePath.replace_extension(".hack").string();
     }
 }
 
-/// <summary>
-/// Releases allocated memory
-/// </summary>
-HackAssembler::~HackAssembler()
-{
-    SAFE_DELETE(parser);
-    SAFE_DELETE(symbol_table);
-}
-
-void HackAssembler::writeAInstruction(std::ofstream* outputStream, int& variableAddress, bool allowOverflowError)
+void HackAssembler::writeAInstruction(ofstream* outputStream, int& variableAddress, bool allowOverflowError)
 {
     int symbolAddress = -1;
-    if (std::isdigit(parser->symbol()[0]))
+    if (isdigit(mParser->symbol()[0]))
     {
-        if (isNumber(parser->symbol()))
+        if (isNumber(mParser->symbol()))
         {
-            symbolAddress = std::stoi(parser->symbol());
+            symbolAddress = stoi(mParser->symbol());
         }
         else
         {
-            throw std::runtime_error("Error: number " + parser->symbol() + " has invalid format");
+            throw HackAssemblerError("Error: number " + mParser->symbol() + " has invalid format");
         }
     }
     else
     {
-        if (!symbol_table->contains(parser->symbol()))
+        if (!mSymbolTable->contains(mParser->symbol()))
         {
-            symbol_table->addEntry(parser->symbol(), variableAddress++);
+            mSymbolTable->addEntry(mParser->symbol(), variableAddress++);
         }
 
-        symbolAddress = symbol_table->getAddress(parser->symbol());
+        symbolAddress = mSymbolTable->getAddress(mParser->symbol());
         if (symbolAddress == -1)
         {
-            throw std::runtime_error("Error: symbol table doesnt contain " + parser->symbol() + " symbol");
+            throw HackAssemblerError("Error: symbol table doesnt contain " + mParser->symbol() + " symbol");
         }
     }
 
@@ -140,22 +131,22 @@ void HackAssembler::writeAInstruction(std::ofstream* outputStream, int& variable
     {
         if (!allowOverflowError)
         {
-            throw std::runtime_error("Error: number " + parser->symbol() + " out of short scope");
+            throw HackAssemblerError("Error: number " + mParser->symbol() + " out of short scope");
         }
-        *outputStream << "OverflowError: @" + std::to_string(symbolAddress) << "\n";
+        *outputStream << "OverflowError: @" + to_string(symbolAddress) << "\n";
         return;
     }
 
-    std::string binary = std::bitset<16>(symbolAddress).to_string();
+    string binary = bitset<16>(symbolAddress).to_string();
     *outputStream << binary << "\n";
 }
 
-void HackAssembler::writeCInstruction(std::ofstream* outputStream)
+void HackAssembler::writeCInstruction(ofstream* outputStream)
 {
     *outputStream
         << "111"
-        << CodeModule::comp(parser->comp())
-        << CodeModule::dest(parser->dest())
-        << CodeModule::jump(parser->jump())
+        << CodeModule::comp(mParser->comp())
+        << CodeModule::dest(mParser->dest())
+        << CodeModule::jump(mParser->jump())
         << "\n";
 }

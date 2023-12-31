@@ -1,6 +1,7 @@
 #include <map>
 #include <stdexcept>
 #include "CodeModule.h"
+#include "HackAssemblerError.h"
 
 using namespace std;
 
@@ -57,7 +58,7 @@ string CodeModule::dest(const string& mnemonic)
     {
         return it->second;
     }
-    throw runtime_error("Error: Failed to convert dest mnemonic '" + mnemonic + "' to binary.");
+    throw HackAssemblerError("Error: Failed to convert dest mnemonic '" + mnemonic + "' to binary.");
 }
 
 /// <summary>
@@ -70,7 +71,7 @@ string CodeModule::comp(const string& mnemonic)
     {
         return it->second;
     }
-    throw runtime_error("Error: Failed to convert comp mnemonic '" + mnemonic + "' to binary.");
+    throw HackAssemblerError("Error: Failed to convert comp mnemonic '" + mnemonic + "' to binary.");
 }
 
 /// <summary>
@@ -83,5 +84,5 @@ string CodeModule::jump(const string& mnemonic)
     {
         return it->second;
     }
-    throw runtime_error("Error: Failed to convert jump mnemonic " + mnemonic + " to binary.");
+    throw HackAssemblerError("Error: Failed to convert jump mnemonic " + mnemonic + " to binary.");
 }
