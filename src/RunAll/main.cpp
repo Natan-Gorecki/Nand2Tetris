@@ -113,11 +113,11 @@ void ensureDirectoryExist(const fs::path& path)
 
 void moveFiles(const fs::path& inputPath, const fs::path& outputPath, const char* extension, FileOperation fileOperation)
 {
-    std::function<void(const fs::path&, const fs::path&)> copyFile = [inputPath, outputPath](const fs::path& input, const fs::path& output)
+    std::function<void(const fs::path&, const fs::path&)> copyFile = [](const fs::path& input, const fs::path& output)
         {
             fs::copy_file(input, output, fs::copy_options::overwrite_existing);
         };
-    std::function<void(const fs::path&, const fs::path&)> moveFile = [inputPath, outputPath](const fs::path& input, const fs::path& output)
+    std::function<void(const fs::path&, const fs::path&)> moveFile = [](const fs::path& input, const fs::path& output)
         {
             fs::rename(input, output);
         };
