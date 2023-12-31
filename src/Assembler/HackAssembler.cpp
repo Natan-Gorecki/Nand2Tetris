@@ -1,5 +1,5 @@
 #include <bitset>
-#include <filesystem> //C++17
+#include <filesystem>
 #include "HackAssembler.h"
 
 #define SAFE_DELETE(x) if(x) { delete x; x = NULL; }
@@ -41,7 +41,7 @@ void HackAssembler::searchSymbols()
 /// <summary>
 /// Converts assembler code to machine instructions (2nd run)
 /// </summary>
-void HackAssembler::assemblerToMachineCode(bool allowOverlowError)
+void HackAssembler::assemblerToMachineCode(bool allowOverflowError)
 {
     SAFE_DELETE(parser);
     parser = new Parser(input_file);
@@ -65,54 +65,11 @@ void HackAssembler::assemblerToMachineCode(bool allowOverlowError)
 
         if (parser->instructionType() == InstructionType::A_INSTRUCTION)
         {
-            int symbolAddress = -1;
-            if (std::isdigit(parser->symbol()[0]))
-            {
-                if (isNumber(parser->symbol()))
-                {
-                    symbolAddress = std::stoi(parser->symbol());
-                }
-                else
-                {
-                    throw std::runtime_error("Error: number " + parser->symbol() + " has invalid format");
-                }
-            }
-            else
-            {
-                if (!symbol_table->contains(parser->symbol()))
-                {
-                    symbol_table->addEntry(parser->symbol(), variableAddress++);
-                }
-
-                symbolAddress = symbol_table->getAddress(parser->symbol());
-                if (symbolAddress == -1)
-                {
-                    throw std::runtime_error("Error: symbol table doesnt contain " + parser->symbol() + " symbol");
-                }
-            }
-
-            if (symbolAddress < 0 || symbolAddress > SHRT_MAX)
-            {
-                if (!allowOverlowError)
-                {
-                    throw std::runtime_error("Error: number " + parser->symbol() + " out of short scope");
-                }
-                *outputStream << "OverflowError: @" + std::to_string(symbolAddress) << "\n";
-                continue;
-            }
-
-            std::string binary = std::bitset<16>(symbolAddress).to_string();
-            *outputStream << binary << "\n";
-            continue;
+            writeAInstruction(outputStream, variableAddress, allowOverflowError);
         }
         else if (parser->instructionType() == InstructionType::C_INSTRUCTION)
         {
-            *outputStream
-                << "111"
-                << CodeModule::comp(parser->comp())
-                << CodeModule::dest(parser->dest())
-                << CodeModule::jump(parser->jump())
-                << "\n";
+            writeCInstruction(outputStream);
         }
     }
 }
@@ -149,4 +106,56 @@ HackAssembler::~HackAssembler()
 {
     SAFE_DELETE(parser);
     SAFE_DELETE(symbol_table);
-}    
+}
+
+void HackAssembler::writeAInstruction(std::ofstream* outputStream, int& variableAddress, bool allowOverflowError)
+{
+    int symbolAddress = -1;
+    if (std::isdigit(parser->symbol()[0]))
+    {
+        if (isNumber(parser->symbol()))
+        {
+            symbolAddress = std::stoi(parser->symbol());
+        }
+        else
+        {
+            throw std::runtime_error("Error: number " + parser->symbol() + " has invalid format");
+        }
+    }
+    else
+    {
+        if (!symbol_table->contains(parser->symbol()))
+        {
+            symbol_table->addEntry(parser->symbol(), variableAddress++);
+        }
+
+        symbolAddress = symbol_table->getAddress(parser->symbol());
+        if (symbolAddress == -1)
+        {
+            throw std::runtime_error("Error: symbol table doesnt contain " + parser->symbol() + " symbol");
+        }
+    }
+
+    if (symbolAddress < 0 || symbolAddress > SHRT_MAX)
+    {
+        if (!allowOverflowError)
+        {
+            throw std::runtime_error("Error: number " + parser->symbol() + " out of short scope");
+        }
+        *outputStream << "OverflowError: @" + std::to_string(symbolAddress) << "\n";
+        return;
+    }
+
+    std::string binary = std::bitset<16>(symbolAddress).to_string();
+    *outputStream << binary << "\n";
+}
+
+void HackAssembler::writeCInstruction(std::ofstream* outputStream)
+{
+    *outputStream
+        << "111"
+        << CodeModule::comp(parser->comp())
+        << CodeModule::dest(parser->dest())
+        << CodeModule::jump(parser->jump())
+        << "\n";
+}
