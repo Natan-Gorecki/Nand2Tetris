@@ -53,7 +53,7 @@ void Parser::advance()
 		return;
 
 	// remove comments
-	int comment_pos = current_line.find("//");
+	auto comment_pos = current_line.find("//");
 	if (comment_pos != std::string::npos)
 	{
 		current_line = comment_pos == 0 ? "" : current_line.substr(0, comment_pos);
@@ -83,14 +83,14 @@ void Parser::advance()
 		instruction_type = InstructionType::C_INSTRUCTION;
 		line_number++;
 		
-		int equal_sign_pos = current_line.find("=");
+		auto equal_sign_pos = current_line.find("=");
 		f_dest = equal_sign_pos != std::string::npos ? current_line.substr(0, equal_sign_pos) : "";
 		
-		int semicolon_pos = current_line.find(";");
+		auto semicolon_pos = current_line.find(";");
 		f_jump = semicolon_pos != std::string::npos ? current_line.substr(semicolon_pos+1, current_line.length()-1-semicolon_pos) : "";
 		
-		int comp_start = equal_sign_pos != std::string::npos ? equal_sign_pos + 1 : 0;
-		int comp_end = semicolon_pos != std::string::npos ? semicolon_pos - 1 : current_line.length()-1;
+		auto comp_start = equal_sign_pos != std::string::npos ? equal_sign_pos + 1 : 0;
+		auto comp_end = semicolon_pos != std::string::npos ? semicolon_pos - 1 : current_line.length()-1;
 		f_comp = current_line.substr(comp_start, comp_end-comp_start+1);
 	}
 	else if (std::regex_match(current_line.c_str(), match, l_regex))
