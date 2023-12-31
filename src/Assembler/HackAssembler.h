@@ -29,7 +29,7 @@ public:
 
 private:
     void writeAInstruction(std::ofstream* outputStream, int& variableAddress, bool allowOverflowError);
-    void writeCInstruction(std::ofstream* outputStream);
+    void writeCInstruction(std::ofstream* outputStream) const;
 
     std::unique_ptr<Parser> mParser;
     std::unique_ptr<SymbolTable> mSymbolTable = std::make_unique<SymbolTable>();

@@ -142,7 +142,7 @@ void HackAssembler::writeAInstruction(ofstream* outputStream, int& variableAddre
     *outputStream << binary << "\n";
 }
 
-void HackAssembler::writeCInstruction(ofstream* outputStream)
+void HackAssembler::writeCInstruction(ofstream* outputStream) const
 {
     *outputStream
         << "111"

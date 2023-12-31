@@ -67,7 +67,7 @@ string CodeModule::dest(const string& mnemonic)
 /// <returns>7 bits, as a string</returns>
 string CodeModule::comp(const string& mnemonic)
 {
-    if (auto it = comp_table.find(mnemonic); it == comp_table.end())
+    if (auto it = comp_table.find(mnemonic); it != comp_table.end())
     {
         return it->second;
     }
