@@ -34,7 +34,7 @@ CodeWriter::~CodeWriter()
 /// Informs that the translation of a new VM file has started (called by VMTranslator).
 /// </summary>
 /// <param name="fileName"></param>
-void CodeWriter::setFileName(const string& fileName)
+void CodeWriter::setFileName(string_view fileName)
 {
     mFileName = fileName;
 }
@@ -669,7 +669,7 @@ void CodeWriter::setFunctionName(const string& functionName)
     mNoFunctionDefined = false;
 }
 
-string CodeWriter::getFullLabelName(const string& label)
+string CodeWriter::getFullLabelName(const string& label) const
 {
     if (mNoFunctionDefined)
     {

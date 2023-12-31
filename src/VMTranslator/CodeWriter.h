@@ -25,7 +25,7 @@ public:
     /// Informs that the translation of a new VM file has started (called by VMTranslator).
     /// </summary>
     /// <param name="fileName">File name</param>
-    void setFileName(const std::string& fileName);
+    void setFileName(std::string_view fileName);
     /// <summary>
     /// Writes to the output file the assembly code that implements the given arithmetic-logical command.
     /// </summary>
@@ -87,7 +87,7 @@ private:
     void writeStatic(ECommandType commandType, int index);
 
     void setFunctionName(const std::string& functionName);
-    std::string getFullLabelName(const std::string& label);
+    std::string getFullLabelName(const std::string& label) const;
 
     std::string stack2DRegister() const;
     std::string DRegister2Stack() const;
