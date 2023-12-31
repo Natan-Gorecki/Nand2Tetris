@@ -4,9 +4,22 @@
 
 int main(int argc, char* argv[])
 {
-    if (argc != 2)
+    bool allowOverflowError = false;
+
+    if (argc == 3 && std::string(argv[2]) != "--alowOverflowError")
     {
-        std::cout << "Usage: HackAssembler InputFile.asm\n";
+        std::cout << "Usage: HackAssembler InputFile.asm --alowOverflowError\n";
+        return EXIT_FAILURE;
+    }
+
+    if (argc == 3 && std::string(argv[2]) == "--alowOverflowError")
+    {
+        allowOverflowError = true;
+    }
+
+    if (argc != 2 && argc != 3)
+    {
+        std::cout << "Usage: HackAssembler InputFile.asm --alowOverflowError\n";
         return EXIT_FAILURE;
     }
 
@@ -20,7 +33,7 @@ int main(int argc, char* argv[])
         std::cout << "Label symbols searched in " << (endTime - startTime) / std::chrono::milliseconds(1) << " ms.\n";
 
         startTime = std::chrono::high_resolution_clock::now();
-        hackAssembler.assemblerToMachineCode();
+        hackAssembler.assemblerToMachineCode(allowOverflowError);
         endTime = std::chrono::high_resolution_clock::now();
         std::cout << "Machine code created in " << (endTime - startTime) / std::chrono::milliseconds(1) << " ms.\n";
 
