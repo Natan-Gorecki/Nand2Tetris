@@ -141,6 +141,7 @@
     <ClInclude Include="..\ECommandType.h" />
     <ClInclude Include="..\Parser.h" />
     <ClInclude Include="..\VMTranslator.h" />
+    <ClInclude Include="..\VMTranslatorError.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

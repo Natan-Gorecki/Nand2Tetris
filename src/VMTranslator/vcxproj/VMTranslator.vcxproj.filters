@@ -35,5 +35,8 @@
     <ClInclude Include="..\VMTranslator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\VMTranslatorError.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
