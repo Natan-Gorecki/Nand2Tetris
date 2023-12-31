@@ -73,7 +73,7 @@ void VMTranslator::parseDirectory()
         parseSingleFile(vmFile);
     }
 
-    mCodeWriter->validateGotoStatements();
+    mCodeWriter->writeFinalCode();
 }
 
 void VMTranslator::parseSingleFile()
@@ -85,7 +85,7 @@ void VMTranslator::parseSingleFile()
 
     parseSingleFile(mInputFileName);
 
-    mCodeWriter->validateGotoStatements();
+    mCodeWriter->writeFinalCode();
 }
 
 string VMTranslator::getOutputFile() const

@@ -14,7 +14,7 @@ public:
     /// May throw a runtime exception.
     /// </summary>
     /// <param name="path"></param>
-    VMTranslator(const std::string& path);
+    explicit VMTranslator(const std::string& path);
 
     /// <summary>
     /// Returns an information, whether provided path is directory or single file.

@@ -23,14 +23,6 @@ CodeWriter::CodeWriter(const string& filename, bool generateComment)
 }
 
 /// <summary>
-/// Closes the output file
-///</summary>
-CodeWriter::~CodeWriter()
-{
-    finalCode();
-}
-
-/// <summary>
 /// Informs that the translation of a new VM file has started (called by VMTranslator).
 /// </summary>
 /// <param name="fileName"></param>
@@ -421,8 +413,9 @@ A=M
 
 /// <summary>
 /// Validates if every label used in goto and if-goto is defined.
+/// Adjusts code at the end of the file.
 /// </summary>
-void CodeWriter::validateGotoStatements()
+void CodeWriter::writeFinalCode()
 {
     for (const auto& labelName : mDefinedGoto)
     {
@@ -431,27 +424,9 @@ void CodeWriter::validateGotoStatements()
             throw VMTranslatorError("Label " + labelName + " is not defined.");
         }
     }
-}
 
-void CodeWriter::initialCode()
-{
-    const char* initCode =
-R"((START)
-@256
-D=A
-@SP
-M=D
-@CHECK_SYSINIT
-0;JMP
-(NO_SYSINIT)
-)";
-    *mOutputFile << initCode;
-}
-
-void CodeWriter::finalCode()
-{
     const char* finalCommand =
-R"(
+        R"(
 (END)
 @END
 0;JMP
@@ -466,7 +441,7 @@ R"(
     else
     {
         const char* sysinitCheck =
-R"(
+            R"(
 (CHECK_SYSINIT)
 @NO_SYSINIT
 0;JMP
@@ -498,6 +473,21 @@ A=M
         comparisonString = regex_replace(comparisonString, regex("DREGISTER_2_STACK\n"), DRegister2Stack());
         *mOutputFile << comparisonString;
     }
+}
+
+void CodeWriter::initialCode()
+{
+    const char* initCode =
+R"((START)
+@256
+D=A
+@SP
+M=D
+@CHECK_SYSINIT
+0;JMP
+(NO_SYSINIT)
+)";
+    *mOutputFile << initCode;
 }
 
 void CodeWriter::writeComparisonCommand(const string& comparisonCheck)

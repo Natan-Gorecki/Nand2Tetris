@@ -16,10 +16,6 @@ public:
     /// </summary>
     /// <param name="filename">Name of the output file</param>
     CodeWriter(const std::string& filename, bool generateComment);
-    /// <summary>
-    /// Closes the output file
-    ///</summary>
-    ~CodeWriter();
 
     /// <summary>
     /// Informs that the translation of a new VM file has started (called by VMTranslator).
@@ -71,12 +67,12 @@ public:
     void writeReturn();
     /// <summary>
     /// Validates if every label used in goto and if-goto is defined.
+    /// Adjusts code at the end of the file.
     /// </summary>
-    void validateGotoStatements();
+    void writeFinalCode();
 
 private:
     void initialCode();
-    void finalCode();
 
     void writeComparisonCommand(const std::string& comparisonCheck);
 
