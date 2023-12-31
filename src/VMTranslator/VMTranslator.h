@@ -10,7 +10,7 @@ class VMTranslator
 {
 public:
     /// <summary>
-    /// Valides provided path, creates CodeWriter. 
+    /// Valides provided path, creates CodeWriter.
     /// May throw a runtime exception.
     /// </summary>
     /// <param name="path"></param>

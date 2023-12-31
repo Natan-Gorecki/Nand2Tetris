@@ -68,7 +68,7 @@ void VMTranslator::parseDirectory()
         throw VMTranslatorError("Directory " + mInputFileName + " doesn't contain any .vm extension");
     }
 
-    for (auto& vmFile : vmFiles)
+    for (const auto& vmFile : vmFiles)
     {
         parseSingleFile(vmFile);
     }
