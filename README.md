@@ -16,3 +16,24 @@ The latest version doesn't contain duplicated code. To obtain partially implemen
 - [Project 10 - Compiler I: Syntax Analysis](https://github.com/Natan-Gorecki/Nand2Tetris/tree/project-10-compiler-I-syntax-analysis/projects/10)
 - [Project 11 - Compiler II: Code Generation](https://github.com/Natan-Gorecki/Nand2Tetris/tree/project-11-compiler-II-code-generation/projects/11)
 - [Project 12 - Operating System](https://github.com/Natan-Gorecki/Nand2Tetris/tree/project-12-operating-system/projects/12)
+
+## Tools
+The final version of built tools consists of:
+- HackAssembler
+- VMTranslator
+- JackCompiler
+
+They are written with *C++17* and can be compiled using solution/project files or the *msbuild* command.\
+Additionally, an auxiliary console application named **RunAll** has been created.\
+With it, you can easily compile *.jack* files to *.vm*, *.xml*, *.asm*, and *.hack* files.
+
+```
+RunAll.exe InputDirectory OutputDirectory
+```
+
+or
+
+```
+cd C:\Projects\Nand2Tetris
+src\x64\Release\RunAll.exe projects\09\Snake out
+```
