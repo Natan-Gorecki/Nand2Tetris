@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <iostream>
 #include "VMTranslator.h"
+#include "VMTranslatorError.h"
 
 int main(int argc, char* argv[])
 {
@@ -26,7 +27,7 @@ int main(int argc, char* argv[])
     
     try
     {
-        VMTranslator vmTranslator = VMTranslator(path);
+        auto vmTranslator = VMTranslator(path);
 
         auto startTime = std::chrono::high_resolution_clock::now();
 
@@ -44,7 +45,7 @@ int main(int argc, char* argv[])
         std::cout << "Created assembly code " << vmTranslator.getOutputFile() << " file in " << (endTime - startTime) / std::chrono::milliseconds(1) << " ms.\n";
         return EXIT_SUCCESS;
     }
-    catch (const std::runtime_error& error)
+    catch (const VMTranslatorError& error)
     {
         std::cout << "Error: " << error.what() << "\n";
         return EXIT_FAILURE;

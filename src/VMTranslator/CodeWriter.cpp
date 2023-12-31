@@ -1,21 +1,23 @@
-#include "CodeWriter.h"
 #include <iostream>
 #include <regex>
+#include "CodeWriter.h"
+#include "VMTranslatorError.h"
+
+using namespace std;
 
 /// <summary>
 /// Opens the output file and gets ready to write into it
 /// </summary>
 /// <param name="filename">Name of the output file</param>
 /// <param name="generateComment">Information if comment should be generated</param>
-CodeWriter::CodeWriter(std::string filename, bool generateComment)
+CodeWriter::CodeWriter(const string& filename, bool generateComment)
+    : mGenerateComment(generateComment)
 {
-    this->output_file = new std::ofstream(filename);
-    if (!this->output_file->is_open())
+    mOutputFile = make_unique<ofstream>(filename);
+    if (!mOutputFile->is_open())
     {
-        throw std::runtime_error("Cannot find or open " + filename + " file.");
+        throw VMTranslatorError("Cannot find or open " + filename + " file.");
     }
-
-    this->generate_comment = generateComment;
 
     initialCode();
 }
@@ -25,33 +27,27 @@ CodeWriter::CodeWriter(std::string filename, bool generateComment)
 ///</summary>
 CodeWriter::~CodeWriter()
 {
-    if (output_file)
-    {
-        this->finalCode();
-        output_file->close();
-        delete output_file;
-        output_file = NULL;
-    }
+    finalCode();
 }
 
 /// <summary>
 /// Informs that the translation of a new VM file has started (called by VMTranslator).
 /// </summary>
 /// <param name="fileName"></param>
-void CodeWriter::setFileName(std::string fileName)
+void CodeWriter::setFileName(string_view fileName)
 {
-    this->file_name = fileName;
+    mFileName = fileName;
 }
 
 /// <summary>
 /// Writes to the output file the assembly code that implements the given arithmetic-logical command.
 /// </summary>
 /// <param name="command">Arithmetic-logical command</param>
-void CodeWriter::writeArithmetic(std::string command)
+void CodeWriter::writeArithmetic(const string& command)
 {
-    if (generate_comment)
+    if (mGenerateComment)
     {
-        *output_file << "\n// " << command << "\n";
+        *mOutputFile << "\n// " << command << "\n";
     }
 
     if (command == "add")
@@ -63,7 +59,7 @@ D=M
 A=A-1
 M=M+D
 )";
-        *output_file << addCommand;
+        *mOutputFile << addCommand;
     }
     else if (command == "sub") 
     {
@@ -74,7 +70,7 @@ D=M
 A=A-1
 M=M-D
 )";
-        *output_file << subCommand;
+        *mOutputFile << subCommand;
     }
     else if (command == "neg")
     {
@@ -83,7 +79,7 @@ R"(@SP
 A=M-1
 M=-M
 )";
-        *output_file << negCommand;
+        *mOutputFile << negCommand;
     }
     else if (command == "eq")
     {
@@ -106,7 +102,7 @@ D=M
 A=A-1
 M=M&D
 )";
-        *output_file << andCommand;
+        *mOutputFile << andCommand;
     }
     else if (command == "or")
     {
@@ -117,7 +113,7 @@ D=M
 A=A-1
 M=M|D
 )";
-        *output_file << orCommand;
+        *mOutputFile << orCommand;
     }
     else if (command == "not")
     {
@@ -126,11 +122,11 @@ R"(@SP
 A=M-1
 M=!M
 )";
-        *output_file << notCommand;
+        *mOutputFile << notCommand;
     }
     else
     {
-        throw std::runtime_error("Unknown C_ARITHMETIC " + command + " command.");
+        throw VMTranslatorError("Unknown C_ARITHMETIC " + command + " command.");
     }    
 }
 
@@ -140,17 +136,17 @@ M=!M
 /// <param name="commandType">C_PUSH or C_POP</param>
 /// <param name="segment">Name of the segment</param>
 /// <param name="index">Numeric address</param>
-void CodeWriter::writePushPop(ECommandType commandType, std::string segment, int index)
+void CodeWriter::writePushPop(ECommandType commandType, const string& segment, int index)
 {
-    std::string pushPop = commandType == ECommandType::C_PUSH ? "push" : "pop";
-    if (generate_comment)
+    string pushPop = commandType == ECommandType::C_PUSH ? "push" : "pop";
+    if (mGenerateComment)
     {
-        *output_file << "\n// " << pushPop << " " << segment << " " << index << "\n";
+        *mOutputFile << "\n// " << pushPop << " " << segment << " " << index << "\n";
     }
     
     if (commandType != ECommandType::C_PUSH && commandType != ECommandType::C_POP)
     {
-        throw std::runtime_error("Method only allowed with C_PUSH or C_POP command.");
+        throw VMTranslatorError("Method only allowed with C_PUSH or C_POP command.");
     }
 
     if (segment == "local")
@@ -187,7 +183,7 @@ void CodeWriter::writePushPop(ECommandType commandType, std::string segment, int
     }
     else
     {
-        throw std::runtime_error("Unknown " + segment + " segment.");
+        throw VMTranslatorError("Unknown " + segment + " segment.");
     }
 }
 
@@ -195,72 +191,71 @@ void CodeWriter::writePushPop(ECommandType commandType, std::string segment, int
 /// Writes assembly code that effects the label command
 /// </summary>
 /// <param name="label">Label name</param>
-void CodeWriter::writeLabel(std::string label)
+void CodeWriter::writeLabel(const string& label)
 {
-    if (generate_comment)
+    if (mGenerateComment)
     {
-        *output_file << "\n// label " << label<< "\n";
+        *mOutputFile << "\n// label " << label<< "\n";
     }
 
-    std::regex labelRegex("[A-z.:][\\w.:]*");
-    std::cmatch match;
-    if (!std::regex_match(label.c_str(), match, labelRegex))
+    regex labelRegex("[A-z.:][\\w.:]*");
+    if (cmatch match; !regex_match(label.c_str(), match, labelRegex))
     {
-        throw std::runtime_error("Invalid label format: " + label);
+        throw VMTranslatorError("Invalid label format: " + label);
     }
 
-    std::string fullName = this->getFullLabelName(label);
+    auto fullName = this->getFullLabelName(label);
 
-    if (defined_labels.count(fullName))
+    if (mDefinedLabels.count(fullName))
     {
-        throw std::runtime_error("Duplicated labels " + fullName);
+        throw VMTranslatorError("Duplicated labels " + fullName);
     }
 
-    *output_file
+    *mOutputFile
         << "(" << fullName << ")\n";
 
-    defined_labels.insert(fullName);
+    mDefinedLabels.insert(fullName);
 }
 
 /// <summary>
 /// Writes assembly code that effects the goto command.
 /// </summary>
 /// <param name="label">Label name</param>
-void CodeWriter::writeGoto(std::string label)
+void CodeWriter::writeGoto(const string& label)
 {
-    if (generate_comment)
+    if (mGenerateComment)
     {
-        *output_file << "\n// goto " << label << "\n";
+        *mOutputFile << "\n// goto " << label << "\n";
     }
 
-    std::string fullName = this->getFullLabelName(label);
+    auto fullName = this->getFullLabelName(label);
     
-    *output_file
+    *mOutputFile
         << "@" << fullName << "\n"
         << "0;JMP\n";    
 
-    defined_goto.insert(fullName);
+    mDefinedGoto.insert(fullName);
 }
 
 /// <summary>
 /// Writes assembly code that effects the if-goto command.
 /// </summary>
 /// <param name="label">Label name</param>
-void CodeWriter::writeIf(std::string label)
+void CodeWriter::writeIf(const string& label)
 {
-    if (generate_comment)
+    if (mGenerateComment)
     {
-        *output_file << "\n// if-goto " << label << "\n";
+        *mOutputFile << "\n// if-goto " << label << "\n";
     }
 
-    std::string fullName = this->getFullLabelName(label);
+    auto fullName = this->getFullLabelName(label);
 
-    *output_file
+    *mOutputFile
         << stack2DRegister()
         << "@" << fullName << "\n"
         << "D;JNE\n";
     
-    defined_goto.insert(fullName);
+    mDefinedGoto.insert(fullName);
 }
 
 /// <summary>
@@ -268,32 +263,32 @@ void CodeWriter::writeIf(std::string label)
 /// </summary>
 /// <param name="functionName">Function name</param>
 /// <param name="nVars">Count of the function local variables</param>
-void CodeWriter::writeFunction(std::string functionName, int nVars)
+void CodeWriter::writeFunction(const string& functionName, int nVars)
 {
-    if (generate_comment)
+    if (mGenerateComment)
     {
-        *output_file << "\n// function " << functionName << " " << nVars << "\n";
+        *mOutputFile << "\n// function " << functionName << " " << nVars << "\n";
     }
 
     this->setFunctionName(functionName);
 
-    if (defined_labels.count(functionName))
+    if (mDefinedLabels.count(functionName))
     {
-        throw std::runtime_error("Duplicated labels " + functionName);
+        throw VMTranslatorError("Duplicated labels " + functionName);
     }
 
-    *output_file
+    *mOutputFile
         << "(" << functionName << ")\n";
 
     for (int i = 0; i < nVars; i++)
     {
-        *output_file
+        *mOutputFile
             << "@0\n"
             << "D=A\n"
             << DRegister2Stack();
     }
 
-    defined_labels.insert(functionName);
+    mDefinedLabels.insert(functionName);
 }
 
 /// <summary>
@@ -301,18 +296,18 @@ void CodeWriter::writeFunction(std::string functionName, int nVars)
 /// </summary>
 /// <param name="functionName">Function name</param>
 /// <param name="nArgs">Count of the arguments that have been pushed onto the stack before the call</param>
-void CodeWriter::writeCall(std::string functionName, int nArgs)
+void CodeWriter::writeCall(const string& functionName, int nArgs)
 {
-    if (generate_comment)
+    if (mGenerateComment)
     {
-        *output_file << "\n// call " << functionName << " " << nArgs << "\n";
+        *mOutputFile << "\n// call " << functionName << " " << nArgs << "\n";
     }
 
-    std::string returnLabel = functionName + "$ret." + std::to_string(getNumber(functionName));
+    auto returnLabel = functionName + "$ret." + std::to_string(getNumber(functionName));
 
-    if (defined_labels.count(returnLabel))
+    if (mDefinedLabels.count(returnLabel))
     {
-        throw std::runtime_error("Duplicated labels " + returnLabel);
+        throw VMTranslatorError("Duplicated labels " + returnLabel);
     }
 
     const char* callCommand =
@@ -348,15 +343,15 @@ M=D
 (ReturnLabel)
 )";
 
-    std::string callString(callCommand);
-    callString = std::regex_replace(callString, std::regex("ReturnLabel"), returnLabel);
-    callString = std::regex_replace(callString, std::regex("DRegister2Stack"), DRegister2Stack());
-    callString = std::regex_replace(callString, std::regex("nArgs"), std::to_string(nArgs));
-    callString = std::regex_replace(callString, std::regex("FunctionName"), functionName);
+    string callString(callCommand);
+    callString = regex_replace(callString, regex("ReturnLabel"), returnLabel);
+    callString = regex_replace(callString, regex("DRegister2Stack"), DRegister2Stack());
+    callString = regex_replace(callString, regex("nArgs"), to_string(nArgs));
+    callString = regex_replace(callString, regex("FunctionName"), functionName);
     
-    *output_file << callString;
+    *mOutputFile << callString;
 
-    defined_goto.insert(functionName);
+    mDefinedGoto.insert(functionName);
 }
 
 /// <summary>
@@ -364,9 +359,9 @@ M=D
 /// </summary>
 void CodeWriter::writeReturn()
 {
-    if (generate_comment)
+    if (mGenerateComment)
     {
-        *output_file << "\n// return\n";
+        *mOutputFile << "\n// return\n";
     }
 
     const char* returnCommand =
@@ -419,9 +414,9 @@ A=M
 0;JMP
 )";
 
-    std::string returnString(returnCommand);
-    returnString = std::regex_replace(returnString, std::regex("stack2DRegister"), stack2DRegister());
-    *output_file << returnString;
+    string returnString(returnCommand);
+    returnString = regex_replace(returnString, regex("stack2DRegister"), stack2DRegister());
+    *mOutputFile << returnString;
 }
 
 /// <summary>
@@ -429,11 +424,11 @@ A=M
 /// </summary>
 void CodeWriter::validateGotoStatements()
 {
-    for (std::string labelName : defined_goto)
+    for (const auto& labelName : mDefinedGoto)
     {
-        if (!defined_labels.count(labelName))
+        if (!mDefinedLabels.count(labelName))
         {
-            throw std::runtime_error("Label " + labelName + " is not defined.");
+            throw VMTranslatorError("Label " + labelName + " is not defined.");
         }
     }
 }
@@ -450,7 +445,7 @@ M=D
 0;JMP
 (NO_SYSINIT)
 )";
-    *output_file << initCode;
+    *mOutputFile << initCode;
 }
 
 void CodeWriter::finalCode()
@@ -461,11 +456,11 @@ R"(
 @END
 0;JMP
 )";
-    *output_file << finalCommand;
+    *mOutputFile << finalCommand;
 
-    if (defined_labels.count("Sys.init"))
+    if (mDefinedLabels.count("Sys.init"))
     {
-        *output_file << "\n(CHECK_SYSINIT)\n";
+        *mOutputFile << "\n(CHECK_SYSINIT)\n";
         writeCall("Sys.init", 0);
     }
     else
@@ -476,10 +471,10 @@ R"(
 @NO_SYSINIT
 0;JMP
 )";
-        *output_file << sysinitCheck;
+        *mOutputFile << sysinitCheck;
     }
 
-    if (is_comparison_used)
+    if (mIsComparisonUsed)
     {
         const char* comparisonCommand =
 R"(
@@ -499,15 +494,15 @@ DREGISTER_2_STACK
 A=M
 0;JMP
 )";
-        std::string comparisonString = std::string(comparisonCommand);
-        comparisonString = std::regex_replace(comparisonString, std::regex("DREGISTER_2_STACK\n"), DRegister2Stack());
-        *output_file << comparisonString;
+        string comparisonString(comparisonCommand);
+        comparisonString = regex_replace(comparisonString, regex("DREGISTER_2_STACK\n"), DRegister2Stack());
+        *mOutputFile << comparisonString;
     }
 }
 
-void CodeWriter::writeComparisonCommand(std::string comparisonCheck)
+void CodeWriter::writeComparisonCommand(const string& comparisonCheck)
 {
-    is_comparison_used = true;
+    mIsComparisonUsed = true;
 
     const char* comparisonCommand =
 R"(@AFTER_CONDITION
@@ -526,13 +521,13 @@ COMPARISON_CHECK
 0;JMP
 (AFTER_CONDITION)
 )";
-    std::string comparisonString(comparisonCommand);
-    comparisonString = std::regex_replace(comparisonString, std::regex("AFTER_CONDITION"), std::string("AFTER_CONDITION.") + std::to_string(getNumber("AFTER_CONDITION")));
-    comparisonString = std::regex_replace(comparisonString, std::regex("COMPARISON_CHECK"), comparisonCheck);
-    *output_file << comparisonString;
+    string comparisonString(comparisonCommand);
+    comparisonString = regex_replace(comparisonString, regex("AFTER_CONDITION"), string("AFTER_CONDITION.") + to_string(getNumber("AFTER_CONDITION")));
+    comparisonString = regex_replace(comparisonString, regex("COMPARISON_CHECK"), comparisonCheck);
+    *mOutputFile << comparisonString;
 }
 
-void CodeWriter::writeLocalArgThisThat(ECommandType commandType, std::string segmentName, int index)
+void CodeWriter::writeLocalArgThisThat(ECommandType commandType, const string& segmentName, int index)
 {
     if (commandType == ECommandType::C_PUSH)
     {
@@ -543,10 +538,10 @@ D=A
 A=M+D
 D=M
 )";
-        std::string pushString = std::string(pushCommand);
-        pushString = std::regex_replace(pushString, std::regex("INDEX"), std::to_string(index));
-        pushString = std::regex_replace(pushString, std::regex("SEGMENT_NAME"), segmentName);
-        *output_file 
+        string pushString(pushCommand);
+        pushString = regex_replace(pushString, regex("INDEX"), to_string(index));
+        pushString = regex_replace(pushString, regex("SEGMENT_NAME"), segmentName);
+        *mOutputFile 
             << pushString 
             << DRegister2Stack();
     }
@@ -565,10 +560,10 @@ R"(@R13
 A=M
 M=D
 )";
-        std::string popString(address2temp);
-        popString = std::regex_replace(popString, std::regex("INDEX"), std::to_string(index));
-        popString = std::regex_replace(popString, std::regex("SEGMENT_NAME"), segmentName);
-        *output_file 
+        string popString(address2temp);
+        popString = regex_replace(popString, regex("INDEX"), to_string(index));
+        popString = regex_replace(popString, regex("SEGMENT_NAME"), segmentName);
+        *mOutputFile 
             << popString 
             << stack2DRegister() 
             << value2Address;
@@ -579,21 +574,21 @@ void CodeWriter::writePointer(ECommandType commandType, int index)
 {
     if (index != 0 && index != 1)
     {
-        throw std::runtime_error("Unsupported index " + std::to_string(index) + " with pointer segment.");
+        throw VMTranslatorError("Unsupported index " + to_string(index) + " with pointer segment.");
     }
 
     const char* segmentName = index == 0 ? "THIS" : "THAT";
 
     if (commandType == ECommandType::C_PUSH)
     {
-        *output_file
+        *mOutputFile
             << "@" << segmentName << "\n"
             << "D=M\n"
             << DRegister2Stack();
     }
     else if (commandType == ECommandType::C_POP)
     {
-        *output_file
+        *mOutputFile
             << stack2DRegister()
             << "@" << segmentName << "\n"
             << "M=D\n";
@@ -605,19 +600,19 @@ void CodeWriter::writeTemp(ECommandType commandType, int index)
     int tempIndex = 5 + index;
     if (index < 0 || index > 7)
     {
-        throw std::runtime_error("Unsupported index " + std::to_string(index) + " with temp segment.");
+        throw VMTranslatorError("Unsupported index " + to_string(index) + " with temp segment.");
     }
 
     if (commandType == ECommandType::C_PUSH)
     {
-        *output_file
+        *mOutputFile
             << "@R" << tempIndex << "\n"
             << "D=M\n"
             << DRegister2Stack();
     }
     else if (commandType == ECommandType::C_POP)
     {
-        *output_file
+        *mOutputFile
             << stack2DRegister()
             << "@R" << tempIndex << "\n"
             << "M=D\n";
@@ -630,17 +625,17 @@ void CodeWriter::writeConstant(ECommandType commandType, int index)
     {
         if (index < 0 || index > SHRT_MAX)
         {
-            throw std::runtime_error("Unsupported index " + std::to_string(index) + " with 'push constant' command.");
+            throw VMTranslatorError("Unsupported index " + to_string(index) + " with 'push constant' command.");
         }
 
-        *output_file
+        *mOutputFile
             << "@" << index << "\n"
             << "D=A\n"
             << DRegister2Stack();
     }
     else if (commandType == ECommandType::C_POP)
     {
-        throw std::runtime_error("Unsupported command 'pop constant " + std::to_string(index) + "'.");
+        throw VMTranslatorError("Unsupported command 'pop constant " + to_string(index) + "'.");
     }
 }
 
@@ -648,60 +643,59 @@ void CodeWriter::writeStatic(ECommandType commandType, int index)
 {
     if (commandType == ECommandType::C_PUSH)
     {
-        *output_file
-            << "@"<< file_name << "." << index << "\n"
+        *mOutputFile
+            << "@"<< mFileName << "." << index << "\n"
             << "D=M\n"
             << DRegister2Stack();
     }
     else if (commandType == ECommandType::C_POP)
     {
-        *output_file
+        *mOutputFile
             << stack2DRegister()
-            << "@" << file_name << "." << index << "\n"
+            << "@" << mFileName << "." << index << "\n"
             << "M=D\n";
     }
 }
 
-void CodeWriter::setFunctionName(std::string functionName)
+void CodeWriter::setFunctionName(const string& functionName)
 {
-    std::regex functionRegex("[A-z][\\w.]*");
-    std::cmatch match;
-    if (!std::regex_match(functionName.c_str(), match, functionRegex))
+    regex functionRegex("[A-z][\\w.]*");
+    if (cmatch match; !regex_match(functionName.c_str(), match, functionRegex))
     {
-        throw std::runtime_error("Invalid function name format: " + functionName);
+        throw VMTranslatorError("Invalid function name format: " + functionName);
     }
 
-    this->function_name = functionName;
-    this->no_function_defined = false;
+    mFunctionName = functionName;
+    mNoFunctionDefined = false;
 }
 
-std::string CodeWriter::getFullLabelName(std::string label)
+string CodeWriter::getFullLabelName(const string& label) const
 {
-    if (this->no_function_defined)
+    if (mNoFunctionDefined)
     {
-        return default_function_name + "$" + label;
+        return mDefaultFunctionName + "$" + label;
     }
 
-    if (function_name.empty())
+    if (mFunctionName.empty())
     {
-        throw std::runtime_error("Function name is empty.");
+        throw VMTranslatorError("Function name is empty.");
     }
 
-    return function_name + "$" + label;
+    return mFunctionName + "$" + label;
 }
 
-std::string CodeWriter::stack2DRegister()
+string CodeWriter::stack2DRegister() const
 {
-    return std::string(
+    return string(
 R"(@SP
 AM=M-1
 D=M
 )");
 }
 
-std::string CodeWriter::DRegister2Stack()
+string CodeWriter::DRegister2Stack() const
 {
-    return std::string(
+    return string(
 R"(@SP
 A=M
 M=D
@@ -710,16 +704,16 @@ M=M+1
 )");
 }
 
-int CodeWriter::getNumber(std::string label)
+int CodeWriter::getNumber(const string& label)
 {
-    std::unordered_map<std::string, int>::iterator it = counters_map.find(label);
+    auto it = mCountersMap.find(label);
     
     int newValue = 1;
-    if (it != counters_map.end())
+    if (it != mCountersMap.end())
     {
-        newValue = ++it->second;    
+        newValue = ++it->second;
     }
     
-    counters_map.insert_or_assign(label, newValue);
+    mCountersMap.insert_or_assign(label, newValue);
     return newValue;
 }
